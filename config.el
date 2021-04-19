@@ -2,12 +2,27 @@
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
-
+(push `(alpha . ,'(90 . 90))                 default-frame-alist)
+(setq frame-resize-pixelwise t)
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets. It is optional.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.com")
+;; clients, file templates and snippets.
+(setq user-full-name "Luke Yao"
+      user-mail-address "oneTOinf@163.com")
+
+;; configuration for mac shortcuts
+(setq mac-option-modifier  'meta
+      mac-command-modifier 'super)
+(bind-keys ([(super a)] . mark-whole-buffer)
+           ([(super c)] . kill-ring-save)
+           ([(super l)] . goto-line)
+           ([(super q)] . save-buffers-kill-emacs)
+           ([(super s)] . save-buffer)
+           ([(super v)] . yank)
+           ([(super w)] . kill-this-buffer)
+           ([(super z)] . undo)
+           ([(super j)] . +vterm/toggle))
+
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -40,7 +55,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/Documents/Org")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
