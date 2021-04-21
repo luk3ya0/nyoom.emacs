@@ -48,3 +48,14 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+
+(package! valign
+  :recipe (:host github :repo "casouri/valign"
+           :files ("*.el")))
+
+(package! org-fragtog)
+
+(package! org-appear
+  :recipe (:host github :repo "awth13/org-appear"))
+
+(disable-packages! htmlsize org-superstar)

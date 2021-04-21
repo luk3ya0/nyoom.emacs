@@ -65,6 +65,60 @@
 
 (setq org-directory "~/Documents/Org")
 
+(after! org
+  (setq org-archive-location (concat org-directory "roam/archive.org::")
+        org-display-inline-images t
+        org-redisplay-inline-images t
+        org-latex-default-class "ctexart"
+        org-latex-compiler "xelatex"
+        org-startup-with-inline-images "inlineimages"
+        org-startup-with-latex-preview "latexpreview"
+        org-link-elisp-confirm-function nil
+        org-link-frame-setup '((file . find-file))
+        org-preview-latex-default-process 'dvisvgm
+        org-image-actual-width 960
+        org-format-latex-options (plist-put org-format-latex-options :scale 0.85)
+        org-log-done t
+        org-use-property-inheritance t
+        org-confirm-babel-evaluate nil
+        org-list-allow-alphabetical t
+        org-export-with-sub-superscripts nil
+        org-export-headline-levels 5
+        org-export-use-babel t
+        org-use-speed-commands t
+        org-return-follows-link t
+        org-hide-emphasis-markers t
+        org-special-ctrl-a/e t
+        org-special-ctrl-k t
+        org-src-preserve-indentation nil
+        org-fontify-quote-and-verse-blocks t
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-catch-invisible-edits 'smart))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local line-spacing 0.3)))
+
+(use-package! org-appear
+  :after org
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil))
+
+(use-package! valign
+  :after org
+  :diminish
+  :hook
+  (org-mode . valign-mode)
+  :init
+  (setq valign-fancy-bar t))
+
+(use-package! org-fragtog
+  :after org
+  :hook (org-mode . org-fragtog-mode))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
