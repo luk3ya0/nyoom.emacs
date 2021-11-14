@@ -26,10 +26,6 @@
 (eval-when-compile
   (require 'use-package))
 
-(use-package benchmark-init
-  :init (benchmark-init/activate)
-  :hook (after-init . benchmark-init/deactivate))
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
