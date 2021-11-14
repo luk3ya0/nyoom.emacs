@@ -11,3 +11,6 @@
 ;; Packages
 (require 'init-package)
 
+;; OS
+(require 'init-mac)
+

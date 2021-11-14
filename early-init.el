@@ -1,5 +1,3 @@
-;;; Code:
-
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold (* 50 1000 1000))
 
