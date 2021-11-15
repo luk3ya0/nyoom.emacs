@@ -13,3 +13,10 @@
 - [elegant-emacs](https://github.com/rougier/elegant-emacs)
 - [org-inline-images](./lisp/org-inline-image.el)
 - [emacs-svg-icons](https://github.com/rougier/emacs-svg-icon)
+
+### TODO
+
+- [ ] complete each component as minor mode
+- [ ] build a callout mode as minor to org mode
+- [ ] parse gif image temp in storage not memory 
+
