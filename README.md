@@ -19,4 +19,8 @@
 - [ ] complete each component as minor mode
 - [ ] build a callout mode as minor to org mode
 - [ ] parse gif image temp in storage not memory 
+- [ ] add evil mode to help emacs more modal
 
+### Other Tools to help reading
+
+- [orgro](https://github.com/luk3ya0/orgro)
