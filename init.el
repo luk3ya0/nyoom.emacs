@@ -14,3 +14,5 @@
 ;; OS
 (require 'init-mac)
 
+;; Org
+(require 'init-org)
