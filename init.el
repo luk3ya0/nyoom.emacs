@@ -8,6 +8,9 @@
 
 (update-load-path)
 
+;; Package
+(require 'init-package)
+
 ;; OS
 (require 'init-mac)
 
