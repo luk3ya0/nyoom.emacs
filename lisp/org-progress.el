@@ -1,4 +1,5 @@
-(require 'init-svg)
+(require 'svg-lib)
+(require 'svg-tag)
 
 (defvar svg-font-lock-keywords
   `(

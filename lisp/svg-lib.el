@@ -526,9 +526,6 @@ and style elements ARGS."
      (dom-append-child svg child))
    svg))
 
-(provide 'init-svg)
+(provide 'svg-lib)
 ;;; svg-lib.el ends here
 
-
-
-      
