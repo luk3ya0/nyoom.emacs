@@ -40,11 +40,4 @@
               (svg-lib-tag value nil
                            :stroke 0 :margin 0)) :ascent 'center)))
 
-(add-hook 'org-mode-hook
-          (lambda ()
-	    (push 'display font-lock-extra-managed-props)
-            (font-lock-add-keywords nil svg-font-lock-keywords)
-            (font-lock-flush (point-min) (point-max))
-	    ))
-
-(provide 'init-sche)
+(provide 'org-progress)
