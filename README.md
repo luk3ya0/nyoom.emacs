@@ -1,6 +1,6 @@
 ### Basic config for org mode in emacs
 
-<img src="imgs/elegant-dark.png" width="48%"><img src="imgs/elegant-light.png" width="48%">
+<img src="orgs/images/elegant-dark.png" width="48%"><img src="orgs/images/elegant-light.png" width="48%">
 
 
 ### Inspiration
