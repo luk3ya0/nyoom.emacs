@@ -3,8 +3,8 @@
 
 (defvar svg-font-lock-keywords
   `(
-    ("\\:\\([0-9a-zA-Z]+\\)\\:"
-     (0 (list 'face nil 'display (svg-font-lock-tag (match-string 1)))))
+    ;;("\\:\\([0-9a-zA-Z]+\\)\\:"
+    ;; (0 (list 'face nil 'display (svg-font-lock-tag (match-string 1)))))
     ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
      (0 (list 'face nil 'display (svg-font-lock-progress_percent (match-string 1)))))
     ("\\[\\([0-9]+/[0-9]+\\)\\]"
