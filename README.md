@@ -68,7 +68,7 @@ The rest config focus on org mode and other productive tools.
 
 ### Basic config for org mode in emacs
 
-<img src="imgs/elegant-dark.png" width="48%"><img src="imgs/elegant-light.png" width="48%">
+<img src="imgs/show-case-00.png" width="48%"><img src="imgs/show-case-01.png" width="48%">
 
 
 ### Inspiration
