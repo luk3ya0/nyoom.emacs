@@ -31,11 +31,13 @@
 
 (require 'init-basic)
 
+(require 'init-evil)
+
 (require 'init-ui)
 
-(require 'init-org)
+(require 'init-ivy)
 
-(require 'init-evil)
+(require 'init-org)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

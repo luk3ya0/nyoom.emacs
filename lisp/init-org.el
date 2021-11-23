@@ -2,7 +2,7 @@
   (require 'org-appear)
   (require 'org-valign)
   (require 'org-fragtog)
-  (require 'org-progress)
+  ;;(require 'org-progress)
   (require 'org-inline-image)
   (require 'svg-tag)
   (require 'ox)
@@ -23,12 +23,12 @@
 
 (add-hook 'org-mode-hook 'org-fragtog-mode)
 
-(add-hook 'org-mode-hook
-          (lambda ()
-	    (push 'display font-lock-extra-managed-props)
-            (font-lock-add-keywords nil svg-font-lock-keywords)
-            (font-lock-flush (point-min) (point-max))
-	    ))
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;; 	    (push 'display font-lock-extra-managed-props)
+;;             (font-lock-add-keywords nil svg-font-lock-keywords)
+;;             (font-lock-flush (point-min) (point-max))
+;; 	    ))
 
 (add-hook 'org-mode-hook (lambda() (require 'org-inline-image)))
 
