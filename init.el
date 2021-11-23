@@ -29,15 +29,22 @@
 ;; Package
 (require 'init-package)
 
+(require 'init-hydra)
+
 (require 'init-basic)
 
 (require 'init-evil)
 
 (require 'init-ui)
 
+(require 'init-dashboard)
+
 (require 'init-ivy)
 
+(require 'init-company)
+
 (require 'init-org)
+
 (require 'init-markdown)
 
 (custom-set-variables
