@@ -24,7 +24,8 @@
 (push '(menu-bar-lines . 0)                  default-frame-alist)
 (push '(tool-bar-lines . 0)                  default-frame-alist)
 (push '(vertical-scroll-bars)                default-frame-alist)
-(push '(fullscreen . maximized)              default-frame-alist)
+(push '(width  . 121)                        default-frame-alist)
+(push '(height . 64)                         default-frame-alist)
 (push '(internal-border-width . 24)          default-frame-alist)
 (push '(font . "Roboto Mono Light 14")       default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
