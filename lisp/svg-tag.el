@@ -152,6 +152,10 @@ INNER-PADDING, OUTER-PADDING and RADIUS controls the visual aspect of the box."
          (outer-padding   (or outer-padding svg-tag-default-outer-padding))
 
          (text (string-trim text))
+         (text (string-remove-prefix "`" text))
+         (text (string-remove-prefix "(" text))
+         (text (string-remove-suffix "`" text))
+         (text (string-remove-suffix ")" text))
          (tag-width (* (+ (length text) inner-padding) txt-char-width))
          (tag-height (* txt-char-height 0.9))
 
@@ -255,12 +259,12 @@ INNER-PADDING, OUTER-PADDING and RADIUS controls the visual aspect of the box."
   (svg-tag-make (substring text 1 -1) 'svg-tag-org-face 1 1 2))
 
 (setq svg-tag-tags
-      '(("@[0-9a-zA-Z]+:"                       . svg-tag-org)
-        (":TODO:"                               . svg-tag-todo)
-        (":NOTE:"                               . svg-tag-note)
-        ("\([0-9a-zA-Z]\)"                      . svg-tag-round)
-        ("\([0-9a-zA-Z][0-9a-zA-Z]\)"           . svg-tag-quasi-round)
-        ("`[0-9a-zA-Z- ⇥></%⌘^→←↑↓]+?`"         . svg-tag-keyboard)))
+      '(("@[0-9a-zA-Z]+:"                           . svg-tag-org)
+        (":TODO:"                                   . svg-tag-todo)
+        (":NOTE:"                                   . svg-tag-note)
+        (" \([0-9a-zA-Z]\) "                      . svg-tag-round)
+        (" \([0-9a-zA-Z][0-9a-zA-Z]\) "           . svg-tag-quasi-round)
+        (" `[0-9a-zA-Z- ⇥></%⌘^→←↑↓]+?` "         . svg-tag-keyboard)))
 
 (provide 'svg-tag)
 ;; Local Variables:

@@ -1,5 +1,6 @@
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold (* 50 1000 1000))
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.5)
 
 ;; Profile emacs startup
 (add-hook 'emacs-startup-hook
@@ -24,7 +25,6 @@
 (push '(tool-bar-lines . 0)                  default-frame-alist)
 (push '(vertical-scroll-bars)                default-frame-alist)
 (push '(fullscreen . maximized)              default-frame-alist)
-(push '(font . "Roboto Mono Light 14")       default-frame-alist)
 (push '(internal-border-width . 24)          default-frame-alist)
 (push '(font . "Roboto Mono Light 14")       default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

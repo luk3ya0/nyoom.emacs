@@ -1,41 +1,4 @@
-;; -------------------------------------------------------------------
-;; A very minimal but elegant and consistent theme
-;; Copyright 2020 Nicolas P. Rougier
-;; -------------------------------------------------------------------
-;; This file is not part of GNU Emacs.
-;;
-;; This program is free software: you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation, either version 3 of the
-;; License, or (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program. If not, see <http://www.gnu.org/licenses/>
-;; -------------------------------------------------------------------
-
-
 ;; Only necessary for the splash screen mockup
-;; -------------------------------------------------------------------
-(with-eval-after-load 'org
-  (setq org-display-inline-images t)
-  (setq org-redisplay-inline-images t)
-  (setq org-startup-with-inline-images "inlineimages")
-  (setq org-hide-emphasis-markers t)
-  (setq org-confirm-elisp-link-function nil)
-  (setq org-link-frame-setup '((file . find-file))))
-;; -------------------------------------------------------------------
-
-
-;; Font and frame size
-(set-face-font 'default "Roboto Mono Light 14")
-(set-frame-parameter (selected-frame)
-                     'internal-border-width 24)
-
 ;; Line spacing, can be 0 for code and 1 or 2 for text
 (setq-default line-spacing 0)
 
@@ -53,14 +16,11 @@
 (setq visible-bell t)
 (setq ring-bell-function 'ignore)
 
-;; No Tooltips
-(tooltip-mode 0)
-
 ;; Paren mode is part of the theme
 (show-paren-mode t)
 
 ;; No fringe but nice glyphs for truncated and wrapped lines
-(fringe-mode '(0 . 0))
+;;(fringe-mode '(0 . 0))
 (defface fallback '((t :family "Fira Code Light"
                        :inherit 'face-faded)) "Fallback")
 (set-display-table-slot standard-display-table 'truncation
@@ -69,7 +29,6 @@
                         (make-glyph-code ?↩ 'fallback))
 (set-display-table-slot standard-display-table 'selective-display
                         (string-to-vector " …"))
-
 
 ;; When we set a face, we take care of removing any previous settings
 (defun set-face (face style)
@@ -90,50 +49,48 @@
 (setq custom-unlispify-remove-prefixes t)
 
 (defface face-critical nil
-"Critical face is for information that requires immediate action.
-It should be of high constrast when compared to other faces. This
-can be realized (for example) by setting an intense background
-color, typically a shade of red. It must be used scarcely."
-:group 'elegance)
+	 "Critical face is for information that requires immediate action.
+	 It should be of high constrast when compared to other faces. This
+	 can be realized (for example) by setting an intense background
+	 color, typically a shade of red. It must be used scarcely."
+	 :group 'elegance)
 
 (defface face-popout nil
-"Popout face is used for information that needs attention.
-To achieve such effect, the hue of the face has to be
-sufficiently different from other faces such that it attracts
-attention through the popout effect."
-:group 'elegance)
+         "Popout face is used for information that needs attention.
+         To achieve such effect, the hue of the face has to be
+         sufficiently different from other faces such that it attracts
+         attention through the popout effect."
+         :group 'elegance)
 
 (defface face-strong nil
-"Strong face is used for information of a structural nature.
-It has to be the same color as the default color and only the
-weight differs by one level (e.g., light/regular or
-regular/bold). IT is generally used for titles, keywords,
-directory, etc."
-:group 'elegance)
+         "Strong face is used for information of a structural nature.
+         It has to be the same color as the default color and only the
+         weight differs by one level (e.g., light/regular or
+         regular/bold). IT is generally used for titles, keywords,
+         directory, etc."
+         :group 'elegance)
 
 (defface face-salient nil
-"Salient face is used for information that are important.
-To suggest the information is of the same nature but important,
-the face uses a different hue with approximately the same
-intensity as the default face. This is typically used for links."
-
-:group 'elegance)
+         "Salient face is used for information that are important.
+         To suggest the information is of the same nature but important,
+         the face uses a different hue with approximately the same
+         intensity as the default face. This is typically used for links."
+         :group 'elegance)
 
 (defface face-faded nil
-"Faded face is for information that are less important.
-It is made by using the same hue as the default but with a lesser
-intensity than the default. It can be used for comments,
-secondary information and also replace italic (which is generally
-abused anyway)."
-:group 'elegance)
+         "Faded face is for information that are less important.
+         It is made by using the same hue as the default but with a lesser
+         intensity than the default. It can be used for comments,
+         secondary information and also replace italic (which is generally
+         abused anyway)."
+         :group 'elegance)
 
 (defface face-subtle nil
-"Subtle face is used to suggest a physical area on the screen.
-It is important to not disturb too strongly the reading of
-information and this can be made by setting a very light
-background color that is barely perceptible."
-:group 'elegance)
-
+         "Subtle face is used to suggest a physical area on the screen.
+         It is important to not disturb too strongly the reading of
+         information and this can be made by setting a very light
+         background color that is barely perceptible."
+         :group 'elegance)
 
 ;; Mode line (this might be slow because of the "☰" that requires substitution)
 ;; This line below makes things a bit faster
@@ -164,7 +121,6 @@ background color that is barely perceptible."
 (setq-default header-line-format mode-line-format)
 (setq-default mode-line-format'(""))
 
-              
 ;; Vertical window divider
 (setq window-divider-default-right-width 3)
 (setq window-divider-default-places 'right-only)
@@ -290,7 +246,7 @@ background color that is barely perceptible."
     (with-eval-after-load 'cus-edit (set-button-faces)))
 
 ;; Set theme
-(elegance-light)
+(elegance-dark)
 
 ;; Structural
 (set-face 'bold                                          'face-strong)
@@ -452,5 +408,5 @@ background color that is barely perceptible."
   (set-face 'org-verse                                    'face-faded)
   (set-face 'org-warning                                'face-popout))
 
-(provide 'init-elegance)
+(provide 'init-ui)
 
