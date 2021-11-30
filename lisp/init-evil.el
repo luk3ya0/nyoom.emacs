@@ -1,8 +1,8 @@
 (use-package undo-tree
-  :init
-  (global-undo-tree-mode 1))
+  :hook ((evil-mode . global-undo-tree-mode)))
 
 (use-package evil
+  :hook ((after-init . evil-mode))
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
@@ -10,8 +10,8 @@
   (setq evil-want-C-i-jump nil)
   (setq evil-respect-visual-line-mode t)
   (setq evil-undo-system 'undo-tree)
+
   :config
-  (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 

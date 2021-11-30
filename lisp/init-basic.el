@@ -9,6 +9,8 @@
 (global-set-key [(super l)] #'goto-line)
 (global-set-key [(super w)] #'kill-this-buffer)
 (global-set-key [(super z)] #'undo)
+(global-set-key [(super \[)] #'previous-buffer)
+(global-set-key [(super \])] #'next-buffer)
 
 ;; Garbage Collector Magic Hack
 (use-package gcmh

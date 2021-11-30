@@ -1,14 +1,3 @@
-;; Speed up startup
-(setq auto-mode-case-fold nil)
-
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.5)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            "Recover GC values after startup."
-            (setq gc-cons-threshold 800000
-                  gc-cons-percentage 0.1)))
-
 ;; Load path
 ;; Optimize: Force "lisp"" and "site-lisp" at the head to reduce the startup time.
 (defun update-load-path (&rest _)
@@ -29,15 +18,17 @@
 ;; Package
 (require 'init-package)
 
+(require 'init-evil)
+
 (require 'init-hydra)
 
 (require 'init-basic)
 
-(require 'init-evil)
-
 (require 'init-ui)
 
 (require 'init-dashboard)
+
+(require 'init-treemacs)
 
 (require 'init-ivy)
 
@@ -61,3 +52,4 @@
  '(ivy-minibuffer-match-face-1 ((t (:foreground "#8d92af"))))
  '(ivy-posframe ((t (:inherit tooltip))))
  '(ivy-posframe-border ((t (:background "#676E95")))))
+(put 'set-goal-column 'disabled nil)

@@ -1,15 +1,15 @@
+;; Speed up startup
+(setq auto-mode-case-fold nil)
+
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.5)
 
-;; Profile emacs startup
-;;(add-hook 'emacs-startup-hook
-;;          (lambda ()
-;;            (message "*** Emacs loaded in %s with %d garbage collections."
-;;                     (format "%.2f seconds"
-;;                             (float-time
-;;                              (time-subtract after-init-time before-init-time)))
-;;                     gcs-done)))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            "Recover GC values after startup."
+            (setq gc-cons-threshold 800000
+                  gc-cons-percentage 0.1)))
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
@@ -26,7 +26,7 @@
 (push '(vertical-scroll-bars)                default-frame-alist)
 (push '(width  . 121)                        default-frame-alist)
 (push '(height . 64)                         default-frame-alist)
-(push '(internal-border-width . 24)          default-frame-alist)
+(push '(internal-border-width . 39)          default-frame-alist)
 (push '(font . "Roboto Mono Light 14")       default-frame-alist)
 (push `(alpha . ,'(90 . 90))     default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
