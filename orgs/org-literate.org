@@ -40,52 +40,52 @@ access permissions:
 
 #+caption: prelude
 #+begin_src python :session manim_context
-from manim.scene.scene import Scene
-from manim.mobject.geometry import Circle, Square
-from manim.mobject.svg.tex_mobject import Tex
+  from manim.scene.scene import Scene
+  from manim.mobject.geometry import Circle, Square
+  from manim.mobject.svg.tex_mobject import Tex
 
-from manim.animation.creation import Create, Write
-from manim.animation.fading import FadeOut
-from manim.animation.transform import Transform
+  from manim.animation.creation import Create, Write
+  from manim.animation.fading import FadeOut
+  from manim.animation.transform import Transform
 
-from manim.constants import PI
-from manim.utils.color import PINK
+  from manim.constants import PI
+  from manim.utils.color import PINK
 
-from manim._config import config
+  from manim._config import config
 
 
-config.custom_folders = True
-config.save_as_gif = True
-config.background_color = "#0D1118"
-config.frame_rate = 30
-config.frame_size = 1080, 540
-config.video_dir = 'images'
-config.format = "gif"
+  config.custom_folders = True
+  config.save_as_gif = True
+  config.background_color = "#0D1118"
+  config.frame_rate = 30
+  config.frame_size = 1080, 540
+  config.video_dir = 'images'
+  config.format = "gif"
 #+end_src
 
 #+RESULTS:
 
 #+caption: later plot
 #+begin_src python :session manim_context :results file
-config.output_file = "geo-demo.gif"
+  config.output_file = "geo-demo.gif"
 
-class SquareToCircle(Scene):
-    def construct(self):
-        circle = Circle()  # create a circle
-        circle.set_fill(PINK, opacity=0.5)  # set color and transparency
+  class SquareToCircle(Scene):
+      def construct(self):
+	  circle = Circle()  # create a circle
+	  circle.set_fill(PINK, opacity=0.5)  # set color and transparency
 
-        square = Square()  # create a square
-        square.rotate(PI / 4)  # rotate a certain amount
+	  square = Square()  # create a square
+	  square.rotate(PI / 4)  # rotate a certain amount
 
-        self.play(Create(square))  # animate the creation of the square
-        self.play(Transform(square, circle))  # interpolate the square into the circle
-        self.play(FadeOut(square))  # fade out animation
+	  self.play(Create(square))  # animate the creation of the square
+	  self.play(Transform(square, circle))  # interpolate the square into the circle
+	  self.play(FadeOut(square))  # fade out animation
 
-scene = SquareToCircle()
-scene.render()  # That's it!
+  scene = SquareToCircle()
+  scene.render()  # That's it!
 
-fname = "images/geo-demo.gif"
-fname
+  fname = "images/geo-demo.gif"
+  fname
 #+end_src
 
 #+RESULTS:
@@ -93,24 +93,24 @@ fname
 [[file:images/geo-demo.gif]]
 
 #+begin_src python :session manim_context :results file
-config.output_file = "tex-demo.gif"
+  config.output_file = "tex-demo.gif"
 
-class TexDemo(Scene):
-    def construct(self):
-        typesOfText = Tex("""
-            This is a regular text,
-            $\\frac{x}{y}$,
-            $$x^2 + y^2 = a^2$$
-        """)
-        self.play(Write(typesOfText))
-        self.wait(3)
+  class TexDemo(Scene):
+      def construct(self):
+	  typesOfText = Tex("""
+	      This is a regular text,
+	      $\\frac{x}{y}$,
+	      $$x^2 + y^2 = a^2$$
+	  """)
+	  self.play(Write(typesOfText))
+	  self.wait(3)
 
 
-scene = TexDemo()
-scene.render()  # That's it!
+  scene = TexDemo()
+  scene.render()  # That's it!
 
-fname = "images/tex-demo.gif"
-fname
+  fname = "images/tex-demo.gif"
+  fname
 #+end_src
 
 #+RESULTS:

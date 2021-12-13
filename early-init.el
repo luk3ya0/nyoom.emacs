@@ -27,7 +27,7 @@
 (push '(width  . 121)                        default-frame-alist)
 (push '(height . 64)                         default-frame-alist)
 (push '(internal-border-width . 39)          default-frame-alist)
-(push '(font . "Roboto Mono Light 14")       default-frame-alist)
-(push `(alpha . ,'(90 . 90))     default-frame-alist)
+(push '(font . "Roboto Mono Light 15")       default-frame-alist)
+;;(push `(alpha . ,'(90 . 90))     default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; early-init.el ends here

@@ -53,3 +53,20 @@
  '(ivy-posframe ((t (:inherit tooltip))))
  '(ivy-posframe-border ((t (:background "#676E95")))))
 (put 'set-goal-column 'disabled nil)
+
+;; (require 'svg-icon)
+;;
+;; ;; Defining a "string icon"
+;; (setq material-attach (propertize "--"
+;;                       'display (svg-icon "material" "attachment")))
+;;
+;;
+;; ;; Defining a "string icon"
+;; (setq material-sad-face (propertize "--"
+;;                       'display (svg-icon "material" "emoticon-sad-outline" nil nil 2)))
+;;
+;;
+;;
+;; (insert (format "[%s]" material-attach))
+;;
+;; (insert (format "[%s]" material-sad-face))

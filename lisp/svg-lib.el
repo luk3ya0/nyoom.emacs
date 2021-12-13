@@ -67,7 +67,7 @@ to the default face)."
       :margin        1      ;; In chracters
       :stroke        2      ;; In pixels
       :radius        3      ;; In pixels
-      :width         20     ;; In characters
+      :width         30     ;; In characters
       :height        0.90   ;; Ratio of text line height
       :scale         0.75   ;; Icon scaling
 

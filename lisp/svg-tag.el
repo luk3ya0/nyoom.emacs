@@ -262,8 +262,8 @@ INNER-PADDING, OUTER-PADDING and RADIUS controls the visual aspect of the box."
       '(("@[0-9a-zA-Z]+:"                           . svg-tag-org)
         (":TODO:"                                   . svg-tag-todo)
         (":NOTE:"                                   . svg-tag-note)
-        (" \([0-9a-zA-Z]\)"                        . svg-tag-round)
-        (" \([0-9a-zA-Z][0-9a-zA-Z]\)"             . svg-tag-quasi-round)
+        ;;(" \([0-9a-zA-Z]\)"                        . svg-tag-round)
+        ;;(" \([0-9a-zA-Z][0-9a-zA-Z]\)"             . svg-tag-quasi-round)
         (" `[0-9a-zA-Z- ⇥></%⌘^→←↑↓]+?`"         . svg-tag-keyboard)))
 
 (provide 'svg-tag)
