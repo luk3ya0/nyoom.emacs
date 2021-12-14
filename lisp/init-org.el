@@ -4,8 +4,6 @@
   (require 'org-fragtog)
   (require 'org-progress)
   (require 'org-inline-image)
-  (require 'svg-tag)
-  (require 'svg-icon)
   (require 'ox)
   (setq org-adapt-indentation nil)
   (setq valign-fancy-bar 1)
@@ -34,8 +32,6 @@
 	    ))
 
 (add-hook 'org-mode-hook (lambda() (require 'org-inline-image)))
-
-(add-hook 'org-mode-hook 'svg-tag-mode)
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."

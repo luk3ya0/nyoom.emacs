@@ -23,11 +23,15 @@
 ;; Faster to disable these here (before they've been initialized)
 (push '(menu-bar-lines . 0)                  default-frame-alist)
 (push '(tool-bar-lines . 0)                  default-frame-alist)
-(push '(vertical-scroll-bars)                default-frame-alist)
+(push '(vertical-scroll-bars . nil)          default-frame-alist)
 (push '(width  . 121)                        default-frame-alist)
+(push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 64)                         default-frame-alist)
-(push '(internal-border-width . 39)          default-frame-alist)
+(push '(min-height . 1)                      default-frame-alist)
+(push '(internal-border-width . 24)          default-frame-alist)
 (push '(font . "Roboto Mono Light 15")       default-frame-alist)
+(push '(left-fringe    . 1)                  default-frame-alist)  
+(push '(right-fringe   . 1)                  default-frame-alist)
 ;;(push `(alpha . ,'(90 . 90))     default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; early-init.el ends here

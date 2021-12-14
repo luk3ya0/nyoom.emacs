@@ -38,6 +38,12 @@
 
 (require 'init-markdown)
 
+;; (set-fontset-font t '(#xe903 . #xfffd) "all-the-icons")
+;; (set-fontset-font t '(#x00a2 . #xf17b) "file-icons")
+;; (set-fontset-font t '(#x2665 . #xf27c) "github-octicons")
+;; (set-fontset-font t '(#x2122 . #xf4a4) "FontAwesome")
+;; (set-fontset-font t '(#xf000 . #xf0eb) "Weather Icons")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -53,20 +59,3 @@
  '(ivy-posframe ((t (:inherit tooltip))))
  '(ivy-posframe-border ((t (:background "#676E95")))))
 (put 'set-goal-column 'disabled nil)
-
-;; (require 'svg-icon)
-;;
-;; ;; Defining a "string icon"
-;; (setq material-attach (propertize "--"
-;;                       'display (svg-icon "material" "attachment")))
-;;
-;;
-;; ;; Defining a "string icon"
-;; (setq material-sad-face (propertize "--"
-;;                       'display (svg-icon "material" "emoticon-sad-outline" nil nil 2)))
-;;
-;;
-;;
-;; (insert (format "[%s]" material-attach))
-;;
-;; (insert (format "[%s]" material-sad-face))
