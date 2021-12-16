@@ -1,6 +1,9 @@
 Org Literate Programming
 
-* Supported features
+* Supported features                                             :EMACS:JAVA:
+:PROPERTIES:
+:CUSTOM_ID: supported-features
+:END:
 
 Org in my doom config can understand the following Org Mode features:
 
@@ -31,14 +34,17 @@ Math in LaTeX markup is supported as both inline ($$ a^2 + b^2 $$) and block:
 - ~code~
 - =verbatim=
   
-** Images
+** TODO Images
 
 Images referenced by relative paths can be displayed when Orgro has the required
 access permissions:
 
 *** animate
+:PROPERTIES:
+:CUSTOM_ID: animate
+:END:
 
-#+caption: prelude
+**** prelude
 #+begin_src python :session manim_context
   from manim.scene.scene import Scene
   from manim.mobject.geometry import Circle, Square
@@ -65,7 +71,7 @@ access permissions:
 
 #+RESULTS:
 
-#+caption: later plot
+**** later plot
 #+begin_src python :session manim_context :results file
   config.output_file = "geo-demo.gif"
 
@@ -147,7 +153,8 @@ fname
 #+ATTR_ORG: :width 540
 [[file:images/matplot.png]]
 
-** TODO Inbox [2/3]
+** DONE Inbox [2/3]
+
 - [X] eggs
 - [ ] milk
 - [X] corn
@@ -171,4 +178,11 @@ fname
 ;; ------------------------------------------------------------------------
 ;; (1) (2) (3) (4) (5) (Z) (W) (12) (99)
 ;; ------------------------------------------------------------------------
+
+* Level 1                                                    :INTENT:EXTRA:TYPESCRIPT:
+** Level 2                                                   :PROBLEM:CODE:PYTHON:
+*** Level 3                                                  :SOLUTION:BALANCE:GO:
+**** Level 4                                                 :STRUCTURE:CONS:JAVA:
+***** Level 5                                                :PSEUDO:PROS:RUST:
+****** Level 6                                               :APP:BUG:BOLT:
 

@@ -48,4 +48,9 @@
          ("s--"   . default-text-scale-decrease)
          ("s-0"   . default-text-scale-reset)))
 
+;; load custom file at last
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 (provide 'init-basic)

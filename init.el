@@ -43,19 +43,3 @@
 ;; (set-fontset-font t '(#x2665 . #xf27c) "github-octicons")
 ;; (set-fontset-font t '(#x2122 . #xf4a4) "FontAwesome")
 ;; (set-fontset-font t '(#xf000 . #xf0eb) "Weather Icons")
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(markdown-toc grip-mode f use-package dash)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ivy-minibuffer-match-face-1 ((t (:foreground "#8d92af"))))
- '(ivy-posframe ((t (:inherit tooltip))))
- '(ivy-posframe-border ((t (:background "#676E95")))))
-(put 'set-goal-column 'disabled nil)

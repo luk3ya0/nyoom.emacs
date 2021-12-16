@@ -12,6 +12,7 @@
   (setq org-redisplay-inline-images t)
   (setq org-startup-with-inline-images "inlineimages")
   (setq org-startup-with-latex-preview "latexpreview")
+  (setq org-ellipsis " -❮")
   (setq org-hide-emphasis-markers t)
   (setq org-confirm-elisp-link-function nil)
   (setq org-link-frame-setup '((file . find-file)))
