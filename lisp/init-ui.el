@@ -8,7 +8,7 @@
 
 ;; Theme
 (use-package doom-themes
-  :init (load-theme 'doom-tomorrow-day t))
+  :init (load-theme 'doom-xcode t))
 
 ;; Icons
 ;; NOTE: Must run `M-x all-the-icons-install-fonts', and install fonts manually on Windows

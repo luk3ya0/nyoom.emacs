@@ -6,10 +6,10 @@
       gc-cons-percentage 0.5)
 
 (add-hook 'emacs-startup-hook
-          (lambda ()
-            "Recover GC values after startup."
-            (setq gc-cons-threshold 800000
-                  gc-cons-percentage 0.1)))
+	  (lambda ()
+	    "Recover GC values after startup."
+	    (setq gc-cons-threshold 800000
+		  gc-cons-percentage 0.1)))
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
@@ -19,6 +19,7 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message           t)
 (setq initial-scratch-message           nil)
+(setq-default line-spacing              0.3)
 
 ;; Faster to disable these here (before they've been initialized)
 (push '(menu-bar-lines . 0)                  default-frame-alist)
@@ -30,7 +31,7 @@
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 24)          default-frame-alist)
 (push '(font . "Roboto Mono Light 15")       default-frame-alist)
-(push '(left-fringe    . 1)                  default-frame-alist)  
+(push '(left-fringe    . 1)                  default-frame-alist)
 (push '(right-fringe   . 1)                  default-frame-alist)
 ;;(push `(alpha . ,'(90 . 90))     default-frame-alist)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

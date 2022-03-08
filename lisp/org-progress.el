@@ -16,6 +16,8 @@
      (0 (list 'face nil 'display (svg-font-lock-simple (match-string 1) "gnuemacs"))))
     ("DESIGN"
      (0 (list 'face nil 'display (svg-font-lock-material (match-string 1) "puzzle-outline"))))
+    ("AUDIO"
+     (0 (list 'face nil 'display (svg-font-lock-material (match-string 1) "volume-high"))))
     ("INTENT"
      (0 (list 'face nil 'display (svg-font-lock-material (match-string 1) "comment-processing-outline"))))
     ("PROBLEM"
