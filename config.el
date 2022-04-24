@@ -76,7 +76,6 @@
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
         org-preview-latex-default-process 'dvisvgm
-        org-image-actual-width 960
         org-format-latex-options (plist-put org-format-latex-options :scale 0.85)
         org-log-done t
         org-use-property-inheritance t
