@@ -126,7 +126,7 @@
 (use-package! org-ol-tree
   :init
   (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 14 :bold nil :foreground "red"))
+    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
     "Face used by org-ol-tree to display the root node."
     :group 'org-ol-tree-faces)
 
