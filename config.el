@@ -24,7 +24,6 @@
            ([(super z)] . undo)
            ([(super j)] . +vterm/toggle))
 
-
 ;; ui
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -47,7 +46,8 @@
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
 (setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font (font-spec :family "Fira Code" )
-      doom-variable-pitch-font (font-spec :family "PingFang SC")
+      ;; doom-variable-pitch-font (font-spec :family "PingFang SC")
+      doom-variable-pitch-font (font-spec :family "Fira Code" :size 14)
       doom-unicode-font (font-spec :family "PingFang SC"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -100,7 +100,8 @@
 
 (add-hook 'org-mode-hook
           (lambda ()
-            (setq-local line-spacing 0.3)))
+            (setq-local line-spacing 0.3)
+            (flycheck-mode -1)))
 
 (use-package! org-appear
   :after org
@@ -123,6 +124,28 @@
   :hook (org-mode . org-fragtog-mode))
 
 (use-package! org-ol-tree
+  :init
+  (defface org-ol-tree-document-face
+    '((t :family "Fira Code" :size 14 :bold nil :foreground "red"))
+    "Face used by org-ol-tree to display the root node."
+    :group 'org-ol-tree-faces)
+
+  (defface org-ol-tree-section-title-face
+    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
+    "Face used by org-ol-tree to display section titles."
+    :group 'org-ol-tree-faces)
+
+  (defface org-ol-tree-section-id-face
+    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
+    "Face used by org-ol-tree to display section titles."
+    :group 'org-ol-tree-faces)
+
+  :config
+  (setq org-ol-tree-ui-window-max-width 0.4
+        org-ol-tree-ui-window-min-width 0.4
+        org-ol-tree-action-move-to-target t
+        org-ol-tree-ui-window-auto-resize nil)
+
   :commands org-ol-tree)
 
 (map! :map org-mode-map
@@ -163,6 +186,9 @@
 ;; they are implemented.
 
 ;; editor > snippets
+(with-eval-after-load 'flycheck
+  (setq-default flycheck-disabled-checkers '(org-mode)))
+
 (use-package doom-snippets
   :load-path "~/.doom.d/editors/snippets"
   :after yasnippet)
@@ -225,8 +251,8 @@
   (define-key evil-normal-state-map (kbd "s-]") 'next-buffer)
   (define-key evil-normal-state-map (kbd "s-f") 'cycle-format)
   (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
-  ;;(define-key evil-normal-state-map (kbd "C-n") 'normal-next-line)
-  ;;(define-key evil-normal-state-map (kbd "C-p") 'normal-previous-line)
+  (define-key evil-normal-state-map (kbd "C-n") 'normal-next-line)
+  (define-key evil-normal-state-map (kbd "C-p") 'normal-previous-line)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -279,3 +305,24 @@
 
   (evil-define-key 'visual global-map
     (kbd "/") 'wrap-with-italic))
+
+;; lang
+(add-hook 'go-mode-hook
+          (lambda ()
+            (setq-local line-spacing 0.3)
+            (flycheck-mode -1)))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq-local line-spacing 0.3)
+            (flycheck-mode -1)))
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq-local line-spacing 0.3)
+            (flycheck-mode -1)))
+
+(add-hook 'lua-mode-hook
+          (lambda ()
+            (setq-local line-spacing 0.3)
+            (flycheck-mode -1)))
