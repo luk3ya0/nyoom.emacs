@@ -5,6 +5,7 @@
 (push `(alpha . ,'(90 . 90))                 default-frame-alist)
 (setq frame-resize-pixelwise t)
 
+;; private information
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "Luke Yao"
@@ -24,6 +25,7 @@
            ([(super j)] . +vterm/toggle))
 
 
+;; ui
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
 ;; - `doom-font' -- the primary font to use
@@ -63,6 +65,7 @@
           (lambda ()
             (setq-local line-spacing 0.3)))
 
+;;specialize for org mode
 (setq org-directory "~/Documents/Org")
 
 (after! org
@@ -121,6 +124,7 @@
 
 (use-package! org-ol-tree
   :commands org-ol-tree)
+
 (map! :map org-mode-map
       :after org
       :localleader
@@ -157,6 +161,11 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;; editor > snippets
+(use-package doom-snippets
+  :load-path "~/.doom.d/editors/snippets"
+  :after yasnippet)
 
 (with-eval-after-load 'evil
   (defun normal-next-line()
