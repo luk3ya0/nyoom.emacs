@@ -2,19 +2,6 @@
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
-;; (push `(alpha . ,'(90 . 90))                 default-frame-alist)
-
-(set-face-background 'default "mac:windowBackgroundColor")
-
-(dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
-
-(setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
-
-(defface my/default-blurred
-   '((t :inherit 'default :stipple "alpha:30%"))
-   "Like 'default but blurred."
-   :group 'my)
-
 (setq frame-resize-pixelwise t)
 
 ;; private information
@@ -56,10 +43,10 @@
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
-(setq doom-font (font-spec :family "Fira Code" :size 15)
+(setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font (font-spec :family "Fira Code" )
       ;; doom-variable-pitch-font (font-spec :family "PingFang SC")
-      doom-variable-pitch-font (font-spec :family "Fira Code" :size 15)
+      doom-variable-pitch-font (font-spec :family "Fira Code" :size 14)
       doom-unicode-font (font-spec :family "PingFang SC"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
