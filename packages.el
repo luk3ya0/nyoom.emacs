@@ -49,6 +49,7 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;;(unpin! t)
 
+;; org-mode
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
@@ -62,3 +63,8 @@
   :pin "207c748aa5fea8626be619e8c55bdb1c16118c25")
 
 (disable-packages! htmlsize org-superstar)
+
+;; editor
+(package! scroll-on-jump
+  :recipe ( :host gitlab
+   :repo "ideasman42/emacs-scroll-on-jump"))
