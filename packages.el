@@ -68,3 +68,5 @@
 (package! scroll-on-jump
   :recipe ( :host gitlab
    :repo "ideasman42/emacs-scroll-on-jump"))
+
+(package! nov)
