@@ -2,17 +2,13 @@
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
-(setq frame-resize-pixelwise t)
 
-;; private information
+
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets.
+;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Luke Yao"
       user-mail-address "oneTOinf@163.com")
 
-;; configuration for mac shortcuts
-(setq mac-option-modifier  'meta
-      mac-command-modifier 'super)
 (bind-keys ([(super a)] . mark-whole-buffer)
            ([(super c)] . kill-ring-save)
            ([(super l)] . goto-line)
@@ -23,7 +19,6 @@
            ([(super z)] . undo)
            ([(super j)] . +vterm/toggle))
 
-;; ui
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
 ;; - `doom-font' -- the primary font to use
@@ -38,21 +33,18 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq doom-unicode-font (font-spec :family "PingFang SC" :size 24))
+(setq doom-font (font-spec :family "Fira Code" :size 24 :weight 'semi-light))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
-(setq doom-font (font-spec :family "Fira Code" :size 14)
-      doom-serif-font (font-spec :family "Fira Code" )
-      ;; doom-variable-pitch-font (font-spec :family "PingFang SC")
-      doom-variable-pitch-font (font-spec :family "Fira Code" :size 14)
-      doom-unicode-font (font-spec :family "PingFang SC"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-smoooooth)
+(setq doom-theme 'doom-one-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -64,7 +56,6 @@
           (lambda ()
             (setq-local line-spacing 0.3)))
 
-;;specialize for org mode
 (setq org-directory "~/Documents/Org")
 
 (after! org
@@ -97,61 +88,6 @@
         org-fontify-done-headline t
         org-catch-invisible-edits 'smart))
 
-(add-hook 'org-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(use-package! org-appear
-  :after org
-  :hook (org-mode . org-appear-mode)
-  :config
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks nil))
-
-(use-package! valign
-  :after org
-  :diminish
-  :hook
-  (org-mode . valign-mode)
-  :init
-  (setq valign-fancy-bar t))
-
-(use-package! org-fragtog
-  :after org
-  :hook (org-mode . org-fragtog-mode))
-
-(use-package! org-ol-tree
-  :init
-  (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
-    "Face used by org-ol-tree to display the root node."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-title-face
-    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-id-face
-    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  :config
-  (setq org-ol-tree-ui-window-max-width 0.4
-        org-ol-tree-ui-window-min-width 0.4
-        org-ol-tree-action-move-to-target t
-        org-ol-tree-ui-window-auto-resize nil)
-
-  :commands org-ol-tree)
-
-(map! :map org-mode-map
-      :after org
-      :localleader
-      :desc "Outline" "O" #'org-ol-tree)
-
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -183,165 +119,3 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-
-;; editor > snippets
-(with-eval-after-load 'flycheck
-  (setq-default flycheck-disabled-checkers '(org-mode)))
-
-(use-package doom-snippets
-  :load-path "~/.doom.d/editors/snippets"
-  :after yasnippet)
-
-(with-eval-after-load 'evil
-  (defun normal-next-line()
-    (interactive)
-    (forward-line 1))
-
-  (defun normal-previous-line()
-    (interactive)
-    (forward-line -1))
-
-  (defun emit-ocr ()
-    (interactive)
-    (insert (shell-command-to-string "/opt/homebrew/bin/ocr")))
-
-  (defun emit-ocr-trim ()
-    (interactive)
-    (insert (string-trim (shell-command-to-string "/opt/homebrew/bin/ocr"))))
-
-  (defun cycle-format ()
-    (interactive)
-    (evil-beginning-of-line)
-    (org-cycle))
-
-  (defun quickb ()
-    (interactive)
-    (evil-visual-char nil nil 'inclusive t)
-    (evil-forward-word-end nil)
-    (let ((beg (region-beginning)) (end (region-end)))
-      (goto-char beg)
-      (insert "*")
-      (goto-char (+ end 2))
-      (insert "*")))
-
-  (defun quickv ()
-    (interactive)
-    (evil-visual-char nil nil 'inclusive t)
-    (evil-forward-word-end nil)
-    (evil-forward-char)
-    (evil-forward-char)
-    (let ((beg (region-beginning)) (end (region-end)))
-      (goto-char beg)
-      (insert "=")
-      (goto-char (+ end 2))
-      (insert "=")))
-
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-  (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
-  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
-  (define-key evil-insert-state-map (kbd "C-n") 'next-line)
-  (define-key evil-insert-state-map (kbd "C-p") 'previous-line)
-  (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
-  (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
-  (define-key evil-normal-state-map (kbd "s-b") 'quickb)
-  (define-key evil-normal-state-map (kbd "s-=") 'quickv)
-  (define-key evil-normal-state-map (kbd "s-[") 'previous-buffer)
-  (define-key evil-normal-state-map (kbd "s-]") 'next-buffer)
-  (define-key evil-normal-state-map (kbd "s-f") 'cycle-format)
-  (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
-  (define-key evil-normal-state-map (kbd "C-n") 'normal-next-line)
-  (define-key evil-normal-state-map (kbd "C-p") 'normal-previous-line)
-
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-
-  (evil-define-operator wrap-with-parens (beg end)
-    (goto-char beg)
-    (insert "(")
-    (goto-char (1+ end))
-    (insert ")"))
-
-  (evil-define-key 'visual global-map
-    (kbd "(") 'wrap-with-parens)
-
-  (evil-define-operator wrap-with-bold (beg end)
-    (goto-char beg)
-    (insert "*")
-    (goto-char (1+ end))
-    (insert "*"))
-
-  (evil-define-key 'visual global-map
-    (kbd "*") 'wrap-with-bold)
-
-  (evil-define-operator wrap-with-verbatim (beg end)
-    (goto-char beg)
-    (insert "=")
-    (goto-char (1+ end))
-    (insert "="))
-
-  (evil-define-key 'visual global-map
-    (kbd "=") 'wrap-with-verbatim)
-
-  (evil-define-operator wrap-with-code (beg end)
-    (goto-char beg)
-    (insert "~")
-    (goto-char (1+ end))
-    (insert "~"))
-
-  (evil-define-key 'visual global-map
-    (kbd "~") 'wrap-with-code)
-
-  (evil-define-operator wrap-with-italic (beg end)
-    (goto-char beg)
-    (insert "/")
-    (goto-char (1+ end))
-    (insert "/"))
-
-  (evil-define-key 'visual global-map
-    (kbd "/") 'wrap-with-italic)
-
-  ;; scroll-on-jump
-  (scroll-on-jump-advice-add evil-undo)
-  (scroll-on-jump-advice-add evil-redo)
-  (scroll-on-jump-advice-add evil-jump-item)
-  (scroll-on-jump-advice-add evil-jump-forward)
-  (scroll-on-jump-advice-add evil-jump-backward)
-  (scroll-on-jump-advice-add evil-ex-search-next)
-  (scroll-on-jump-advice-add evil-ex-search-previous)
-  (scroll-on-jump-advice-add evil-forward-paragraph)
-  (scroll-on-jump-advice-add evil-backward-paragraph)
-  (scroll-on-jump-advice-add evil-goto-mark)
-
-  ;; Actions that themselves scroll.
-  (scroll-on-jump-with-scroll-advice-add evil-goto-line)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-down)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-up)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
-  (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
-
-;; lang
-(add-hook 'go-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'python-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'java-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'lua-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))

@@ -1,3 +1,0 @@
-[submodule "editors/snippets"]
-	path = editors/snippets
-	url = https://github.com/doomemacs/snippets.git
