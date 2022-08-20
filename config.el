@@ -6,8 +6,13 @@
 (push '(min-height . 1)                      default-frame-alist)
 (push '(left-fringe    . 29)                 default-frame-alist)
 (push '(right-fringe   . 29)                 default-frame-alist)
-(push '(internal-border-width . 24)          default-frame-alist)
+(push '(internal-border-width . 14)          default-frame-alist)
 (push `(alpha . ,'(95 . 95))                 default-frame-alist)
+
+(set-face-background 'default "mac:windowBackgroundColor")
+
+(set-face-stipple 'default "alpha:30%")
+
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
@@ -41,8 +46,8 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq doom-unicode-font (font-spec :family "PingFang SC" :size 24))
-(setq doom-font (font-spec :family "Fira Code" :size 26 :weight 'semi-light))
+(setq doom-unicode-font (font-spec :family "PingFang SC" :size 14))
+(setq doom-font (font-spec :family "Fira Code" :size 14 :weight 'semi-light))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
