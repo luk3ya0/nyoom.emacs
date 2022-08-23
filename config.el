@@ -11,7 +11,14 @@
 
 (set-face-background 'default "mac:windowBackgroundColor")
 
-(set-face-stipple 'default "alpha:30%")
+(dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
+
+(setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
+
+(defface my/default-blurred
+   '((t :inherit 'default :stipple "alpha:30%"))
+   "Like 'default but blurred."
+   :group 'my)
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -104,10 +111,11 @@
         org-fontify-quote-and-verse-blocks t
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-catch-invisible-edits 'smart))
+        org-fold-catch-invisible-edits 'smart))
 
 (add-hook 'org-mode-hook
           (lambda ()
+            (visual-line-mode 1)
             (setq-local line-spacing 0.3)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
@@ -194,7 +202,7 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; editor > snippets
+;;; editor > snippets
 (with-eval-after-load 'flycheck
   (setq-default flycheck-disabled-checkers '(org-mode)))
 
@@ -355,28 +363,3 @@
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
 
-;; lang
-(add-hook 'go-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'python-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'java-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(add-hook 'lua-mode-hook
-          (lambda ()
-            (setq-local line-spacing 0.3)
-            (flycheck-mode -1)))
-
-(use-package! pyvenv
-  :ensure t
-  :config
-  (pyvenv-mode 1))
