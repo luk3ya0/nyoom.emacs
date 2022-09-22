@@ -54,6 +54,10 @@
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
 
+(package! ftable
+  :recipe (:host github :repo "casouri/ftable"
+           :files ("*.el")))
+
 (package! org-fragtog)
 
 (package! org-appear

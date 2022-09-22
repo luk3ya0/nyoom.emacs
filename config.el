@@ -9,16 +9,16 @@
 (push '(internal-border-width . 14)          default-frame-alist)
 (push `(alpha . ,'(95 . 95))                 default-frame-alist)
 
-(set-face-background 'default "mac:windowBackgroundColor")
+;; (set-face-background 'default "mac:windowBackgroundColor")
 
-(dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
+;; (dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
 
-(setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
+;; (setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
 
-(defface my/default-blurred
-   '((t :inherit 'default :stipple "alpha:30%"))
-   "Like 'default but blurred."
-   :group 'my)
+;; (defface my/default-blurred
+;;    '((t :inherit 'default :stipple "alpha:30%"))
+;;    "Like 'default but blurred."
+;;    :group 'my)
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -64,7 +64,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-smoooooth-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -82,19 +82,21 @@
 (after! org
   (org-link-set-parameters "file"
                            :face 'org-link-green)
-
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-display-inline-images t
         org-redisplay-inline-images t
         org-image-actual-width nil
         org-latex-default-class "ctexart"
         org-latex-compiler "xelatex"
-        org-startup-with-inline-images "inlineimages"
-        org-startup-with-latex-preview "latexpreview"
+        ;; org-startup-with-inline-images "inlineimages"
+        org-startup-with-inline-images nil
+        org-startup-with-latex-preview nil
+        ;; org-startup-with-latex-preview "latexpreview"
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
         org-preview-latex-default-process 'dvisvgm
-        org-format-latex-options (plist-put org-format-latex-options :scale 0.85)
+        org-format-latex-options (plist-put org-format-latex-options :scale 0.9)
+
         org-log-done t
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
@@ -116,13 +118,13 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (visual-line-mode 1)
-            (setq-local line-spacing 0.3)
+            (setq-local line-spacing 5)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
 (use-package! org-appear
   :after org
-  :hook (org-mode . org-appear-mode)
+  ;; :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
@@ -135,6 +137,12 @@
   (org-mode . valign-mode)
   :init
   (setq valign-fancy-bar t))
+
+(use-package! ftable
+  :after org
+  :diminish
+  :init
+  (setq ftable-fill-column 10))
 
 (use-package! org-fragtog
   :after org
@@ -241,8 +249,13 @@
 
   (defun cycle-format ()
     (interactive)
-    (evil-beginning-of-line)
-    (org-cycle))
+    (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)
+    (save-buffer)
+    ;; (evil-beginning-of-line)
+    ;; (org-cycle)
+    )
 
   (defun quickb ()
     (interactive)
