@@ -27,7 +27,7 @@
 }
 
 .block-body dl > li, .block-body ol > li, .block-body ul > li {
-    margin: 1em 0px;
+    margin: 0;
 }
 
 .block-body .is-paragraph:first-child {
