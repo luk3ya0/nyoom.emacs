@@ -30,6 +30,10 @@
     margin-top: 1em;
 }
 
+.block-body ol > li:first-child {
+    margin-top: 0;
+}
+
 .block-body ul > li {
     margin: 0;
 }
