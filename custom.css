@@ -39,7 +39,7 @@
 }
 
 li > p {
-    line-height: 2;
+    line-height: 2 !important;
 }
 
 .block-body .is-paragraph:first-child {
