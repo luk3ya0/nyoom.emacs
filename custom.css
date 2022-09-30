@@ -38,6 +38,10 @@
     margin: 0;
 }
 
+li > p {
+    line-height: 2;
+}
+
 .block-body .is-paragraph:first-child {
     margin-top: 1em;
 }
