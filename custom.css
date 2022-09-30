@@ -36,9 +36,6 @@
 
 .block-body ul > li {
     margin: 0;
-}
-
-li > p {
     line-height: 2 !important;
 }
 
