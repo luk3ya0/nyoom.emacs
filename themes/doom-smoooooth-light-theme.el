@@ -126,7 +126,7 @@ Can be an integer to determine the exact padding."
   ;;;; Base theme face overrides
   (((font-lock-comment-face &override)
     :background (if doom-smoooooth-light-brighter-comments base0))
-   ((font-lock-doc-face &override) :slant 'italic)
+   ((font-lock-doc-face &override))
    ((line-number &override) :foreground (doom-lighten base4 0.15))
    ((line-number-current-line &override) :foreground base8)
    (mode-line
@@ -170,8 +170,8 @@ Can be an integer to determine the exact padding."
    ((outline-1 &override) :foreground red)
    ((outline-2 &override) :foreground orange)
    ;;;; org <built-in>
-   ((org-block &override) :background base1)
-   ((org-block-begin-line &override) :foreground fg :slant 'italic)
+   ((org-block &override) :background bg)
+   ((org-block-begin-line &override) :foreground fg)
    (org-ellipsis :underline nil :background bg     :foreground red)
    ((org-quote &override) :background base1)
    ;;;; posframe

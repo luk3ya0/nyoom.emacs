@@ -53,8 +53,8 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq doom-unicode-font (font-spec :family "PingFang SC" :size 14))
-(setq doom-font (font-spec :family "Fira Code" :size 14 :weight 'semi-light))
+(setq doom-unicode-font (font-spec :family "PingFang SC" :size 15))
+(setq doom-font (font-spec :family "Fira Code" :size 15 :weight 'semi-light))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -151,17 +151,17 @@
 (use-package! org-ol-tree
   :init
   (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
+    '((t :family "Fira Code" :size 15 :bold nil :foreground "#59B0CF"))
     "Face used by org-ol-tree to display the root node."
     :group 'org-ol-tree-faces)
 
   (defface org-ol-tree-section-title-face
-    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
+    '((t :inherit font-lock-doc-face :family "Fira Code" :size 15))
     "Face used by org-ol-tree to display section titles."
     :group 'org-ol-tree-faces)
 
   (defface org-ol-tree-section-id-face
-    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
+    '((t :inherit treemacs-file-face :family "Fira Code" :size 15))
     "Face used by org-ol-tree to display section titles."
     :group 'org-ol-tree-faces)
 
