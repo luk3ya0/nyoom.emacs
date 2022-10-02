@@ -7,7 +7,7 @@
 (push '(left-fringe    . 29)                 default-frame-alist)
 (push '(right-fringe   . 29)                 default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
-(push `(alpha . ,'(95 . 95))                 default-frame-alist)
+;; (push `(alpha . ,'(95 . 95))                 default-frame-alist)
 
 ;; (set-face-background 'default "mac:windowBackgroundColor")
 
@@ -231,9 +231,11 @@
 
   (defun what-face ()
     (interactive)
-    (let ((face (or (get-char-property (point) 'read-face-name)
-                    (get-char-property (point) 'face))))
-      (if face (message "Face: %s" face) (message "No face at %d" (point)))))
+    (message "char-after: %s" (char-after)))
+    ;; (message "thing at point: %s" (thing-at-point 'symbol)))
+    ;; (let ((face (or (get-char-property (point) 'read-face-name)
+    ;;                 (get-char-property (point) 'face))))
+    ;;   (if face (message "Face: %s" face) (message "No face at %d" (point)))))
 
   (defun normal-previous-line()
     (interactive)
@@ -259,25 +261,29 @@
 
   (defun quickb ()
     (interactive)
-    (evil-visual-char nil nil 'inclusive t)
-    (evil-forward-word-end nil)
-    (let ((beg (region-beginning)) (end (region-end)))
+    (let (beg end)
+      (setq beg (point))
+      (while (not (equal (char-after) 32))
+        (evil-forward-char))
+      (setq end (- (point) 1))
       (goto-char beg)
       (insert "*")
       (goto-char (+ end 2))
-      (insert "*")))
+      (insert "*")
+      ))
 
   (defun quickv ()
     (interactive)
-    (evil-visual-char nil nil 'inclusive t)
-    (evil-forward-word-end nil)
-    (evil-forward-char)
-    (evil-forward-char)
-    (let ((beg (region-beginning)) (end (region-end)))
+    (let (beg end)
+      (setq beg (point))
+      (while (not (equal (char-after) 32))
+        (evil-forward-char))
+      (setq end (- (point) 1))
       (goto-char beg)
       (insert "=")
       (goto-char (+ end 2))
-      (insert "=")))
+      (insert "=")
+      ))
 
   (defun toggle-narrow ()
     (interactive)
@@ -376,3 +382,11 @@
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
 
+;;; log
+(use-package! command-log-mode
+   :commands global-command-log-mode
+   :config
+   (setq command-log-mode-auto-show t
+         command-log-mode-open-log-turns-on-mode nil
+         command-log-mode-is-global t
+         command-log-mode-window-size 50))

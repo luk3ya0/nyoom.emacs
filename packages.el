@@ -76,3 +76,5 @@
 (package! nov)
 
 (package! pyenv)
+
+(package! command-log-mode)
