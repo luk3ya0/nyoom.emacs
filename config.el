@@ -64,7 +64,8 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-smoooooth-light)
+;; (setq doom-theme 'doom-smoooooth-light)
+(setq doom-theme 'doom-smoooooth)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -261,40 +262,55 @@
 
   (defun quickb ()
     (interactive)
-    (let (beg end)
+    (let (beg end sentinel pad)
+      (setq sentinel 32)
+      (setq pad 2)
       (setq beg (point))
-      (while (not (equal (char-after) 32))
-        (evil-forward-char))
+      (while (not (equal (char-after) sentinel))
+        (evil-forward-char)
+        (if (equal (char-after) 40)
+            (setq sentinel 41
+                  pad 3)))
       (setq end (- (point) 1))
       (goto-char beg)
       (insert "*")
-      (goto-char (+ end 2))
+      (goto-char (+ end pad))
       (insert "*")
       ))
 
   (defun quickc ()
     (interactive)
-    (let (beg end)
+    (let (beg end sentinel pad)
+      (setq sentinel 32)
+      (setq pad 2)
       (setq beg (point))
-      (while (not (equal (char-after) 32))
-        (evil-forward-char))
+      (while (not (equal (char-after) sentinel))
+        (evil-forward-char)
+        (if (equal (char-after) 40)
+            (setq sentinel 41
+                  pad 3)))
       (setq end (- (point) 1))
       (goto-char beg)
       (insert "~")
-      (goto-char (+ end 2))
+      (goto-char (+ end pad))
       (insert "~")
       ))
 
   (defun quickv ()
     (interactive)
-    (let (beg end)
+    (let (beg end sentinel pad)
+      (setq sentinel 32)
+      (setq pad 2)
       (setq beg (point))
-      (while (not (equal (char-after) 32))
-        (evil-forward-char))
+      (while (not (equal (char-after) sentinel))
+        (evil-forward-char)
+        (if (equal (char-after) 40)
+            (setq sentinel 41
+                  pad 3)))
       (setq end (- (point) 1))
       (goto-char beg)
       (insert "=")
-      (goto-char (+ end 2))
+      (goto-char (+ end pad))
       (insert "=")
       ))
 
