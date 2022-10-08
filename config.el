@@ -211,7 +211,340 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;;; editor > snippets
+;;; Org > Exporting
+(after! ox-html
+  (require 'f)
+        (setq org-export-headline-levels 5) ; I like nesting
+
+        (require 'ox-extra)
+        (ox-extras-activate '(ignore-headlines))
+
+        (setq org-export-creator-string
+        (format "Emacs %s (Org mode %s–%s)" emacs-version (org-release) (org-git-version)))
+
+        (define-minor-mode org-fancy-html-export-mode
+        "Toggle my fabulous org export tweaks. While this mode itself does a little bit,
+        the vast majority of the change in behaviour comes from switch statements in:
+        - `org-html-template-fancier'
+        - `org-html--build-meta-info-extended'
+        - `org-html-src-block-collapsable'
+        - `org-html-block-collapsable'
+        - `org-html-table-wrapped'
+        - `org-html--format-toc-headline-colapseable'
+        - `org-html--toc-text-stripped-leaves'
+        - `org-export-html-headline-anchor'"
+        :global t
+        :init-value t
+        (if org-fancy-html-export-mode
+        (setq org-html-style-default org-html-style-fancy
+                org-html-meta-tags #'org-html-meta-tags-fancy
+                org-html-checkbox-type 'html-span)
+        (setq org-html-style-default org-html-style-plain
+                org-html-meta-tags #'org-html-meta-tags-default
+                org-html-checkbox-type 'html)))
+
+        (defadvice! org-html-template-fancier (orig-fn contents info)
+        "Return complete document string after HTML conversion.
+        CONTENTS is the transcoded contents string.  INFO is a plist
+        holding export options. Adds a few extra things to the body
+        compared to the default implementation."
+        :around #'org-html-template
+        (if (or (not org-fancy-html-export-mode) (bound-and-true-p org-msg-export-in-progress))
+        (funcall orig-fn contents info)
+        (concat
+        (when (and (not (org-html-html5-p info)) (org-html-xhtml-p info))
+        (let* ((xml-declaration (plist-get info :html-xml-declaration))
+                (decl (or (and (stringp xml-declaration) xml-declaration)
+                                (cdr (assoc (plist-get info :html-extension)
+                                        xml-declaration))
+                                (cdr (assoc "html" xml-declaration))
+                                "")))
+                (when (not (or (not decl) (string= "" decl)))
+                (format "%s\n"
+                        (format decl
+                                (or (and org-html-coding-system
+                                        (fboundp 'coding-system-get)
+                                        (coding-system-get org-html-coding-system 'mime-charset))
+                                "iso-8859-1"))))))
+        (org-html-doctype info)
+        "\n"
+        (concat "<html"
+                (cond ((org-html-xhtml-p info)
+                        (format
+                        " xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"%s\" xml:lang=\"%s\""
+                        (plist-get info :language) (plist-get info :language)))
+                        ((org-html-html5-p info)
+                        (format " lang=\"%s\"" (plist-get info :language))))
+                ">\n")
+        "<head>\n"
+        (org-html--build-meta-info info)
+        (org-html--build-head info)
+        (org-html--build-mathjax-config info)
+        "</head>\n"
+        "<body>\n<input type='checkbox' id='theme-switch'><div id='page'><label id='switch-label' for='theme-switch'></label>"
+        (let ((link-up (org-trim (plist-get info :html-link-up)))
+                (link-home (org-trim (plist-get info :html-link-home))))
+        (unless (and (string= link-up "") (string= link-home ""))
+                (format (plist-get info :html-home/up-format)
+                        (or link-up link-home)
+                        (or link-home link-up))))
+        ;; Preamble.
+        (org-html--build-pre/postamble 'preamble info)
+        ;; Document contents.
+        (let ((div (assq 'content (plist-get info :html-divs))))
+        (format "<%s id=\"%s\">\n" (nth 1 div) (nth 2 div)))
+        ;; Document title.
+        (when (plist-get info :with-title)
+        (let ((title (and (plist-get info :with-title)
+                                (plist-get info :title)))
+                (subtitle (plist-get info :subtitle))
+                (html5-fancy (org-html--html5-fancy-p info)))
+                (when title
+                (format
+                (if html5-fancy
+                        "<header class=\"page-header\">%s\n<h1 class=\"title\">%s</h1>\n%s</header>"
+                "<h1 class=\"title\">%s%s</h1>\n")
+                (if (or (plist-get info :with-date)
+                        (plist-get info :with-author))
+                        (concat "<div class=\"page-meta\">"
+                                (when (plist-get info :with-date)
+                                (org-export-data (plist-get info :date) info))
+                                (when (and (plist-get info :with-date) (plist-get info :with-author)) ", ")
+                                (when (plist-get info :with-author)
+                                (org-export-data (plist-get info :author) info))
+                                "</div>\n")
+                "")
+                (org-export-data title info)
+                (if subtitle
+                        (format
+                        (if html5-fancy
+                        "<p class=\"subtitle\" role=\"doc-subtitle\">%s</p>\n"
+                        (concat "\n" (org-html-close-tag "br" nil info) "\n"
+                                "<span class=\"subtitle\">%s</span>\n"))
+                        (org-export-data subtitle info))
+                "")))))
+        contents
+        (format "</%s>\n" (nth 1 (assq 'content (plist-get info :html-divs))))
+        ;; Postamble.
+        (org-html--build-pre/postamble 'postamble info)
+        ;; Possibly use the Klipse library live code blocks.
+        (when (plist-get info :html-klipsify-src)
+        (concat "<script>" (plist-get info :html-klipse-selection-script)
+                "</script><script src=\""
+                org-html-klipse-js
+                "\"></script><link rel=\"stylesheet\" type=\"text/css\" href=\""
+                org-html-klipse-css "\"/>"))
+        ;; Closing document.
+        "</div>\n</body>\n</html>")))
+
+        (setq org-html-style-plain org-html-style-default
+        org-html-htmlize-output-type 'css
+        org-html-doctype "html5"
+        org-html-html5-fancy t)
+
+        (defun org-html-reload-fancy-style ()
+        (interactive)
+        (setq org-html-style-fancy
+                (concat (f-read-text (expand-file-name "misc/org-export-header.html" doom-private-dir))
+                        "<script>\n"
+                        (f-read-text (expand-file-name "misc/org-css/main.js" doom-private-dir))
+                        "</script>\n<style>\n"
+                        (f-read-text (expand-file-name "misc/org-css/main.css" doom-private-dir))
+                        "</style>"))
+        (when org-fancy-html-export-mode
+        (setq org-html-style-default org-html-style-fancy)))
+        (org-html-reload-fancy-style)
+
+        (defvar org-html-export-collapsed nil)
+        (eval '(cl-pushnew '(:collapsed "COLLAPSED" "collapsed" org-html-export-collapsed t)
+                        (org-export-backend-options (org-export-get-backend 'html))))
+        (add-to-list 'org-default-properties "EXPORT_COLLAPSED")
+
+        (defadvice! org-html-src-block-collapsable (orig-fn src-block contents info)
+        "Wrap the usual <pre> block in a <details>"
+        :around #'org-html-src-block
+        (if (or (not org-fancy-html-export-mode) (bound-and-true-p org-msg-export-in-progress))
+        (funcall orig-fn src-block contents info)
+        (let* ((properties (cadr src-block))
+                (lang (mode-name-to-lang-name
+                        (plist-get properties :language)))
+                (name (plist-get properties :name))
+                (ref (org-export-get-reference src-block info))
+                (collapsed-p (member (or (org-export-read-attribute :attr_html src-block :collapsed)
+                                        (plist-get info :collapsed))
+                                        '("y" "yes" "t" t "true" "all"))))
+        (format
+        "<details id='%s' class='code'%s><summary%s>%s</summary>
+        <div class='gutter'>
+        <a href='#%s'>#</a>
+        <button title='Copy to clipboard' onclick='copyPreToClipbord(this)'>⎘</button>\
+        </div>
+        %s
+        </details>"
+        ref
+        (if collapsed-p "" " open")
+        (if name " class='named'" "")
+        (concat
+                (when name (concat "<span class=\"name\">" name "</span>"))
+                "<span class=\"lang\">" lang "</span>")
+        ref
+        (if name
+                (replace-regexp-in-string (format "<pre\\( class=\"[^\"]+\"\\)? id=\"%s\">" ref) "<pre\\1>"
+                                        (funcall orig-fn src-block contents info))
+                (funcall orig-fn src-block contents info))))))
+
+        (defun mode-name-to-lang-name (mode)
+        (or (cadr (assoc mode
+                        '(("asymptote" "Asymptote")
+                        ("awk" "Awk")
+                        ("C" "C")
+                        ("clojure" "Clojure")
+                        ("css" "CSS")
+                        ("D" "D")
+                        ("ditaa" "ditaa")
+                        ("dot" "Graphviz")
+                        ("calc" "Emacs Calc")
+                        ("emacs-lisp" "Emacs Lisp")
+                        ("fortran" "Fortran")
+                        ("gnuplot" "gnuplot")
+                        ("haskell" "Haskell")
+                        ("hledger" "hledger")
+                        ("java" "Java")
+                        ("js" "Javascript")
+                        ("latex" "LaTeX")
+                        ("ledger" "Ledger")
+                        ("lisp" "Lisp")
+                        ("lilypond" "Lilypond")
+                        ("lua" "Lua")
+                        ("matlab" "MATLAB")
+                        ("mscgen" "Mscgen")
+                        ("ocaml" "Objective Caml")
+                        ("octave" "Octave")
+                        ("org" "Org mode")
+                        ("oz" "OZ")
+                        ("plantuml" "Plantuml")
+                        ("processing" "Processing.js")
+                        ("python" "Python")
+                        ("R" "R")
+                        ("ruby" "Ruby")
+                        ("sass" "Sass")
+                        ("scheme" "Scheme")
+                        ("screen" "Gnu Screen")
+                        ("sed" "Sed")
+                        ("sh" "shell")
+                        ("sql" "SQL")
+                        ("sqlite" "SQLite")
+                        ("forth" "Forth")
+                        ("io" "IO")
+                        ("J" "J")
+                        ("makefile" "Makefile")
+                        ("maxima" "Maxima")
+                        ("perl" "Perl")
+                        ("picolisp" "Pico Lisp")
+                        ("scala" "Scala")
+                        ("shell" "Shell Script")
+                        ("ebnf2ps" "ebfn2ps")
+                        ("cpp" "C++")
+                        ("abc" "ABC")
+                        ("coq" "Coq")
+                        ("groovy" "Groovy")
+                        ("bash" "bash")
+                        ("csh" "csh")
+                        ("ash" "ash")
+                        ("dash" "dash")
+                        ("ksh" "ksh")
+                        ("mksh" "mksh")
+                        ("posh" "posh")
+                        ("ada" "Ada")
+                        ("asm" "Assembler")
+                        ("caml" "Caml")
+                        ("delphi" "Delphi")
+                        ("html" "HTML")
+                        ("idl" "IDL")
+                        ("mercury" "Mercury")
+                        ("metapost" "MetaPost")
+                        ("modula-2" "Modula-2")
+                        ("pascal" "Pascal")
+                        ("ps" "PostScript")
+                        ("prolog" "Prolog")
+                        ("simula" "Simula")
+                        ("tcl" "tcl")
+                        ("tex" "LaTeX")
+                        ("plain-tex" "TeX")
+                        ("verilog" "Verilog")
+                        ("vhdl" "VHDL")
+                        ("xml" "XML")
+                        ("nxml" "XML")
+                        ("conf" "Configuration File"))))
+        mode))
+
+        (defun org-html-block-collapsable (orig-fn block contents info)
+        "Wrap the usual block in a <details>"
+        (if (or (not org-fancy-html-export-mode) (bound-and-true-p org-msg-export-in-progress))
+        (funcall orig-fn block contents info)
+        (let ((ref (org-export-get-reference block info))
+                (type (pcase (car block)
+                        ('property-drawer "Properties")))
+                (collapsed-default (pcase (car block)
+                                ('property-drawer t)
+                                (_ nil)))
+                (collapsed-value (org-export-read-attribute :attr_html block :collapsed))
+                (collapsed-p (or (member (org-export-read-attribute :attr_html block :collapsed)
+                                        '("y" "yes" "t" t "true"))
+                                (member (plist-get info :collapsed) '("all")))))
+        (format
+        "<details id='%s' class='code'%s>
+        <summary%s>%s</summary>
+        <div class='gutter'>\
+        <a href='#%s'>#</a>
+        <button title='Copy to clipboard' onclick='copyPreToClipbord(this)'>⎘</button>\
+        </div>
+        %s\n
+        </details>"
+        ref
+        (if (or collapsed-p collapsed-default) "" " open")
+        (if type " class='named'" "")
+        (if type (format "<span class='type'>%s</span>" type) "")
+        ref
+        (funcall orig-fn block contents info)))))
+
+        (advice-add 'org-html-example-block   :around #'org-html-block-collapsable)
+        (advice-add 'org-html-fixed-width     :around #'org-html-block-collapsable)
+        (advice-add 'org-html-property-drawer :around #'org-html-block-collapsable)
+
+        (defadvice! org-html-table-wrapped (orig-fn table contents info)
+        "Wrap the usual <table> in a <div>"
+        :around #'org-html-table
+        (if (or (not org-fancy-html-export-mode) (bound-and-true-p org-msg-export-in-progress))
+        (funcall orig-fn table contents info)
+        (let* ((name (plist-get (cadr table) :name))
+                (ref (org-export-get-reference table info)))
+        (format "<div id='%s' class='table'>
+        <div class='gutter'><a href='#%s'>#</a></div>
+        <div class='tabular'>
+        %s
+        </div>\
+        </div>"
+                ref ref
+                (if name
+                        (replace-regexp-in-string (format "<table id=\"%s\"" ref) "<table"
+                                                (funcall orig-fn table contents info))
+                        (funcall orig-fn table contents info))))))
+  )
+;;; Behavior
+(global-subword-mode 1)      ; Iterate through CamelCase words
+
+(setq-default major-mode 'org-mode)
+
+;;; Windows
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
+
+(defadvice! prompt-for-buffer (&rest _)
+  :after '(evil-window-split evil-window-vsplit)
+  (consult-buffer))
+
+;;; Editor > snippets
 (with-eval-after-load 'flycheck
   (setq-default flycheck-disabled-checkers '(org-mode)))
 
@@ -221,6 +554,11 @@
 
 
 ;;; Editor > Motion
+(setq undo-limit 80000000             ; Raise undo-limit to 80MB
+      evil-want-fine-undo t           ; By default while in insert all changes are one big blob. Be more granular
+      auto-save-default t             ; Nobody likes to loose work, I certainly don't
+      )
+
 (defun narrow-p ()
   "Return t if a buffer is narrowed"
    (not (equal (- (point-max) (point-min)) (buffer-size))))
@@ -412,7 +750,7 @@
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
 
-;;; log
+;;; Log
 (use-package! command-log-mode
    :commands global-command-log-mode
    :config
@@ -420,3 +758,105 @@
          command-log-mode-open-log-turns-on-mode nil
          command-log-mode-is-global t
          command-log-mode-window-size 50))
+;;; Company
+(after! company
+  (setq company-idle-delay 0.5
+        company-minimum-prefix-length 2)
+  (setq company-show-numbers t)
+  (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying
+
+(setq-default history-length 1000)
+
+;;; Keycast in modeline
+
+(use-package! keycast
+  :commands keycast-mode
+  :config
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line."
+    :global t
+    (if keycast-mode
+        (progn
+          (add-hook 'pre-command-hook 'keycast--update t)
+          (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
+      (remove-hook 'pre-command-hook 'keycast--update)
+      (setq global-mode-string (remove '("" mode-line-keycast " ") global-mode-string))))
+  (custom-set-faces!
+    '(keycast-command :inherit doom-modeline-debug
+                      :height 0.9)
+    '(keycast-key :inherit custom-modified
+                  :height 1.1
+                  :weight bold)))
+
+;;; Calibre
+;; (use-package! calibredb
+;;   :commands calibredb
+;;   :config
+;;   (setq calibredb-root-dir "~/Desktop/TEC/Other/Ebooks"
+;;         calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
+;; (use-package! nov
+;;   :mode ("\\.epub\\'" . nov-mode)
+;;   :config
+;;   (map! :map nov-mode-map
+;;         :n "RET" #'nov-scroll-up)
+
+;;   (defun doom-modeline-segment--nov-info ()
+;;     (concat
+;;      " "
+;;      (propertize
+;;       (cdr (assoc 'creator nov-metadata))
+;;       'face 'doom-modeline-project-parent-dir)
+;;      " "
+;;      (cdr (assoc 'title nov-metadata))
+;;      " "
+;;      (propertize
+;;       (format "%d/%d"
+;;               (1+ nov-documents-index)
+;;               (length nov-documents))
+;;       'face 'doom-modeline-info)))
+
+;;   (advice-add 'nov-render-title :override #'ignore)
+
+;;   (defun +nov-mode-setup ()
+;;     (face-remap-add-relative 'variable-pitch
+;;                              :family "Merriweather"
+;;                              :height 1.4
+;;                              :width 'semi-expanded)
+;;     (face-remap-add-relative 'default :height 1.3)
+;;     (setq-local line-spacing 0.2
+;;                 next-screen-context-lines 4
+;;                 shr-use-colors nil)
+;;     (require 'visual-fill-column nil t)
+;;     (setq-local visual-fill-column-center-text t
+;;                 visual-fill-column-width 81
+;;                 nov-text-width 80)
+;;     (visual-fill-column-mode 1)
+;;     (hl-line-mode -1)
+
+;;     (add-to-list '+lookup-definition-functions #'+lookup/dictionary-definition)
+
+;;     (setq-local mode-line-format
+;;                 `((:eval
+;;                    (doom-modeline-segment--workspace-name))
+;;                   (:eval
+;;                    (doom-modeline-segment--window-number))
+;;                   (:eval
+;;                    (doom-modeline-segment--nov-info))
+;;                   ,(propertize
+;;                     " %P "
+;;                     'face 'doom-modeline-buffer-minor-mode)
+;;                   ,(propertize
+;;                     " "
+;;                     'face (if (doom-modeline--active) 'mode-line 'mode-line-inactive)
+;;                     'display `((space
+;;                                 :align-to
+;;                                 (- (+ right right-fringe right-margin)
+;;                                    ,(* (let ((width (doom-modeline--font-width)))
+;;                                          (or (and (= width 1) 1)
+;;                                              (/ width (frame-char-width) 1.0)))
+;;                                        (string-width
+;;                                         (format-mode-line (cons "" '(:eval (doom-modeline-segment--major-mode))))))))))
+;;                   (:eval (doom-modeline-segment--major-mode)))))
+
+;;   (add-hook 'nov-mode-hook #'+nov-mode-setup))
+

@@ -73,8 +73,17 @@
   :recipe ( :host gitlab
    :repo "ideasman42/emacs-scroll-on-jump"))
 
-(package! nov)
+(package! calibredb :pin "8a6148a264e5e57e11824a238ae7b92bb3b6c9ab")
+
+(package! nov :pin "8f5b42e9d9f304b422c1a7918b43ee323a7d3532")
 
 (package! pyenv)
 
 (package! command-log-mode)
+
+(package! keycast :pin "72d9add8ba16e0cae8cfcff7fc050fa75e493b4e")
+
+(package! calctex :recipe (:host github :repo "johnbcoughlin/calctex"
+                           :files ("*.el" "calctex/*.el" "calctex-contrib/*.el" "org-calctex/*.el" "vendor"))
+  :pin "67a2e76847a9ea9eff1f8e4eb37607f84b380ebb")
+
