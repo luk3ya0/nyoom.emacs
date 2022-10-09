@@ -47,54 +47,54 @@ This has to be implemented on a per-format basis, currently HTML and LaTeX
 exports are supported.
 
 #+begin_src emacs-lisp
-(defun org-export-filter-text-acronym (text backend _info)
-  "Wrap suspected acronyms in acronyms-specific formatting.
-Treat sequences of 2+ capital letters (optionally succeeded by \"s\") as an acronym.
-Ignore if preceeded by \";\" (for manual prevention) or \"\\\" (for LaTeX commands).
+  (defun org-export-filter-text-acronym (text backend _info)
+    "Wrap suspected acronyms in acronyms-specific formatting.
+  Treat sequences of 2+ capital letters (optionally succeeded by \"s\") as an acronym.
+  Ignore if preceeded by \";\" (for manual prevention) or \"\\\" (for LaTeX commands).
 
-TODO abstract backend implementations."
-  (let ((base-backend
-         (cond
-          ((org-export-derived-backend-p backend 'latex) 'latex)
-          ;; Markdown is derived from HTML, but we don't want to format it
-          ((org-export-derived-backend-p backend 'md) nil)
-          ((org-export-derived-backend-p backend 'html) 'html)))
-        (case-fold-search nil))
-    (when base-backend
-      (replace-regexp-in-string
-       "[;\\\\]?\\b[A-Z][A-Z]+s?\\(?:[^A-Za-z]\\|\\b\\)"
-       (lambda (all-caps-str)
-         (cond ((equal (aref all-caps-str 0) ?\\) all-caps-str)                ; don't format LaTeX commands
-               ((equal (aref all-caps-str 0) ?\;) (substring all-caps-str 1))  ; just remove not-acronym indicator char ";"
-               (t (let* ((final-char (if (string-match-p "[^A-Za-z]" (substring all-caps-str -1 (length all-caps-str)))
-                                         (substring all-caps-str -1 (length all-caps-str))
-                                       nil)) ; needed to re-insert the [^A-Za-z] at the end
-                         (trailing-s (equal (aref all-caps-str (- (length all-caps-str) (if final-char 2 1))) ?s))
-                         (acr (if final-char
-                                  (substring all-caps-str 0 (if trailing-s -2 -1))
-                                (substring all-caps-str 0 (+ (if trailing-s -1 (length all-caps-str)))))))
-                    (pcase base-backend
-                      ('latex (concat "\\acr{" (s-downcase acr) "}" (when trailing-s "\\acrs{}") final-char))
-                      ('html (concat "<span class='acr'>" acr "</span>" (when trailing-s "<small>s</small>") final-char)))))))
-       text t t))))
+  TODO abstract backend implementations."
+    (let ((base-backend
+           (cond
+            ((org-export-derived-backend-p backend 'latex) 'latex)
+            ;; Markdown is derived from HTML, but we don't want to format it
+            ((org-export-derived-backend-p backend 'md) nil)
+            ((org-export-derived-backend-p backend 'html) 'html)))
+          (case-fold-search nil))
+      (when base-backend
+        (replace-regexp-in-string
+         "[;\\\\]?\\b[A-Z][A-Z]+s?\\(?:[^A-Za-z]\\|\\b\\)"
+         (lambda (all-caps-str)
+           (cond ((equal (aref all-caps-str 0) ?\\) all-caps-str)                ; don't format LaTeX commands
+                 ((equal (aref all-caps-str 0) ?\;) (substring all-caps-str 1))  ; just remove not-acronym indicator char ";"
+                 (t (let* ((final-char (if (string-match-p "[^A-Za-z]" (substring all-caps-str -1 (length all-caps-str)))
+                                           (substring all-caps-str -1 (length all-caps-str))
+                                         nil)) ; needed to re-insert the [^A-Za-z] at the end
+                           (trailing-s (equal (aref all-caps-str (- (length all-caps-str) (if final-char 2 1))) ?s))
+                           (acr (if final-char
+                                    (substring all-caps-str 0 (if trailing-s -2 -1))
+                                  (substring all-caps-str 0 (+ (if trailing-s -1 (length all-caps-str)))))))
+                      (pcase base-backend
+                        ('latex (concat "\\acr{" (s-downcase acr) "}" (when trailing-s "\\acrs{}") final-char))
+                        ('html (concat "<span class='acr'>" acr "</span>" (when trailing-s "<small>s</small>") final-char)))))))
+         text t t))))
 
-(add-to-list 'org-export-filter-plain-text-functions
-             #'org-export-filter-text-acronym)
+  (add-to-list 'org-export-filter-plain-text-functions
+               #'org-export-filter-text-acronym)
 
-;; We won't use `org-export-filter-headline-functions' because it
-;; passes (and formats) the entire section contents. That's no good.
+  ;; We won't use `org-export-filter-headline-functions' because it
+  ;; passes (and formats) the entire section contents. That's no good.
 
-(defun org-html-format-headline-acronymised (todo todo-type priority text tags info)
-  "Like `org-html-format-headline-default-function', but with acronym formatting."
-  (org-html-format-headline-default-function
-   todo todo-type priority (org-export-filter-text-acronym text 'html info) tags info))
-(setq org-html-format-headline-function #'org-html-format-headline-acronymised)
+  (defun org-html-format-headline-acronymised (todo todo-type priority text tags info)
+    "Like `org-html-format-headline-default-function', but with acronym formatting."
+    (org-html-format-headline-default-function
+     todo todo-type priority (org-export-filter-text-acronym text 'html info) tags info))
+  (setq org-html-format-headline-function #'org-html-format-headline-acronymised)
 
-(defun org-latex-format-headline-acronymised (todo todo-type priority text tags info)
-  "Like `org-latex-format-headline-default-function', but with acronym formatting."
-  (org-latex-format-headline-default-function
-   todo todo-type priority (org-export-filter-text-acronym text 'latex info) tags info))
-(setq org-latex-format-headline-function #'org-latex-format-headline-acronymised)
+  (defun org-latex-format-headline-acronymised (todo todo-type priority text tags info)
+    "Like `org-latex-format-headline-default-function', but with acronym formatting."
+    (org-latex-format-headline-default-function
+     todo todo-type priority (org-export-filter-text-acronym text 'latex info) tags info))
+  (setq org-latex-format-headline-function #'org-latex-format-headline-acronymised)
 #+end_src
 
 ** Exporting Org code
