@@ -88,53 +88,6 @@ summary {
     display: list-item;
 }
 
-/*! end normalise.css */
-@media (prefers-color-scheme: light) {
-    #page {
-        --accent: #002642;
-        --accent-dark: #00151c;
-        --code-foreground: #2c3e50;
-        --code-background: #efefef;
-        --code-func: #6c3163;
-        --code-const: #4e3163;
-        --code-regex: #655370;
-        --back-white: #fff;
-        --back-light: #f0eeed;
-        --back-medium: #c8c8c8;
-        --text-light: #7b7b7b;
-        --text-gray: #444;
-        --text-medium: #222;
-        --text-dark: #000;
-        --switch-icon: "🌚";
-        --switch-shadow-color: #373d4e;
-        --switch-text: "dark mode?";
-    }
-
-    #theme-switch:checked ~ #page {
-        --accent: #002642;
-        --accent-dark: #daf1ff;
-        --code-foreground: #a1a8ae;
-        --code-background: #222;
-        --code-func: #bd56ad;
-        --code-const: #8755ab;
-        --code-regex: #a184b3;
-        --back-white: #000;
-        --back-light: #181818;
-        --back-medium: #444;
-        --text-light: #7b7b7b;
-        --text-gray: #c8c8c8;
-        --text-medium: #ddd;
-        --text-dark: #efefef;
-        --switch-icon: "🌝";
-        --switch-shadow-color: #fce477;
-        --switch-text: "light mode?";
-    }
-
-    #theme-switch:checked ~ #page img.invertible, #theme-switch:checked ~ #page object[type="image/svg+xml"].invertible {
-        filter: invert(90%) hue-rotate(180deg) sepia(1%);
-    }
-}
-
 @media (prefers-color-scheme: dark) {
     #theme-switch:checked ~ #page {
         --accent: #002642;
@@ -181,6 +134,53 @@ summary {
     }
 
     #page img.invertible, #page object[type="image/svg+xml"].invertible {
+        filter: invert(90%) hue-rotate(180deg) sepia(1%);
+    }
+}
+
+/*! end normalise.css */
+@media (prefers-color-scheme: light) {
+    #page {
+        --accent: #002642;
+        --accent-dark: #00151c;
+        --code-foreground: #2c3e50;
+        --code-background: #efefef;
+        --code-func: #6c3163;
+        --code-const: #4e3163;
+        --code-regex: #655370;
+        --back-white: #fff;
+        --back-light: #f0eeed;
+        --back-medium: #c8c8c8;
+        --text-light: #7b7b7b;
+        --text-gray: #444;
+        --text-medium: #222;
+        --text-dark: #000;
+        --switch-icon: "🌚";
+        --switch-shadow-color: #373d4e;
+        --switch-text: "dark mode?";
+    }
+
+    #theme-switch:checked ~ #page {
+        --accent: #002642;
+        --accent-dark: #daf1ff;
+        --code-foreground: #a1a8ae;
+        --code-background: #222;
+        --code-func: #bd56ad;
+        --code-const: #8755ab;
+        --code-regex: #a184b3;
+        --back-white: #000;
+        --back-light: #181818;
+        --back-medium: #444;
+        --text-light: #7b7b7b;
+        --text-gray: #c8c8c8;
+        --text-medium: #ddd;
+        --text-dark: #efefef;
+        --switch-icon: "🌝";
+        --switch-shadow-color: #fce477;
+        --switch-text: "light mode?";
+    }
+
+    #theme-switch:checked ~ #page img.invertible, #theme-switch:checked ~ #page object[type="image/svg+xml"].invertible {
         filter: invert(90%) hue-rotate(180deg) sepia(1%);
     }
 }
@@ -240,30 +240,6 @@ summary {
     visibility: visible;
 }
 
-@font-face {
-    font-family: "Merriweather";
-    src: url("https://tecosaur.com/resources/org/Merriweather-TextRegular.woff2") format("woff2");
-    font-weight: normal;
-    font-style: normal;
-    font-display: fallback;
-}
-
-@font-face {
-    font-family: "Merriweather";
-    src: url("https://tecosaur.com/resources/org/Merriweather-TextItalic.woff2") format("woff2");
-    font-weight: normal;
-    font-style: italic;
-    font-display: fallback;
-}
-
-@font-face {
-    font-family: "Merriweather";
-    src: url("https://tecosaur.com/resources/org/Merriweather-TextBold.woff2") format("woff2");
-    font-weight: bold;
-    font-style: normal;
-    font-display: fallback;
-}
-
 *::selection {
     background: var(--back-medium);
 }
@@ -277,6 +253,7 @@ html, body {
 }
 
 body {
+    background-color: var(--back-light);
     display: flex;
     flex-direction: column;
     font-size: 1em;
@@ -1609,7 +1586,8 @@ dl a[href^="#"]:hover::selection {
 }
 
 *:target::before {
-    content: "🠖";
+    display: none;
+    /* content: "🠖"; */
     position: absolute;
     left: -7rem;
     top: calc(0.5em - 2rem);
@@ -2134,10 +2112,10 @@ div.org-center {
     text-align: center;
 }
 
-span.acr {
-    font-variant-caps: all-small-caps;
-    letter-spacing: 0.1em;
-}
+/* span.acr { */
+/*     font-variant-caps: all-small-caps; */
+/*     letter-spacing: 0.1em; */
+/* } */
 
 .music-track {
     display: flex;
@@ -2254,7 +2232,7 @@ table caption .table-number {
     background: #888;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1500px) {
     #table-of-contents {
         position: fixed;
         width: 18rem;
@@ -2375,7 +2353,7 @@ table caption .table-number {
 }
 
 #table-of-contents #text-table-of-contents li label::after {
-    content: "\25b6";
+    /* content: "\25b6"; */
     color: var(--text-gray);
     margin-left: 0.5em;
     font-size: 1em;
@@ -2383,7 +2361,7 @@ table caption .table-number {
     position: absolute;
     top: 3.4px;
     left: -20px;
-    opacity: 0.8;
+    opacity: 0;
 }
 
 #table-of-contents #text-table-of-contents li input:checked ~ ul {
@@ -2484,4 +2462,8 @@ table caption .table-number {
     size: auto;
     margin-top: 4mm;
     margin-bottom: 4mm;
+}
+
+a[aria-hidden] {
+    display: none;
 }
