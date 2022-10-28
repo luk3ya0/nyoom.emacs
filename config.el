@@ -53,9 +53,32 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq doom-unicode-font (font-spec :family "PingFang SC" :size 15))
-(setq doom-font (font-spec :family "Fira Code" :size 15 :weight 'semi-light))
-;;
+;; (setq doom-unicode-font (font-spec :family "PingFang SC" :size 14))
+;; (setq doom-emoji-fallback-font-families '("Apple Color Emoji"))
+;; (setq doom-symbol-fallback-font-families '("Apple Symbols"))
+
+(setq doom-font (font-spec :family "Fira Code" :size 14)
+      doom-serif-font doom-font
+      doom-unicode-font (font-spec :family "PingFang SC")
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :weight 'extra-bold))
+
+(setq use-default-font-for-symbols nil)
+
+(add-hook! 'after-setting-font-hook
+  (set-fontset-font t 'latin (font-spec :family "Fira Code"))
+  (set-fontset-font t 'symbol (font-spec :family "Symbola"))
+  (set-fontset-font t 'mathematical (font-spec :family "Symbola"))
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji")))
+
+(use-package! emojify
+  :config
+  (when (member "Apple Color Emoji" (font-family-list))
+    (set-fontset-font
+     t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+  (setq emojify-display-style 'unicode)
+  (setq emojify-emoji-styles '(unicode))
+  (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
+
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
@@ -84,6 +107,7 @@
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (setq org-archive-location (concat org-directory "roam/archive.org::")
+        org-edit-src-content-indentation 0
         org-display-inline-images t
         org-redisplay-inline-images t
         org-image-actual-width nil
@@ -117,6 +141,13 @@
         org-fold-catch-invisible-edits 'smart))
 
 (add-hook 'org-mode-hook
+          (lambda ()
+            (visual-line-mode 1)
+            (setq-local line-spacing 5)
+            (hl-line-mode -1)  ;; for what face
+            (flycheck-mode -1)))
+
+(add-hook 'markdown-mode-hook
           (lambda ()
             (visual-line-mode 1)
             (setq-local line-spacing 5)
@@ -212,6 +243,9 @@
 ;; they are implemented.
 
 ;;; Org > Exporting
+(after! ox-hugo
+  (setq org-hugo-use-code-for-kbd t))
+
 (after! ox-html
   (require 'f)
   (setq org-export-headline-levels 5) ; I like nesting
@@ -346,11 +380,13 @@
     (interactive)
     (setq org-html-style-fancy
           (concat (f-read-text (expand-file-name "misc/org-export-header.html" doom-private-dir))
-                  "<script>\n"
-                  (f-read-text (expand-file-name "misc/org-css/main.js" doom-private-dir))
-                  "</script>\n<style>\n"
-                  (f-read-text (expand-file-name "misc/org-css/main.css" doom-private-dir))
-                  "</style>"))
+                  ""
+                  ;; "<script>\n"
+                  ;; (f-read-text (expand-file-name "misc/org-css/main.js" doom-private-dir))
+                  ;; "</script>\n<style>\n"
+                  ;; (f-read-text (expand-file-name "misc/org-css/main.css" doom-private-dir))
+                  ;;"</style>"
+                  ))
     (when org-fancy-html-export-mode
       (setq org-html-style-default org-html-style-fancy)))
   (org-html-reload-fancy-style)
@@ -561,7 +597,7 @@
 
 (defun narrow-p ()
   "Return t if a buffer is narrowed"
-   (not (equal (- (point-max) (point-min)) (buffer-size))))
+  (not (equal (- (point-max) (point-min)) (buffer-size))))
 
 (with-eval-after-load 'evil
   (defun normal-next-line()
@@ -571,10 +607,10 @@
   (defun what-face ()
     (interactive)
     (message "char-after: %s" (char-after)))
-    ;; (message "thing at point: %s" (thing-at-point 'symbol)))
-    ;; (let ((face (or (get-char-property (point) 'read-face-name)
-    ;;                 (get-char-property (point) 'face))))
-    ;;   (if face (message "Face: %s" face) (message "No face at %d" (point)))))
+  ;; (message "thing at point: %s" (thing-at-point 'symbol)))
+  ;; (let ((face (or (get-char-property (point) 'read-face-name)
+  ;;                 (get-char-property (point) 'face))))
+  ;;   (if face (message "Face: %s" face) (message "No face at %d" (point)))))
 
   (defun normal-previous-line()
     (interactive)
@@ -767,111 +803,11 @@
 
 ;;; Log
 (use-package! command-log-mode
-   :commands global-command-log-mode
-   :config
-   (setq command-log-mode-auto-show t
-         command-log-mode-open-log-turns-on-mode nil
-         command-log-mode-is-global t
-         command-log-mode-window-size 50))
-;;; Company
-(after! company
-  (setq company-idle-delay 0.5
-        company-minimum-prefix-length 2)
-  (setq company-show-numbers t)
-  (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying
+  :commands global-command-log-mode
+  :config
+  (setq command-log-mode-auto-show t
+        command-log-mode-open-log-turns-on-mode nil
+        command-log-mode-is-global t
+        command-log-mode-window-size 50))
 
 (setq-default history-length 1000)
-
-;;; Keycast in modeline
-
-(use-package! keycast
-  :commands keycast-mode
-  :config
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line."
-    :global t
-    (if keycast-mode
-        (progn
-          (add-hook 'pre-command-hook 'keycast--update t)
-          (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
-      (remove-hook 'pre-command-hook 'keycast--update)
-      (setq global-mode-string (remove '("" mode-line-keycast " ") global-mode-string))))
-  (custom-set-faces!
-    '(keycast-command :inherit doom-modeline-debug
-                      :height 0.9)
-    '(keycast-key :inherit custom-modified
-                  :height 1.1
-                  :weight bold)))
-
-;;; Calibre
-;; (use-package! calibredb
-;;   :commands calibredb
-;;   :config
-;;   (setq calibredb-root-dir "~/Desktop/TEC/Other/Ebooks"
-;;         calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
-;; (use-package! nov
-;;   :mode ("\\.epub\\'" . nov-mode)
-;;   :config
-;;   (map! :map nov-mode-map
-;;         :n "RET" #'nov-scroll-up)
-
-;;   (defun doom-modeline-segment--nov-info ()
-;;     (concat
-;;      " "
-;;      (propertize
-;;       (cdr (assoc 'creator nov-metadata))
-;;       'face 'doom-modeline-project-parent-dir)
-;;      " "
-;;      (cdr (assoc 'title nov-metadata))
-;;      " "
-;;      (propertize
-;;       (format "%d/%d"
-;;               (1+ nov-documents-index)
-;;               (length nov-documents))
-;;       'face 'doom-modeline-info)))
-
-;;   (advice-add 'nov-render-title :override #'ignore)
-
-;;   (defun +nov-mode-setup ()
-;;     (face-remap-add-relative 'variable-pitch
-;;                              :family "Merriweather"
-;;                              :height 1.4
-;;                              :width 'semi-expanded)
-;;     (face-remap-add-relative 'default :height 1.3)
-;;     (setq-local line-spacing 0.2
-;;                 next-screen-context-lines 4
-;;                 shr-use-colors nil)
-;;     (require 'visual-fill-column nil t)
-;;     (setq-local visual-fill-column-center-text t
-;;                 visual-fill-column-width 81
-;;                 nov-text-width 80)
-;;     (visual-fill-column-mode 1)
-;;     (hl-line-mode -1)
-
-;;     (add-to-list '+lookup-definition-functions #'+lookup/dictionary-definition)
-
-;;     (setq-local mode-line-format
-;;                 `((:eval
-;;                    (doom-modeline-segment--workspace-name))
-;;                   (:eval
-;;                    (doom-modeline-segment--window-number))
-;;                   (:eval
-;;                    (doom-modeline-segment--nov-info))
-;;                   ,(propertize
-;;                     " %P "
-;;                     'face 'doom-modeline-buffer-minor-mode)
-;;                   ,(propertize
-;;                     " "
-;;                     'face (if (doom-modeline--active) 'mode-line 'mode-line-inactive)
-;;                     'display `((space
-;;                                 :align-to
-;;                                 (- (+ right right-fringe right-margin)
-;;                                    ,(* (let ((width (doom-modeline--font-width)))
-;;                                          (or (and (= width 1) 1)
-;;                                              (/ width (frame-char-width) 1.0)))
-;;                                        (string-width
-;;                                         (format-mode-line (cons "" '(:eval (doom-modeline-segment--major-mode))))))))))
-;;                   (:eval (doom-modeline-segment--major-mode)))))
-
-;;   (add-hook 'nov-mode-hook #'+nov-mode-setup))
-
