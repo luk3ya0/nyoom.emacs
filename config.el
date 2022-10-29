@@ -607,11 +607,11 @@
 
   (defun what-face ()
     (interactive)
-    (message "char-after: %s" (char-after)))
+    ;; (message "char-after: %s" (char-after)))
   ;; (message "thing at point: %s" (thing-at-point 'symbol)))
-  ;; (let ((face (or (get-char-property (point) 'read-face-name)
-  ;;                 (get-char-property (point) 'face))))
-  ;;   (if face (message "Face: %s" face) (message "No face at %d" (point)))))
+    (let ((face (or (get-char-property (point) 'read-face-name)
+                    (get-char-property (point) 'face))))
+      (if face (message "Face: %s" face) (message "No face at %d" (point)))))
 
   (defun normal-previous-line()
     (interactive)

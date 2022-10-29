@@ -39,7 +39,8 @@
     (cons 320 "#675160")
     (cons 340 "#56697A")
     (cons 360 "#56697A")))
- '(vc-annotate-very-old-color nil))
+ '(vc-annotate-very-old-color nil)
+ '(warning-suppress-types '((org-element-cache) (defvaralias))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
