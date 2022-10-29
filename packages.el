@@ -82,5 +82,15 @@
 
 (package! command-log-mode)
 
-;; (package! nano-theme)
-;; (package! nano-modeline)
+(package! hl-sentence
+  :recipe (:local-repo "packages/hl-sentence"
+
+           ;; By default, the package manager grabs all *.el files at the root
+           ;; of the project and nothing else. To include other files, or
+           ;; accommodate unconventional project structures, specify what :files
+           ;; you want:
+           :files ("*.el" "src/lisp/*.el")
+
+           ;; With this you can avoid having to run 'doom sync' every time you
+           ;; change the package.
+           :build (:not compile)))

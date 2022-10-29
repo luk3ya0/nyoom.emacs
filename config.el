@@ -39,6 +39,13 @@
            ([(super r)] . doom/reload)
            ([(super j)] . +vterm/toggle))
 
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-[" 'previous-buffer)
+
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-]" 'next-buffer)
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
 ;; - `doom-font' -- the primary font to use
@@ -271,7 +278,7 @@
   (setq-default flycheck-disabled-checkers '(org-mode)))
 
 (use-package! doom-snippets
-  :load-path "~/.doom.d/editors/snippets"
+  :load-path "~/.doom.d/snippets"
   :after yasnippet)
 
 ;;; Editor > Motion
@@ -289,13 +296,20 @@
     (interactive)
     (forward-line 1))
 
+  ;; (defun what-face ()
+  ;;   (interactive)
+  ;;   ;; (message "char-after: %s" (char-after)))
+  ;;   ;; (message "thing at point: %s" (thing-sentence 'symbol)))
+  ;;   (let ((face (or (get-char-property (point) 'read-face-name)
+  ;;                   (get-char-property (point) 'face))))
+  ;;     (if face (message "%s" face) (message "No face" (point)))))
+
   (defun what-face ()
     (interactive)
-    ;; (message "char-after: %s" (char-after)))
-  ;; (message "thing at point: %s" (thing-at-point 'symbol)))
-    (let ((face (or (get-char-property (point) 'read-face-name)
-                    (get-char-property (point) 'face))))
-      (if face (message "Face: %s" face) (message "No face at %d" (point)))))
+    (require 'org-element)
+    (message "element type of %s, parent type of %s"
+             (org-element-type (org-element-at-point))
+             (org-element-type (org-element-property :parent (org-element-at-point)))))
 
   (defun normal-previous-line()
     (interactive)
@@ -496,3 +510,10 @@
         command-log-mode-window-size 50))
 
 (setq-default history-length 1000)
+
+(use-package! hl-sentence
+  :after org
+  :diminish
+  ;; :hook
+  ;; (org-mode . hl-sentence-mode)
+  )
