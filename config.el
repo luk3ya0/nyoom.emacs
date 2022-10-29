@@ -296,15 +296,15 @@
     (interactive)
     (forward-line 1))
 
-  ;; (defun what-face ()
-  ;;   (interactive)
-  ;;   ;; (message "char-after: %s" (char-after)))
-  ;;   ;; (message "thing at point: %s" (thing-sentence 'symbol)))
-  ;;   (let ((face (or (get-char-property (point) 'read-face-name)
-  ;;                   (get-char-property (point) 'face))))
-  ;;     (if face (message "%s" face) (message "No face" (point)))))
-
   (defun what-face ()
+    "Get the actual face at point."
+    (interactive)
+    (let ((face (or (get-char-property (point) 'read-face-name)
+                    (get-char-property (point) 'face))))
+      (if face (message "%s" face) (message "No face"))))
+
+  (defun what-org ()
+    "Get the org-element-type at point."
     (interactive)
     (require 'org-element)
     (message "element type of %s, parent type of %s"
@@ -317,11 +317,11 @@
 
   (defun emit-ocr ()
     (interactive)
-    (insert (shell-command-to-string "/opt/homebrew/bin/ocr")))
+    (insert (shell-command-to-string "/opt/homebrew/bin/ocr -l zh")))
 
   (defun emit-ocr-trim ()
     (interactive)
-    (insert (string-trim (shell-command-to-string "/opt/homebrew/bin/ocr"))))
+    (insert (string-trim (shell-command-to-string "/opt/homebrew/bin/ocr -l zh"))))
 
   (defun cycle-format ()
     (interactive)
@@ -427,6 +427,7 @@
   (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-visual-line)
   (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
+  (define-key evil-normal-state-map (kbd "s-p") 'what-org)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
