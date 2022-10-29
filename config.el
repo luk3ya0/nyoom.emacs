@@ -59,8 +59,8 @@
 
 (setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC")
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :weight 'extra-bold))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 14)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 14))
 
 (setq use-default-font-for-symbols nil)
 
@@ -89,6 +89,12 @@
 ;; `load-theme' function. This is the default:
 ;; (setq doom-theme 'doom-smoooooth-light)
 (setq doom-theme 'doom-smoooooth)
+;; (setq doom-theme nil)
+
+;; (require 'nano-theme)
+;; (nano-mode)
+;; (nano-dark)
+;; (nano-modeline-mode)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.

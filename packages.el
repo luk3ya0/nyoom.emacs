@@ -82,3 +82,5 @@
 
 (package! command-log-mode)
 
+;; (package! nano-theme)
+;; (package! nano-modeline)
