@@ -409,13 +409,13 @@
         (widen)
       (org-narrow-to-subtree)))
 
-(defun plainp ()
-  "Check current sentence is paragraph and it's parent is section."
-  (require 'org-element)
-  (and
-   (eq (org-element-type (org-element-at-point)) 'paragraph)
-   (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
-   ))
+  (defun plainp ()
+    "Check current sentence is paragraph and it's parent is section."
+    (require 'org-element)
+    (and
+     (eq (org-element-type (org-element-at-point)) 'paragraph)
+     (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
+     ))
 
   (defun visual-curr-sentence ()
     (interactive)
@@ -448,7 +448,7 @@
     (evil-forward-sentence-begin)
     (if (eq ?\n (char-after))
         (forward-sentence))
-    (if (not (plainp))
+    (while (not (plainp))
       (forward-sentence))
     (visual-curr-sentence))
 
@@ -457,7 +457,7 @@
     (evil-exit-visual-state)
     (backward-sentence)
     (backward-sentence)
-    (if (not (plainp))
+    (while (not (plainp))
       (evil-backward-sentence-begin))
     (visual-curr-sentence))
 
@@ -484,8 +484,8 @@
   (define-key evil-normal-state-map (kbd "s-o") 'what-org)
   (define-key evil-normal-state-map (kbd "s-k") 'visual-curr-sentence)
 
-  (define-key evil-visual-state-map (kbd "M-n") 'visual-next-sentence)
-  (define-key evil-visual-state-map (kbd "M-p") 'visual-prev-sentence)
+  (define-key evil-visual-state-map (kbd "s-n") 'visual-next-sentence)
+  (define-key evil-visual-state-map (kbd "s-p") 'visual-prev-sentence)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
