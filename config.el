@@ -114,7 +114,8 @@
 
 (defface org-link-green
   '((t (:inherit org-link :foreground "medium sea green" :underline nil)))
-  "A green link.")
+  "A green link."
+  :group `org-faces)
 
 (after! org
   (org-link-set-parameters "file"
@@ -408,6 +409,58 @@
         (widen)
       (org-narrow-to-subtree)))
 
+(defun plainp ()
+  "Check current sentence is paragraph and it's parent is section."
+  (require 'org-element)
+  (and
+   (eq (org-element-type (org-element-at-point)) 'paragraph)
+   (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
+   ))
+
+  (defun visual-curr-sentence ()
+    (interactive)
+    (let (posbeg posend)
+      (save-excursion
+        (unless (= (point) (point-max))
+          (forward-char))
+        (backward-sentence)
+        (setq posbeg (point)))
+      (save-excursion
+        (unless (= (point) (point-max))
+          (forward-char))
+        (backward-sentence)
+        (forward-sentence)
+        (if (eq 32 (char-after))
+            (evil-backward-char)
+          )
+        (if (eq ?\n (char-after))
+            (progn
+              (evil-backward-char)
+              (evil-forward-char)
+              ))
+        (setq posend (point)))
+      (evil-visual-select posbeg posend)
+      ))
+
+  (defun visual-next-sentence ()
+    (interactive)
+    (evil-exit-visual-state)
+    (evil-forward-sentence-begin)
+    (if (eq ?\n (char-after))
+        (forward-sentence))
+    (if (not (plainp))
+      (forward-sentence))
+    (visual-curr-sentence))
+
+  (defun visual-prev-sentence ()
+    (interactive)
+    (evil-exit-visual-state)
+    (backward-sentence)
+    (backward-sentence)
+    (if (not (plainp))
+      (evil-backward-sentence-begin))
+    (visual-curr-sentence))
+
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
@@ -416,6 +469,7 @@
   (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-visual-line)
   (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
   (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
+
   (define-key evil-normal-state-map (kbd "s-b") 'quickb)
   (define-key evil-normal-state-map (kbd "s-,") 'quickv)
   (define-key evil-normal-state-map (kbd "s-;") 'quickc)
@@ -427,7 +481,11 @@
   (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-visual-line)
   (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
-  (define-key evil-normal-state-map (kbd "s-p") 'what-org)
+  (define-key evil-normal-state-map (kbd "s-o") 'what-org)
+  (define-key evil-normal-state-map (kbd "s-k") 'visual-curr-sentence)
+
+  (define-key evil-visual-state-map (kbd "M-n") 'visual-next-sentence)
+  (define-key evil-visual-state-map (kbd "M-p") 'visual-prev-sentence)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -511,10 +569,3 @@
         command-log-mode-window-size 50))
 
 (setq-default history-length 1000)
-
-(use-package! hl-sentence
-  :after org
-  :diminish
-  ;; :hook
-  ;; (org-mode . hl-sentence-mode)
-  )
