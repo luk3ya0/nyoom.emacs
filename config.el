@@ -168,6 +168,23 @@
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (setq-local tab-width 2)))
+
+(use-package! web-mode
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2))
+
+(setq js-indent-level 2)
+
+(add-hook 'html-mode-hook
+          (lambda()
+            (setq-local sgml-basic-offset 2)
+            (setq-local indent-tabs-mode nil)))
+
 (use-package! org-appear
   :after org
   ;; :hook (org-mode . org-appear-mode)
