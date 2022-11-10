@@ -4,19 +4,19 @@
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
-(push '(left-fringe    . 29)                 default-frame-alist)
-(push '(right-fringe   . 29)                 default-frame-alist)
-(push '(internal-border-width . 14)          default-frame-alist)
+;; (push '(left-fringe    . 29)                 default-frame-alist)
+;; (push '(right-fringe   . 29)                 default-frame-alist)
+;; (push '(internal-border-width . 15)          default-frame-alist)
 ;; (push `(alpha . ,'(95 . 95))                 default-frame-alist)
 
 ;; (set-face-background 'default "mac:windowBackgroundColor")
 
-;; (dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
+;; (dolist (f (face-list)) (set-face-stipple f "alpha:80%"))
 
 ;; (setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
 
 ;; (defface my/default-blurred
-;;    '((t :inherit 'default :stipple "alpha:30%"))
+;;    '((t :inherit 'default :stipple "alpha:80%"))
 ;;    "Like 'default but blurred."
 ;;    :group 'my)
 
@@ -60,14 +60,14 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-;; (setq doom-unicode-font (font-spec :family "PingFang SC" :size 14))
+;; (setq doom-unicode-font (font-spec :family "PingFang SC" :size 15))
 ;; (setq doom-emoji-fallback-font-families '("Apple Color Emoji"))
 ;; (setq doom-symbol-fallback-font-families '("Apple Symbols"))
 
-(setq doom-font (font-spec :family "Fira Code" :size 14)
+(setq doom-font (font-spec :family "Fira Code" :size 15)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 14)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 14))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 15)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15))
 
 (setq use-default-font-for-symbols nil)
 
@@ -426,58 +426,6 @@
         (widen)
       (org-narrow-to-subtree)))
 
-  (defun plainp ()
-    "Check current sentence is paragraph and it's parent is section."
-    (require 'org-element)
-    (and
-     (eq (org-element-type (org-element-at-point)) 'paragraph)
-     (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
-     ))
-
-  (defun visual-curr-sentence ()
-    (interactive)
-    (let (posbeg posend)
-      (save-excursion
-        (unless (= (point) (point-max))
-          (forward-char))
-        (backward-sentence)
-        (setq posbeg (point)))
-      (save-excursion
-        (unless (= (point) (point-max))
-          (forward-char))
-        (backward-sentence)
-        (forward-sentence)
-        (if (eq 32 (char-after))
-            (evil-backward-char)
-          )
-        (if (eq ?\n (char-after))
-            (progn
-              (evil-backward-char)
-              (evil-forward-char)
-              ))
-        (setq posend (point)))
-      (evil-visual-select posbeg posend)
-      ))
-
-  (defun visual-next-sentence ()
-    (interactive)
-    (evil-exit-visual-state)
-    (evil-forward-sentence-begin)
-    (if (eq ?\n (char-after))
-        (forward-sentence))
-    (while (not (plainp))
-      (forward-sentence))
-    (visual-curr-sentence))
-
-  (defun visual-prev-sentence ()
-    (interactive)
-    (evil-exit-visual-state)
-    (backward-sentence)
-    (backward-sentence)
-    (while (not (plainp))
-      (evil-backward-sentence-begin))
-    (visual-curr-sentence))
-
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
@@ -499,10 +447,6 @@
   (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
   (define-key evil-normal-state-map (kbd "s-o") 'what-org)
-  (define-key evil-normal-state-map (kbd "s-k") 'visual-curr-sentence)
-
-  (define-key evil-visual-state-map (kbd "s-n") 'visual-next-sentence)
-  (define-key evil-visual-state-map (kbd "s-p") 'visual-prev-sentence)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -586,3 +530,10 @@
         command-log-mode-window-size 50))
 
 (setq-default history-length 1000)
+
+(use-package! hl-sentence
+  :after org
+  :diminish
+  ;; :hook
+  ;; (org-mode . hl-sentence-mode)
+  )

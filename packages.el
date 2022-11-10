@@ -81,3 +81,7 @@
 (package! pyenv)
 
 (package! command-log-mode)
+
+(package! hl-sentence
+  :recipe (:host github :repo "luk3ya0/hl-sentence"
+          :files ("*.el" "lisp/*.el")))
