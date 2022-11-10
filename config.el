@@ -552,6 +552,7 @@
        (0 (list 'face nil 'display (svg-font-lock-progress_percent (match-string 1)))))
       ("\\[\\([0-9]+/[0-9]+\\)\\]"
        (0 (list 'face nil 'display (svg-font-lock-progress_count (match-string 1)))))))
+  
 
   (defun svg-font-lock-progress_percent (value)
     (svg-image (svg-lib-concat
@@ -560,12 +561,13 @@
                                       :stroke 2
                                       :radius 3
                                       :padding 2
+                                      :height 0.87
                                       :width 12)
                 (svg-lib-tag (concat value "%")
                              nil
                              :stroke 0
                              :margin 0))
-               :ascent 65)) ;; corresponding to line-spacing
+               :ascent 61)) ;; corresponding to line-spacing
 
   (defun svg-font-lock-progress_count (value)
     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
@@ -577,11 +579,12 @@
                                         :stroke 2
                                         :radius 3
                                         :padding 2
+                                        :height 0.87
                                         :width 12)
                   (svg-lib-tag value nil
                                :stroke 0
                                :margin 0))
-                 :ascent 65))) ;; corresponding to line-spacing
+                 :ascent 61))) ;; corresponding to line-spacing
   )
 
 (defun org-summary-todo (n-done n-not-done)
