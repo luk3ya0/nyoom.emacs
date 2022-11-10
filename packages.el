@@ -85,3 +85,7 @@
 (package! hl-sentence
   :recipe (:host github :repo "luk3ya0/hl-sentence"
           :files ("*.el" "lisp/*.el")))
+
+(package! svg-lib
+  :recipe (:host github :repo "luk3ya0/svg-lib"
+          :files ("*.el" "lisp/*.el")))

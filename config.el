@@ -157,14 +157,14 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (visual-line-mode 1)
-            (setq-local line-spacing 5)
+            ;; (setq-local line-spacing 5)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
 (add-hook 'markdown-mode-hook
           (lambda ()
             (visual-line-mode 1)
-            (setq-local line-spacing 5)
+            ;; (setq-local line-spacing 5)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
@@ -534,6 +534,51 @@
 (use-package! hl-sentence
   :after org
   :diminish
-  ;; :hook
-  ;; (org-mode . hl-sentence-mode)
   )
+
+(use-package! svg-lib
+  :after org
+  :diminish
+  :hook
+  (org-mode . (lambda ()
+                (push 'display font-lock-extra-managed-props)
+                (font-lock-add-keywords nil svg-font-lock-keywords)
+                (font-lock-flush (point-min) (point-max))
+                ))
+  :init
+  (defvar svg-font-lock-keywords
+    `(
+      ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
+       (0 (list 'face nil 'display (svg-font-lock-progress_percent (match-string 1)))))
+      ("\\[\\([0-9]+/[0-9]+\\)\\]"
+       (0 (list 'face nil 'display (svg-font-lock-progress_count (match-string 1)))))))
+
+  (defun svg-font-lock-progress_percent (value)
+    (svg-image (svg-lib-concat
+                (svg-lib-progress-bar (/ (string-to-number value) 100.0) nil
+                                      :margin 0
+                                      :stroke 2
+                                      :radius 3
+                                      :padding 2
+                                      :width 12)
+                (svg-lib-tag (concat value "%")
+                             nil
+                             :stroke 0
+                             :margin 0)) :ascent 'center))
+
+  (defun svg-font-lock-progress_count (value)
+    (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+           (count (float (car seq)))
+           (total (float (cadr seq))))
+      (svg-image (svg-lib-concat
+                  (svg-lib-progress-bar (/ count total) nil
+                                        :margin 0
+                                        :stroke 2
+                                        :radius 3
+                                        :padding 2
+                                        :width 12)
+                  (svg-lib-tag value nil
+                               :stroke 0
+                               :margin 0)) :ascent 'center)))
+  )
+
