@@ -170,10 +170,10 @@ Can be an integer to determine the exact padding."
    ((outline-1 &override) :foreground red)
    ((outline-2 &override) :foreground orange)
    ;;;; org <built-in>
-   ((org-block &override) :background bg)
+   ((org-block &override) :background nil)
    ((org-block-begin-line &override) :foreground fg)
-   (org-ellipsis :underline nil :background bg     :foreground red)
-   ((org-quote &override) :background base1)
+   (org-ellipsis :underline nil :background bg :foreground red)
+   ((org-quote &override) :background nil)
    ;;;; posframe
    (ivy-posframe               :background base0)
    ;;;; selectrum
