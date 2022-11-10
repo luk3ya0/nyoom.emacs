@@ -6,7 +6,7 @@
 (push '(min-height . 1)                      default-frame-alist)
 ;; (push '(left-fringe    . 29)                 default-frame-alist)
 ;; (push '(right-fringe   . 29)                 default-frame-alist)
-;; (push '(internal-border-width . 15)          default-frame-alist)
+;; (push '(internal-border-width . 14)          default-frame-alist)
 ;; (push `(alpha . ,'(95 . 95))                 default-frame-alist)
 
 ;; (set-face-background 'default "mac:windowBackgroundColor")
@@ -60,14 +60,14 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-;; (setq doom-unicode-font (font-spec :family "PingFang SC" :size 15))
+;; (setq doom-unicode-font (font-spec :family "PingFang SC" :size 14))
 ;; (setq doom-emoji-fallback-font-families '("Apple Color Emoji"))
 ;; (setq doom-symbol-fallback-font-families '("Apple Symbols"))
 
-(setq doom-font (font-spec :family "Fira Code" :size 15)
+(setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 15)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 14)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 14))
 
 (setq use-default-font-for-symbols nil)
 
@@ -157,14 +157,14 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (visual-line-mode 1)
-            ;; (setq-local line-spacing 5)
+            (setq-local line-spacing 5)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
 (add-hook 'markdown-mode-hook
           (lambda ()
             (visual-line-mode 1)
-            ;; (setq-local line-spacing 5)
+            (setq-local line-spacing 5)
             (hl-line-mode -1)  ;; for what face
             (flycheck-mode -1)))
 
@@ -214,17 +214,17 @@
 (use-package! org-ol-tree
   :init
   (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 15 :bold nil :foreground "#59B0CF"))
+    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
     "Face used by org-ol-tree to display the root node."
     :group 'org-ol-tree-faces)
 
   (defface org-ol-tree-section-title-face
-    '((t :inherit font-lock-doc-face :family "Fira Code" :size 15))
+    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
     "Face used by org-ol-tree to display section titles."
     :group 'org-ol-tree-faces)
 
   (defface org-ol-tree-section-id-face
-    '((t :inherit treemacs-file-face :family "Fira Code" :size 15))
+    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
     "Face used by org-ol-tree to display section titles."
     :group 'org-ol-tree-faces)
 
@@ -564,7 +564,8 @@
                 (svg-lib-tag (concat value "%")
                              nil
                              :stroke 0
-                             :margin 0)) :ascent 'center))
+                             :margin 0))
+               :ascent 65)) ;; corresponding to line-spacing
 
   (defun svg-font-lock-progress_count (value)
     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
@@ -579,6 +580,13 @@
                                         :width 12)
                   (svg-lib-tag value nil
                                :stroke 0
-                               :margin 0)) :ascent 'center)))
+                               :margin 0))
+                 :ascent 65))) ;; corresponding to line-spacing
   )
 
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
