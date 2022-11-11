@@ -6,7 +6,7 @@
 (push '(min-height . 1)                      default-frame-alist)
 ;; (push '(left-fringe    . 29)                 default-frame-alist)
 ;; (push '(right-fringe   . 29)                 default-frame-alist)
-;; (push '(internal-border-width . 14)          default-frame-alist)
+(push '(internal-border-width . 14)          default-frame-alist)
 ;; (push `(alpha . ,'(95 . 95))                 default-frame-alist)
 
 ;; (set-face-background 'default "mac:windowBackgroundColor")
@@ -66,15 +66,15 @@
 
 (setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 14)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 14))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 160)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 160))
 
 (setq use-default-font-for-symbols nil)
 
 (add-hook! 'after-setting-font-hook
   (set-fontset-font t 'latin (font-spec :family "Fira Code"))
-  (set-fontset-font t 'symbol (font-spec :family "Symbola"))
-  (set-fontset-font t 'mathematical (font-spec :family "Symbola"))
+  (set-fontset-font t 'symbol (font-spec :family "Fira Code Symbol"))
+  (set-fontset-font t 'mathematical (font-spec :family "Fira Code Symbol"))
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji")))
 
 (use-package! emojify
@@ -117,10 +117,27 @@
   "A green link."
   :group `org-faces)
 
+(defface org-progress-todo
+  '((t (:inherit org-todo
+        :foreground "azure1"
+        :font-family "Fira Code"
+        :height 150
+        :avgwidth 160
+        :spacing 100)))
+  "Org mode todo face"
+  :group 'org-face
+  )
+
 (after! org
   (org-link-set-parameters "file"
                            :face 'org-link-green)
+  (set-face-attribute 'org-checkbox-statistics-todo nil
+                      :inherit 'org-progress-todo
+                      :width 'ultra-condensed
+                      )
   (setq org-archive-location (concat org-directory "roam/archive.org::")
+        org-hide-leading-stars nil
+        org-startup-indented nil
         org-edit-src-content-indentation 0
         org-display-inline-images t
         org-redisplay-inline-images t
@@ -546,45 +563,78 @@
                 (font-lock-flush (point-min) (point-max))
                 ))
   :init
+  (require 'svg)
   (defvar svg-font-lock-keywords
     `(
+      ("TODO"
+       (0 (list 'face nil 'display (svg-font-lock-todo (match-string 1)))))
+      ("DONE"
+       (0 (list 'face nil 'display (svg-font-lock-done (match-string 1)))))
       ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
-       (0 (list 'face nil 'display (svg-font-lock-progress_percent (match-string 1)))))
+       (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
       ("\\[\\([0-9]+/[0-9]+\\)\\]"
-       (0 (list 'face nil 'display (svg-font-lock-progress_count (match-string 1)))))))
-  
+       (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
+      ))
 
-  (defun svg-font-lock-progress_percent (value)
-    (svg-image (svg-lib-concat
-                (svg-lib-progress-bar (/ (string-to-number value) 100.0) nil
-                                      :margin 0
-                                      :stroke 2
-                                      :radius 3
-                                      :padding 2
-                                      :height 0.87
-                                      :width 12)
-                (svg-lib-tag (concat value "%")
-                             nil
-                             :stroke 0
-                             :margin 0))
-               :ascent 61)) ;; corresponding to line-spacing
+  (defun svg-font-lock-done (value)
+    (message "%s" value)
+    (svg-lib-button "checkbox-multiple-marked" "DONE" nil
+                    :font-family "Roboto Mono"
+                    :font-weight 700
+                    :stroke 0
+                    :height 1.1
+                    :padding 0.5
+                    :background "#673AB7"
+                    :foreground "white"
+                    :ascent 'center))
 
-  (defun svg-font-lock-progress_count (value)
+  (defun svg-font-lock-todo (value)
+    (message "%s" value)
+    (svg-lib-button "checkbox-multiple-blank" "TODO" nil
+                    :font-family "Roboto Mono"
+                    :font-weight 700
+                    :height 1.1
+                    :padding 0.5
+                    :stroke 0
+                    :background "#548B54"
+                    :foreground "white"
+                    :ascent 'center))
+
+  (defun fira-code-progress-count (value)
+    (concat (fira-code-progress-bar value) " " value)
+    )
+
+  (defun fira-code-progress-percent (value)
+    (concat (fira-code-progress-bar (concat value "/100")) " " value "%")
+    )
+
+  (defun fira-code-progress-bar (value)
     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
            (count (float (car seq)))
            (total (float (cadr seq))))
-      (svg-image (svg-lib-concat
-                  (svg-lib-progress-bar (/ count total) nil
-                                        :margin 0
-                                        :stroke 2
-                                        :radius 3
-                                        :padding 2
-                                        :height 0.87
-                                        :width 12)
-                  (svg-lib-tag value nil
-                               :stroke 0
-                               :margin 0))
-                 :ascent 61))) ;; corresponding to line-spacing
+
+      (let (comp uncomp bar)
+        (setq comp (* (/ count total) 20))
+        (setq uncomp (- 20 comp))
+        (setq bar (format "%s%s"
+                          (make-string (round comp) #xee04)
+                          (make-string (round uncomp) #xee01)))
+        (setq bar (substring bar 1 18))
+        (if (= 0 comp)
+            (setq bar (concat "\uee00" bar "\uee02"))
+          )
+        (if (and
+             (> comp 0)
+             (< comp 20)
+             )
+            (setq bar (concat "\uee03" bar "\uee02"))
+          )
+        (if (= 20 comp)
+            (setq bar (concat "\uee03" bar "\uee05"))
+          )
+        bar
+        )
+      ))
   )
 
 (defun org-summary-todo (n-done n-not-done)
