@@ -128,11 +128,26 @@
   :group 'org-face
   )
 
+(defface org-progress-done
+  '((t (:inherit org-todo
+        :foreground "azure1"
+        :font-family "Fira Code"
+        :height 150
+        :avgwidth 160
+        :spacing 100)))
+  "Org mode todo face"
+  :group 'org-face
+  )
+
 (after! org
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
                       :inherit 'org-progress-todo
+                      :width 'ultra-condensed
+                      )
+  (set-face-attribute 'org-checkbox-statistics-done nil
+                      :inherit 'org-progress-done
                       :width 'ultra-condensed
                       )
   (setq org-archive-location (concat org-directory "roam/archive.org::")
@@ -575,7 +590,6 @@
       ("\\[\\([0-9]+/[0-9]+\\)\\]"
        (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
       ))
-
   (defun svg-font-lock-done (value)
     (message "%s" value)
     (svg-lib-button "checkbox-multiple-marked" "DONE" nil
@@ -583,7 +597,7 @@
                     :font-weight 700
                     :stroke 0
                     :height 1.1
-                    :padding 0.5
+                    :padding 0.2
                     :background "#673AB7"
                     :foreground "white"
                     :ascent 'center))
@@ -594,7 +608,7 @@
                     :font-family "Roboto Mono"
                     :font-weight 700
                     :height 1.1
-                    :padding 0.5
+                    :padding 0.2
                     :stroke 0
                     :background "#548B54"
                     :foreground "white"
