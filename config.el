@@ -4,22 +4,7 @@
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
-;; (push '(left-fringe    . 29)                 default-frame-alist)
-;; (push '(right-fringe   . 29)                 default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
-;; (push `(alpha . ,'(95 . 95))                 default-frame-alist)
-
-;; (set-face-background 'default "mac:windowBackgroundColor")
-
-;; (dolist (f (face-list)) (set-face-stipple f "alpha:80%"))
-
-;; (setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
-
-;; (defface my/default-blurred
-;;    '((t :inherit 'default :stipple "alpha:80%"))
-;;    "Like 'default but blurred."
-;;    :group 'my)
-
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
@@ -96,12 +81,6 @@
 ;; `load-theme' function. This is the default:
 ;; (setq doom-theme 'doom-smoooooth-light)
 (setq doom-theme 'doom-smoooooth)
-;; (setq doom-theme nil)
-
-;; (require 'nano-theme)
-;; (nano-mode)
-;; (nano-dark)
-;; (nano-modeline-mode)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -118,8 +97,8 @@
   :group `org-faces)
 
 (defface org-progress-todo
-  '((t (:inherit org-todo
-        :foreground "azure1"
+  '((t (:inherit 'org-todo
+        :foreground "azure2"
         :font-family "Fira Code"
         :height 150
         :avgwidth 160
@@ -129,8 +108,8 @@
   )
 
 (defface org-progress-done
-  '((t (:inherit org-todo
-        :foreground "azure1"
+  '((t (:inherit 'org-todo
+        :foreground "azure4"
         :font-family "Fira Code"
         :height 150
         :avgwidth 160
@@ -159,10 +138,8 @@
         org-image-actual-width nil
         org-latex-default-class "ctexart"
         org-latex-compiler "xelatex"
-        ;; org-startup-with-inline-images "inlineimages"
         org-startup-with-inline-images nil
         org-startup-with-latex-preview nil
-        ;; org-startup-with-latex-preview "latexpreview"
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
         org-preview-latex-default-process 'dvisvgm
@@ -172,8 +149,6 @@
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
         org-list-allow-alphabetical t
-        org-export-with-sub-superscripts nil
-        org-export-headline-levels 5
         org-export-use-babel t
         org-use-speed-commands t
         org-return-follows-link t
@@ -186,19 +161,12 @@
         org-fontify-done-headline t
         org-fold-catch-invisible-edits 'smart))
 
-(add-hook 'org-mode-hook
-          (lambda ()
-            (visual-line-mode 1)
-            (setq-local line-spacing 5)
-            (hl-line-mode -1)  ;; for what face
-            (flycheck-mode -1)))
-
-(add-hook 'markdown-mode-hook
-          (lambda ()
-            (visual-line-mode 1)
-            (setq-local line-spacing 5)
-            (hl-line-mode -1)  ;; for what face
-            (flycheck-mode -1)))
+(dolist (hook '(org-mode-hook markdown-mode-hook))
+      (add-hook hook (lambda ()
+                       (setq-local line-spacing 5)
+                       (visual-line-mode 1)
+                       (flyspell-mode -1)
+                       (hl-line-mode -1))))
 
 (add-hook 'ruby-mode-hook
           (lambda ()
@@ -210,6 +178,8 @@
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2))
 
+(defalias 'vue-mode 'web-mode)
+
 (setq js-indent-level 2)
 
 (add-hook 'html-mode-hook
@@ -219,7 +189,7 @@
 
 (use-package! org-appear
   :after org
-  ;; :hook (org-mode . org-appear-mode)
+  :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
@@ -273,7 +243,6 @@
       :localleader
       :desc "Outline" "O" #'org-ol-tree)
 
-(defalias 'vue-mode 'web-mode)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -565,8 +534,7 @@
 
 (use-package! hl-sentence
   :after org
-  :diminish
-  )
+  :diminish)
 
 (use-package! svg-lib
   :after org
@@ -579,6 +547,15 @@
                 ))
   :init
   (require 'svg)
+  (defface fira-lock
+    '((t (:font-family "Fira Code"
+          :height 160
+          :avgwidth 180
+          :spacing 100
+          )))
+    "Org mode todo face"
+    :group 'org-face
+    )
   (defvar svg-font-lock-keywords
     `(
       ("TODO"
@@ -589,9 +566,14 @@
        (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
       ("\\[\\([0-9]+/[0-9]+\\)\\]"
        (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
+      ("\\(--\\)"
+       (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
       ))
+
+  (defun dash-to-hyphen (value)
+    (format "%s" (make-string (length value) #x2500)))
+
   (defun svg-font-lock-done (value)
-    (message "%s" value)
     (svg-lib-button "checkbox-multiple-marked" "DONE" nil
                     :font-family "Roboto Mono"
                     :font-weight 700
@@ -603,7 +585,6 @@
                     :ascent 'center))
 
   (defun svg-font-lock-todo (value)
-    (message "%s" value)
     (svg-lib-button "checkbox-multiple-blank" "TODO" nil
                     :font-family "Roboto Mono"
                     :font-weight 700
