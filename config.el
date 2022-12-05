@@ -1,5 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-;;; UI
+;;; UI ──────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
@@ -102,14 +102,8 @@
             (setq-local sgml-basic-offset 2)
             (setq-local indent-tabs-mode nil)))
 
-(use-package! org-appear
-  :after org
-  :hook (org-mode . org-appear-mode)
-  :config
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks nil))
-
+(add-hook 'python-mode-hook (lambda ()
+			      (setq python-indent 4)))
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -141,7 +135,7 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-;;; Org Mode
+;;; Org Mode ────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Documents/Org")
@@ -157,7 +151,8 @@
         :font-family "Fira Code"
         :height 150
         :avgwidth 160
-        :spacing 100)))
+        :spacing 100
+        )))
   "Org mode todo face"
   :group 'org-face
   )
@@ -184,6 +179,14 @@
                       :inherit 'org-progress-done
                       :width 'ultra-condensed
                       )
+  (setq org-emphasis-alist
+        '(("*" (bold))
+          ("/" italic)
+          ;; ("_" underline)
+          ("=" (:background nil :foreground "white"))
+          ("~" (:background nil :foreground "tan"))
+          ;; ("+" (:strike-through t))
+          ))
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-hide-leading-stars nil
         org-startup-indented nil
@@ -271,16 +274,23 @@
       :localleader
       :desc "Outline" "O" #'org-ol-tree)
 
-;;; Org > Exporting
+(use-package! org-appear
+  :after org
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil))
+
 (after! ox-hugo
   (setq org-hugo-use-code-for-kbd t))
 
-;;; Behavior
+;;; Behavior ────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
 (setq-default major-mode 'org-mode)
 
-;;; Windows
+;;; Windows ─────────────────────────────────────────
 (setq evil-vsplit-window-right t
       evil-split-window-below t)
 
@@ -288,7 +298,7 @@
   :after '(evil-window-split evil-window-vsplit)
   (consult-buffer))
 
-;;; Editor > snippets
+;;; Editor > snippets & check ───────────────────────
 (with-eval-after-load 'flycheck
   (setq-default flycheck-disabled-checkers '(org-mode)))
 
@@ -296,7 +306,7 @@
   :load-path "~/.doom.d/snippets"
   :after yasnippet)
 
-;;; Editor > Motion
+;;; Editor > Motion ─────────────────────────────────
 (setq undo-limit 80000000             ; Raise undo-limit to 80MB
       evil-want-fine-undo t           ; By default while in insert all changes are one big blob. Be more granular
       auto-save-default t             ; Nobody likes to loose work, I certainly don't
@@ -517,7 +527,7 @@
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
 
-;;; Log
+;;; Log ─────────────────────────────────────────────
 (use-package! command-log-mode
   :commands global-command-log-mode
   :config
@@ -532,74 +542,74 @@
   :after org
   :diminish)
 
-(use-package! svg-lib
-  :after org
-  :diminish
-  :hook
-  (org-mode . (lambda ()
-                (push 'display font-lock-extra-managed-props)
-                (font-lock-add-keywords nil svg-font-lock-keywords)
-                (font-lock-flush (point-min) (point-max))
-                ))
-  :init
-  (require 'svg)
-  (defface fira-lock
-    '((t (:font-family "Fira Code"
-          :height 160
-          :avgwidth 180
-          :spacing 100
-          )))
-    "Org mode todo face"
-    :group 'org-face
-    )
-  (defvar svg-font-lock-keywords
-    `(
-      ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
-       (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
-      ("\\[\\([0-9]+/[0-9]+\\)\\]"
-       (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-      ("\\(--\\)"
-       (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-      ))
+(defface fira-lock
+  '((t (:font-family "Fira Code"
+        :height 160
+        :avgwidth 180
+        :spacing 100
+        )))
+  "Org mode todo face"
+  :group 'org-face)
 
-  (defun dash-to-hyphen (value)
-    (format "%s" (make-string (length value) #x2500)))
+(defvar log-font-lock-keywords
+  `(
+    ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
+     (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
+    ("\\[\\([0-9]+/[0-9]+\\)\\]"
+     (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
+    ("\\(--\\)"
+     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ("\\(──\\)"
+     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ))
 
-  (defun fira-code-progress-count (value)
-    (concat (fira-code-progress-bar value) " " value)
-    )
+(defun dash-to-hyphen (value)
+  (format "%s" (make-string (length value) #x2500)))
 
-  (defun fira-code-progress-percent (value)
-    (concat (fira-code-progress-bar (concat value "/100")) " " value "%")
-    )
+(defun fira-code-progress-count (value)
+  (concat (fira-code-progress-bar value) " " value))
 
-  (defun fira-code-progress-bar (value)
-    (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-           (count (float (car seq)))
-           (total (float (cadr seq))))
+(defun fira-code-progress-percent (value)
+  (concat (fira-code-progress-bar (concat value "/100")) " " value "%"))
 
-      (let (comp uncomp bar)
-        (setq comp (* (/ count total) 20))
-        (setq uncomp (- 20 comp))
-        (setq bar (format "%s%s"
-                          (make-string (round comp) #xee04)
-                          (make-string (round uncomp) #xee01)))
-        (setq bar (substring bar 1 18))
-        (if (= 0 comp)
-            (setq bar (concat "\uee00" bar "\uee02"))
-          )
-        (if (and
-             (> comp 0)
-             (< comp 20)
-             )
-            (setq bar (concat "\uee03" bar "\uee02"))
-          )
-        (if (= 20 comp)
-            (setq bar (concat "\uee03" bar "\uee05"))
-          )
-        bar
+(defun fira-code-progress-bar (value)
+  (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+         (count (float (car seq)))
+         (total (float (cadr seq))))
+
+    (let (comp uncomp bar)
+      (setq comp (* (/ count total) 20))
+      (setq uncomp (- 20 comp))
+      (setq bar (format "%s%s"
+                        (make-string (round comp) #xee04)
+                        (make-string (round uncomp) #xee01)))
+      (setq bar (substring bar 1 18))
+      (if (= 0 comp)
+          (setq bar (concat "\uee00" bar "\uee02"))
         )
+      (if (and
+           (> comp 0)
+           (< comp 20)
+           )
+          (setq bar (concat "\uee03" bar "\uee02"))
+        )
+      (if (= 20 comp)
+          (setq bar (concat "\uee03" bar "\uee05"))
+        )
+      bar
       )))
+
+(add-hook 'org-mode-hook  (lambda ()
+               (push 'display font-lock-extra-managed-props)
+               (font-lock-add-keywords nil log-font-lock-keywords)
+               (font-lock-flush (point-min) (point-max))
+               ))
+
+(add-hook 'emacs-lisp-mode-hook  (lambda ()
+               (push 'display font-lock-extra-managed-props)
+               (font-lock-add-keywords nil log-font-lock-keywords)
+               (font-lock-flush (point-min) (point-max))
+               ))
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
