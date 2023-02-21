@@ -54,29 +54,31 @@
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
 
-(package! ftable
-  :recipe (:host github :repo "casouri/ftable"
-           :files ("*.el")))
+;; (package! ftable
+;;   :recipe (:host github :repo "casouri/ftable"
+;;            :files ("*.el")))
 
-(package! org-fragtog)
+;; (package! org-fragtog)
 
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 
-(package! elisp-format
-  :recipe (:host github :repo "luk3ya0/elisp-format"))
+;; (package! elisp-format
+;;   :recipe (:host github :repo "luk3ya0/elisp-format"))
 
-(package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree")
-  :pin "207c748aa5fea8626be619e8c55bdb1c16118c25")
+;; (package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree")
+;;   :pin "207c748aa5fea8626be619e8c55bdb1c16118c25")
 
 (disable-packages! htmlsize org-superstar)
 
 ;; editor
-(package! scroll-on-jump
-  :recipe ( :host gitlab
-   :repo "ideasman42/emacs-scroll-on-jump"))
+;; (package! scroll-on-jump
+;;   :recipe ( :host gitlab
+;;    :repo "ideasman42/emacs-scroll-on-jump"))
 
 (package! nov :pin "8f5b42e9d9f304b422c1a7918b43ee323a7d3532")
+
+(package! scroll-on-jump)
 
 (package! pyenv)
 

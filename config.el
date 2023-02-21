@@ -182,8 +182,8 @@
   (setq org-emphasis-alist
         '(("*" (bold))
           ("/" italic)
-          ;; ("_" underline)
-          ("=" (:background nil :foreground "white"))
+          ("_" nil)
+          ("=" (:background nil :foreground "pink4"))
           ("~" (:background nil :foreground "tan"))
           ;; ("+" (:strike-through t))
           ))
@@ -194,8 +194,8 @@
         org-display-inline-images t
         org-redisplay-inline-images t
         org-image-actual-width nil
-        org-latex-default-class "ctexart"
-        org-latex-compiler "xelatex"
+        ;; org-latex-default-class "ctexart"
+        ;; org-latex-compiler "xelatex"
         org-startup-with-inline-images nil
         org-startup-with-latex-preview nil
         org-link-elisp-confirm-function nil
@@ -234,15 +234,35 @@
   :init
   (setq valign-fancy-bar t))
 
-(use-package! ftable
-  :after org
-  :diminish
-  :init
-  (setq ftable-fill-column 10))
+;; (use-package! ftable
+;;   :after org
+;;   :diminish
+;;   :init
+;;   (setq ftable-fill-column 10))
 
-(use-package! org-fragtog
-  :after org
-  :hook (org-mode . org-fragtog-mode))
+;; (use-package! org-fragtog
+;;   :after org
+;;   :hook (org-mode . org-fragtog-mode))
+(defun org-center-images ()
+  "Center images in document."
+  (require 'nov)
+  (let* ((pixel-buffer-width (shr-pixel-buffer-width))
+         match)
+    (save-excursion
+      (goto-char (point-min))
+      (while (setq match (text-property-search-forward
+                          'display nil
+                          (lambda (_ p) (eq (car-safe p) 'image))))
+        (when-let ((size (car (image-size
+                               (prop-match-value match) 'pixels)))
+                   ((> size 150))
+                   (center-pixel (floor (- pixel-buffer-width size) 2))
+                   (center-pos (floor center-pixel (frame-char-width))))
+          (beginning-of-line)
+          (indent-to center-pos)
+          (end-of-line))))))
+
+(add-hook 'org-mode-hook 'org-center-images)
 
 (use-package! org-ol-tree
   :init
