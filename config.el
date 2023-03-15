@@ -46,7 +46,7 @@
 ;;
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-(setq doom-font (font-spec :family "Fira Code" :size 14)
+(setq doom-font (font-spec :family "Fira Code" :size 15)
       doom-serif-font doom-font
       doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 160)
       doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 160))
@@ -105,6 +105,7 @@
 (add-hook 'python-mode-hook (lambda ()
                               (setq python-indent 4)))
 
+;;; org ──────────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Documents/Org")
@@ -186,7 +187,7 @@
   (setq org-latex-preview-options
         (progn
           (plist-put org-format-latex-options :background "Transparent")
-          (plist-put org-format-latex-options :scale 2)
+          (plist-put org-format-latex-options :scale 1)
           (plist-put org-format-latex-options :zoom 1)))
   (setq org-latex-packages-alist
         '(
