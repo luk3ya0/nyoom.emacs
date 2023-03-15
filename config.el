@@ -5,11 +5,12 @@
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
+(setq user-full-name "John Doe"
+      user-mail-address "john@doe.com")
+
 (setq user-full-name "Luke Yao"
       user-mail-address "oneTOinf@163.com")
 
@@ -43,8 +44,8 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-;; (setq doom-emoji-fallback-font-families '("Apple Color Emoji"))
-;; (setq doom-symbol-fallback-font-families '("Apple Symbols"))
+;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font doom-font
       doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 160)
@@ -66,7 +67,7 @@
   (setq emojify-display-style 'unicode)
   (setq emojify-emoji-styles '(unicode))
   (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
-
+;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
@@ -75,14 +76,13 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;; (setq doom-theme 'doom-smoooooth-light)
-(setq doom-theme 'doom-smoooooth)
+(setq doom-theme 'doom-one-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type nil)
 
-
+;; Language mode
 (add-hook 'ruby-mode-hook
           (lambda ()
             (setq-local tab-width 2)))
@@ -103,39 +103,8 @@
             (setq-local indent-tabs-mode nil)))
 
 (add-hook 'python-mode-hook (lambda ()
-			      (setq python-indent 4)))
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
-;;
-;;   (after! PACKAGE
-;;     (setq x y))
-;;
-;; The exceptions to this rule:
-;;
-;;   - Setting file/directory variables (like `org-directory')
-;;   - Setting variables which explicitly tell you to set them before their
-;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
-;;   - Setting doom variables (which start with 'doom-' or '+').
-;;
-;; Here are some additional functions/macros that will help you configure Doom.
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
-;; etc).
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-;;; Org Mode ────────────────────────────────────────
+                              (setq python-indent 4)))
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Documents/Org")
@@ -179,14 +148,6 @@
                       :inherit 'org-progress-done
                       :width 'ultra-condensed
                       )
-  (setq org-emphasis-alist
-        '(("*" (bold))
-          ("/" italic)
-          ("_" nil)
-          ("=" (:background nil :foreground "pink4"))
-          ("~" (:background nil :foreground "tan"))
-          ;; ("+" (:strike-through t))
-          ))
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-hide-leading-stars nil
         org-startup-indented nil
@@ -194,15 +155,10 @@
         org-display-inline-images t
         org-redisplay-inline-images t
         org-image-actual-width nil
-        ;; org-latex-default-class "ctexart"
-        ;; org-latex-compiler "xelatex"
         org-startup-with-inline-images nil
         org-startup-with-latex-preview nil
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
-        org-preview-latex-default-process 'dvisvgm
-        org-format-latex-options (plist-put org-format-latex-options :scale 0.9)
-
         org-log-done t
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
@@ -217,7 +173,39 @@
         org-fontify-quote-and-verse-blocks t
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fold-catch-invisible-edits 'smart))
+        org-fold-catch-invisible-edits 'smart)
+  (setq org-emphasis-alist
+        '(("*" (bold))
+          ("/" italic)
+          ("_" nil)
+          ("=" (:background nil :foreground "pink4"))
+          ("~" (:background nil :foreground "tan"))
+          ;; ("+" (:strike-through t))
+          ))
+  (setq org-latex-preview-default-process 'dvisvgm)
+  (setq org-latex-preview-options
+        (progn
+          (plist-put org-format-latex-options :background "Transparent")
+          (plist-put org-format-latex-options :scale 2)
+          (plist-put org-format-latex-options :zoom 1)))
+  (setq org-latex-packages-alist
+        '(
+          ("" "siunitx" t)
+          ("version=4" "mhchem" t)
+          ("" "mlmodern")))
+
+
+  (setq org-latex-preview-preamble
+        "\\documentclass{article}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+\\usepackage{xcolor}
+\\usepackage{fontspec}
+\\usepackage{tikz}
+\\newcommand{\\vect}[1]{\\textit{\\textbf{#1}}}
+\\newcommand{\\diff}{\\mathop{}\\!\\mathrm{d}}
+\\newcommand{\\Diff}{\\mathop{}\\!\\mathrm{D}}")
+  )
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
       (add-hook hook (lambda ()
@@ -234,15 +222,6 @@
   :init
   (setq valign-fancy-bar t))
 
-;; (use-package! ftable
-;;   :after org
-;;   :diminish
-;;   :init
-;;   (setq ftable-fill-column 10))
-
-;; (use-package! org-fragtog
-;;   :after org
-;;   :hook (org-mode . org-fragtog-mode))
 (defun org-center-images ()
   "Center images in document."
   (require 'nov)
@@ -309,14 +288,6 @@
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
 (setq-default major-mode 'org-mode)
-
-;;; Windows ─────────────────────────────────────────
-(setq evil-vsplit-window-right t
-      evil-split-window-below t)
-
-(defadvice! prompt-for-buffer (&rest _)
-  :after '(evil-window-split evil-window-vsplit)
-  (consult-buffer))
 
 ;;; Editor > snippets & check ───────────────────────
 (with-eval-after-load 'flycheck
@@ -637,3 +608,34 @@
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+;; Whenever you reconfigure a package, make sure to wrap your config in an
+;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;;
+;;   (after! PACKAGE
+;;     (setq x y))
+;;
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
