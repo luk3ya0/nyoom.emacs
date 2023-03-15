@@ -139,6 +139,7 @@
   )
 
 (after! org
+  (require 'preview-dvisvgm)
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
@@ -182,31 +183,8 @@
           ("=" (:background nil :foreground "pink4"))
           ("~" (:background nil :foreground "tan"))
           ;; ("+" (:strike-through t))
-          ))
-  (setq org-latex-preview-default-process 'dvisvgm)
-  (setq org-latex-preview-options
-        (progn
-          (plist-put org-format-latex-options :background "Transparent")
-          (plist-put org-format-latex-options :scale 1)
-          (plist-put org-format-latex-options :zoom 1)))
-  (setq org-latex-packages-alist
-        '(
-          ("" "siunitx" t)
-          ("version=4" "mhchem" t)
-          ("" "mlmodern")))
+          )))
 
-
-  (setq org-latex-preview-preamble
-        "\\documentclass{article}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-\\usepackage{xcolor}
-\\usepackage{fontspec}
-\\usepackage{tikz}
-\\newcommand{\\vect}[1]{\\textit{\\textbf{#1}}}
-\\newcommand{\\diff}{\\mathop{}\\!\\mathrm{d}}
-\\newcommand{\\Diff}{\\mathop{}\\!\\mathrm{D}}")
-  )
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
       (add-hook hook (lambda ()

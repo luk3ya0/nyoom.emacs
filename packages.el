@@ -54,6 +54,7 @@
            :files ("*.el")))
 
 ;; (package! org-fragtog)
+(package! preview-dvisvgm)
 
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
