@@ -76,7 +76,9 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one-light)
+;; (setq doom-theme 'doom-one-light)
+(setq doom-theme 'doom-smoooooth-light)
+;; (setq doom-theme 'doom-smoooooth)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -105,7 +107,7 @@
 (add-hook 'python-mode-hook (lambda ()
                               (setq python-indent 4)))
 
-;;; org ──────────────────────────────────────────────
+;;; Org ──────────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Documents/Org")
@@ -139,7 +141,29 @@
   )
 
 (after! org
-  (require 'preview-dvisvgm)
+  ;; Vertically align LaTeX preview in org mode
+  (defun my-org-latex-preview-advice (beg end &rest _args)
+    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
+           (img (cdr (overlay-get ov 'display)))
+           (new-img (plist-put img :ascent 95)))
+      (overlay-put ov 'display (cons 'image new-img))))
+  (advice-add 'org--make-preview-overlay
+              :after #'my-org-latex-preview-advice)
+
+  ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
+  ;; Justifying-LaTeX-preview-fragments-in-org-mode/
+  ;; specify the justification you want
+  (plist-put org-format-latex-options :justify 'right)
+
+  (defun eli/org-justify-fragment-overlay (beg end image imagetype)
+    (let* ((position (plist-get org-format-latex-options :justify))
+           (img (create-image image 'svg t))
+           (ov (car (overlays-at (/ (+ beg end) 2) t)))
+           (width (car (image-display-size (overlay-get ov 'display))))
+           offset)
+      (cond
+       ((and (eq 'center position)
+             (= beg (line-beginning-position)))))))
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
@@ -161,6 +185,7 @@
         org-startup-with-latex-preview nil
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
+        org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-log-done t
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
@@ -175,7 +200,123 @@
         org-fontify-quote-and-verse-blocks t
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fold-catch-invisible-edits 'smart)
+        org-fold-catch-invisible-edits 'smart
+        org-latex-prefer-user-labels t
+        org-startup-with-latex-preview nil
+        org-preview-latex-default-process 'dvisvgm
+        org-preview-latex-process-alist'((dvisvgm :programs
+                                          ("xelatex" "dvisvgm")
+                                          :description "xdv > svg"
+                                          :message "you need to install the programs: xelatex and dvisvgm."
+                                          :use-xcolor t
+                                          :image-input-type "xdv"
+                                          :image-output-type "svg"
+                                          :image-size-adjust (1 . 1)
+                                          :latex-compiler
+                                          ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
+                                          :image-converter
+                                          ("dvisvgm %f -e -n -b min -c %S -o %O"))
+                                         (imagemagick :programs
+                                                      ("xelatex" "convert")
+                                                      :description "pdf > png"
+                                                      :message "you need to install the programs: xelatex and imagemagick."
+                                                      :use-xcolor t
+                                                      :image-input-type "pdf"
+                                                      :image-output-type "png"
+                                                      :image-size-adjust (1.0 . 1.0)
+                                                      :latex-compiler
+                                                      ("xelatex -interaction nonstopmode -output-directory %o %f")
+                                                      :image-converter
+                                                      ("convert -density %D -trim -antialias %f -quality 100 %O")))
+        ;; org-latex-hyperref-template "\\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},\n pdfsubject={%d},\n pdfcreator={%c}, \n pdflang={%L},\n colorlinks=true,\n linkcolor=black}\n"
+        ;; org-format-latex-options '(:foreground default :background default :scale 1.5 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+        ;;                            ("begin" "$1" "$" "$$" "\\(" "\\["))
+        ;; org-latex-src-block-backend 'minted
+        ;; org-latex-minted-options '(("breaklines")
+        ;;                            ("bgcolor" "bg"))
+        org-latex-compiler "xelatex"
+        org-latex-packages-alist '(("" "amsthm")
+                                   ("" "amsfonts")
+                                   ("" "ctex")
+                                   ("" "xcolor" t)
+                                   ("cache=false" "minted" t))
+        org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "biber %b"
+                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
+                                )
+        ;; org-latex-classes '(("Notes" "\\documentclass{ctexart}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]\n\\usepackage{/home/eli/.emacs.d/private/NotesTeXV3}"
+        ;;                      ("\\part{%s}" . "\\part*{%s}")
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+        ;;                     ("article_cn" "\\documentclass[11pt]{ctexart}\n[DEFAULT-PACKAGES]\n[PACKAGES]\n[EXTRA]\n\\definecolor{bg}{rgb}{0.95,0.95,0.95}"
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+        ;;                     ("beamer" "\\documentclass[ignorenonframetext,presentation]{beamer}"
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}"))
+        ;;                     ("article" "\\documentclass[11pt]{article}"
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+        ;;                     ("report" "\\documentclass[11pt]{report}"
+        ;;                      ("\\part{%s}" . "\\part*{%s}")
+        ;;                      ("\\chapter{%s}" . "\\chapter*{%s}")
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+        ;;                     ("book" "\\documentclass[11pt]{book}"
+        ;;                      ("\\part{%s}" . "\\part*{%s}")
+        ;;                      ("\\chapter{%s}" . "\\chapter*{%s}")
+        ;;                      ("\\section{%s}" . "\\section*{%s}")
+        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
+        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+        )
+  ;; (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams ("xelatex" "dvisvgm")
+  ;;                                                 :discription "xdv > svg"
+  ;;                                                 :message "you need install the programs: xelatex and dvisvgm."
+  ;;                                                 :image-input-type "xdv"
+  ;;                                                 :image-output-type "svg"
+  ;;                                                 :image-size-adjust (1.0 . 1.0)
+  ;;                                                 :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
+  ;;                                                 :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
+  ;; (add-to-list 'org-preview-latex-process-alist '(lualatex :programs ("lualatex" "dvisvgm")
+  ;;                                                :description "dvi > svg"
+  ;;                                                :message "you need to install the programs: lualatex and dvisvgm."
+  ;;                                                :image-input-type "dvi"
+  ;;                                                :image-output-type "svg"
+  ;;                                                :image-size-adjust (1.0 . 1.0)
+  ;;                                                :latex-compiler ("lualatex --interaction=nonstopmode --shell-escape --output-format=dvi --output-directory=%o %f")
+  ;;                                                :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
+  ;; (add-to-list 'org-preview-latex-process-alist '(imagemagick :programs
+  ;;                                                 ("latex" "convert")
+  ;;                                                 :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :use-xcolor t :image-input-type "pdf" :image-output-type "png" :image-size-adjust
+  ;;                                                 (1.0 . 1.0)
+  ;;                                                 :latex-compiler
+  ;;                                                 ("pdflatex -interaction nonstopmode -output-directory %o %f")
+  ;;                                                 :image-converter
+  ;;                                                 ("convert -density %D -trim -antialias %f -quality 100 %O")))
+  ;; (add-to-list 'org-preview-latex-process-alist '(dvisvgm :programs
+  ;;                                                 ("latex" "dvisvgm")
+  ;;                                                 :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :use-xcolor t :image-input-type "dvi" :image-output-type "svg" :image-size-adjust
+  ;;                                                 (1.7 . 1.5)
+  ;;                                                 :latex-compiler
+  ;;                                                 ("latex -interaction nonstopmode -output-directory %o %f")
+  ;;                                                 :image-converter
+  ;;                                                 ("dvisvgm %f -n -b min -c %S -o %O")))
+
+  ;; (add-to-list 'org-latex-default-packages-alist '("" "ctex" t ("xelatex")))
+  ;; (setq org-preview-latex-default-process 'xdvsvgm)
+  ;; (setq org-preview-latex-default-process 'dvisvgm)
   (setq org-emphasis-alist
         '(("*" (bold))
           ("/" italic)
@@ -187,11 +328,11 @@
 
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
-      (add-hook hook (lambda ()
-                       (setq-local line-spacing 5)
-                       (visual-line-mode 1)
-                       (flyspell-mode -1)
-                       (hl-line-mode -1))))
+  (add-hook hook (lambda ()
+                   ;; (setq-local line-spacing 5)
+                   (visual-line-mode 1)
+                   (flyspell-mode -1)
+                   (hl-line-mode -1))))
 
 (use-package! valign
   :after org
@@ -570,16 +711,16 @@
       )))
 
 (add-hook 'org-mode-hook  (lambda ()
-               (push 'display font-lock-extra-managed-props)
-               (font-lock-add-keywords nil log-font-lock-keywords)
-               (font-lock-flush (point-min) (point-max))
-               ))
+                            (push 'display font-lock-extra-managed-props)
+                            (font-lock-add-keywords nil log-font-lock-keywords)
+                            (font-lock-flush (point-min) (point-max))
+                            ))
 
 (add-hook 'emacs-lisp-mode-hook  (lambda ()
-               (push 'display font-lock-extra-managed-props)
-               (font-lock-add-keywords nil log-font-lock-keywords)
-               (font-lock-flush (point-min) (point-max))
-               ))
+                                   (push 'display font-lock-extra-managed-props)
+                                   (font-lock-add-keywords nil log-font-lock-keywords)
+                                   (font-lock-flush (point-min) (point-max))
+                                   ))
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
@@ -618,3 +759,5 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;; Vertically align LaTeX preview in org mode
