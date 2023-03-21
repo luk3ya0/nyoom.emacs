@@ -1,4 +1,5 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+;; (add-to-list 'load-path "~/.doom.d/lisp/")
+
 ;;; UI ──────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
@@ -8,9 +9,6 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.com")
-
 (setq user-full-name "Luke Yao"
       user-mail-address "oneTOinf@163.com")
 
@@ -141,29 +139,6 @@
   )
 
 (after! org
-  ;; Vertically align LaTeX preview in org mode
-  (defun my-org-latex-preview-advice (beg end &rest _args)
-    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-           (img (cdr (overlay-get ov 'display)))
-           (new-img (plist-put img :ascent 95)))
-      (overlay-put ov 'display (cons 'image new-img))))
-  (advice-add 'org--make-preview-overlay
-              :after #'my-org-latex-preview-advice)
-
-  ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
-  ;; Justifying-LaTeX-preview-fragments-in-org-mode/
-  ;; specify the justification you want
-  (plist-put org-format-latex-options :justify 'right)
-
-  (defun eli/org-justify-fragment-overlay (beg end image imagetype)
-    (let* ((position (plist-get org-format-latex-options :justify))
-           (img (create-image image 'svg t))
-           (ov (car (overlays-at (/ (+ beg end) 2) t)))
-           (width (car (image-display-size (overlay-get ov 'display))))
-           offset)
-      (cond
-       ((and (eq 'center position)
-             (= beg (line-beginning-position)))))))
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
@@ -178,14 +153,11 @@
         org-hide-leading-stars nil
         org-startup-indented nil
         org-edit-src-content-indentation 0
-        org-display-inline-images t
-        org-redisplay-inline-images t
         org-image-actual-width nil
         org-startup-with-inline-images nil
         org-startup-with-latex-preview nil
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
-        org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-log-done t
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
@@ -203,6 +175,7 @@
         org-fold-catch-invisible-edits 'smart
         org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
+        org-format-latex-options (plist-put org-format-latex-options :scale 1.3)
         org-preview-latex-default-process 'dvisvgm
         org-preview-latex-process-alist'((dvisvgm :programs
                                           ("xelatex" "dvisvgm")
@@ -211,7 +184,7 @@
                                           :use-xcolor t
                                           :image-input-type "xdv"
                                           :image-output-type "svg"
-                                          :image-size-adjust (1 . 1)
+                                          :image-size-adjust (1.2 . 1.2)
                                           :latex-compiler
                                           ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
                                           :image-converter
@@ -228,16 +201,11 @@
                                                       ("xelatex -interaction nonstopmode -output-directory %o %f")
                                                       :image-converter
                                                       ("convert -density %D -trim -antialias %f -quality 100 %O")))
-        ;; org-latex-hyperref-template "\\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},\n pdfsubject={%d},\n pdfcreator={%c}, \n pdflang={%L},\n colorlinks=true,\n linkcolor=black}\n"
-        ;; org-format-latex-options '(:foreground default :background default :scale 1.5 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-        ;;                            ("begin" "$1" "$" "$$" "\\(" "\\["))
-        ;; org-latex-src-block-backend 'minted
-        ;; org-latex-minted-options '(("breaklines")
-        ;;                            ("bgcolor" "bg"))
         org-latex-compiler "xelatex"
         org-latex-packages-alist '(("" "amsthm")
                                    ("" "amsfonts")
                                    ("" "ctex")
+                                   ("" "tikz")
                                    ("" "xcolor" t)
                                    ("cache=false" "minted" t))
         org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
@@ -246,77 +214,7 @@
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
                                 )
-        ;; org-latex-classes '(("Notes" "\\documentclass{ctexart}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]\n\\usepackage{/home/eli/.emacs.d/private/NotesTeXV3}"
-        ;;                      ("\\part{%s}" . "\\part*{%s}")
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
-        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-        ;;                     ("article_cn" "\\documentclass[11pt]{ctexart}\n[DEFAULT-PACKAGES]\n[PACKAGES]\n[EXTRA]\n\\definecolor{bg}{rgb}{0.95,0.95,0.95}"
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
-        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-        ;;                     ("beamer" "\\documentclass[ignorenonframetext,presentation]{beamer}"
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}"))
-        ;;                     ("article" "\\documentclass[11pt]{article}"
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
-        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ;;                      ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ;;                      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-        ;;                     ("report" "\\documentclass[11pt]{report}"
-        ;;                      ("\\part{%s}" . "\\part*{%s}")
-        ;;                      ("\\chapter{%s}" . "\\chapter*{%s}")
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
-        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-        ;;                     ("book" "\\documentclass[11pt]{book}"
-        ;;                      ("\\part{%s}" . "\\part*{%s}")
-        ;;                      ("\\chapter{%s}" . "\\chapter*{%s}")
-        ;;                      ("\\section{%s}" . "\\section*{%s}")
-        ;;                      ("\\subsection{%s}" . "\\subsection*{%s}")
-        ;;                      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
         )
-  ;; (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams ("xelatex" "dvisvgm")
-  ;;                                                 :discription "xdv > svg"
-  ;;                                                 :message "you need install the programs: xelatex and dvisvgm."
-  ;;                                                 :image-input-type "xdv"
-  ;;                                                 :image-output-type "svg"
-  ;;                                                 :image-size-adjust (1.0 . 1.0)
-  ;;                                                 :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
-  ;;                                                 :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
-  ;; (add-to-list 'org-preview-latex-process-alist '(lualatex :programs ("lualatex" "dvisvgm")
-  ;;                                                :description "dvi > svg"
-  ;;                                                :message "you need to install the programs: lualatex and dvisvgm."
-  ;;                                                :image-input-type "dvi"
-  ;;                                                :image-output-type "svg"
-  ;;                                                :image-size-adjust (1.0 . 1.0)
-  ;;                                                :latex-compiler ("lualatex --interaction=nonstopmode --shell-escape --output-format=dvi --output-directory=%o %f")
-  ;;                                                :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
-  ;; (add-to-list 'org-preview-latex-process-alist '(imagemagick :programs
-  ;;                                                 ("latex" "convert")
-  ;;                                                 :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :use-xcolor t :image-input-type "pdf" :image-output-type "png" :image-size-adjust
-  ;;                                                 (1.0 . 1.0)
-  ;;                                                 :latex-compiler
-  ;;                                                 ("pdflatex -interaction nonstopmode -output-directory %o %f")
-  ;;                                                 :image-converter
-  ;;                                                 ("convert -density %D -trim -antialias %f -quality 100 %O")))
-  ;; (add-to-list 'org-preview-latex-process-alist '(dvisvgm :programs
-  ;;                                                 ("latex" "dvisvgm")
-  ;;                                                 :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :use-xcolor t :image-input-type "dvi" :image-output-type "svg" :image-size-adjust
-  ;;                                                 (1.7 . 1.5)
-  ;;                                                 :latex-compiler
-  ;;                                                 ("latex -interaction nonstopmode -output-directory %o %f")
-  ;;                                                 :image-converter
-  ;;                                                 ("dvisvgm %f -n -b min -c %S -o %O")))
-
-  ;; (add-to-list 'org-latex-default-packages-alist '("" "ctex" t ("xelatex")))
-  ;; (setq org-preview-latex-default-process 'xdvsvgm)
-  ;; (setq org-preview-latex-default-process 'dvisvgm)
   (setq org-emphasis-alist
         '(("*" (bold))
           ("/" italic)
@@ -326,10 +224,9 @@
           ;; ("+" (:strike-through t))
           )))
 
-
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
-                   ;; (setq-local line-spacing 5)
+                   (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
@@ -341,57 +238,6 @@
   (org-mode . valign-mode)
   :init
   (setq valign-fancy-bar t))
-
-(defun org-center-images ()
-  "Center images in document."
-  (require 'nov)
-  (let* ((pixel-buffer-width (shr-pixel-buffer-width))
-         match)
-    (save-excursion
-      (goto-char (point-min))
-      (while (setq match (text-property-search-forward
-                          'display nil
-                          (lambda (_ p) (eq (car-safe p) 'image))))
-        (when-let ((size (car (image-size
-                               (prop-match-value match) 'pixels)))
-                   ((> size 150))
-                   (center-pixel (floor (- pixel-buffer-width size) 2))
-                   (center-pos (floor center-pixel (frame-char-width))))
-          (beginning-of-line)
-          (indent-to center-pos)
-          (end-of-line))))))
-
-(add-hook 'org-mode-hook 'org-center-images)
-
-(use-package! org-ol-tree
-  :init
-  (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
-    "Face used by org-ol-tree to display the root node."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-title-face
-    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-id-face
-    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  :config
-  (setq org-ol-tree-ui-window-max-width 0.4
-        org-ol-tree-ui-window-min-width 0.4
-        org-ol-tree-action-move-to-target t
-        org-ol-tree-ui-window-auto-resize nil)
-
-  :commands org-ol-tree)
-
-(map! :map org-mode-map
-      :after org
-      :localleader
-      :desc "Outline" "O" #'org-ol-tree)
 
 (use-package! org-appear
   :after org
@@ -649,9 +495,9 @@
 
 (setq-default history-length 1000)
 
-(use-package! hl-sentence
-  :after org
-  :diminish)
+;; (use-package! hl-sentence
+;;   :after org
+;;   :diminish)
 
 (defface fira-lock
   '((t (:font-family "Fira Code"
@@ -668,14 +514,14 @@
      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
     ("\\[\\([0-9]+/[0-9]+\\)\\]"
      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-    ("\\(--\\)"
-     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-    ("\\(──\\)"
-     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ;; ("\\(--\\)"
+    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ;; ("\\(──\\)"
+    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
     ))
 
-(defun dash-to-hyphen (value)
-  (format "%s" (make-string (length value) #x2500)))
+;; (defun dash-to-hyphen (value)
+;;   (format "%s" (make-string (length value) #x2500)))
 
 (defun fira-code-progress-count (value)
   (concat (fira-code-progress-bar value) " " value))
@@ -696,17 +542,13 @@
                         (make-string (round uncomp) #xee01)))
       (setq bar (substring bar 1 18))
       (if (= 0 comp)
-          (setq bar (concat "\uee00" bar "\uee02"))
-        )
+          (setq bar (concat "\uee00" bar "\uee02")))
       (if (and
            (> comp 0)
-           (< comp 20)
-           )
-          (setq bar (concat "\uee03" bar "\uee02"))
-        )
+           (< comp 20))
+          (setq bar (concat "\uee03" bar "\uee02")))
       (if (= 20 comp)
-          (setq bar (concat "\uee03" bar "\uee05"))
-        )
+          (setq bar (concat "\uee03" bar "\uee05")))
       bar
       )))
 
@@ -759,5 +601,3 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-
-;; Vertically align LaTeX preview in org mode

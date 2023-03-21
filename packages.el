@@ -53,34 +53,23 @@
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
 
-;; (package! org-fragtog)
 (package! preview-dvisvgm)
 
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 
-;; (package! elisp-format
-;;   :recipe (:host github :repo "luk3ya0/elisp-format"))
-
-;; (package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree")
-;;   :pin "207c748aa5fea8626be619e8c55bdb1c16118c25")
-
 (disable-packages! htmlsize org-superstar)
-
-(package! nov :pin "8f5b42e9d9f304b422c1a7918b43ee323a7d3532")
 
 (package! scroll-on-jump)
 
-(package! pyenv)
+;; (package! pyenv)
 
 (package! command-log-mode)
 
-(package! hl-sentence
-  :recipe (:host github :repo "luk3ya0/hl-sentence"
-          :files ("*.el" "lisp/*.el")))
+;; (package! hl-sentence
+;;   :recipe (:host github :repo "luk3ya0/hl-sentence"
+;;           :files ("*.el" "lisp/*.el")))
 
 (package! svg-lib
   :recipe (:host github :repo "luk3ya0/svg-lib"
           :files ("*.el" "lisp/*.el")))
-
-(package! xenops)
