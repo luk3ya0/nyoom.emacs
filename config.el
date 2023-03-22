@@ -1,4 +1,4 @@
-;; (add-to-list 'load-path "~/.doom.d/lisp/")
+(add-to-list 'load-path "~/.doom.d/config/")
 
 ;;; UI ──────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
@@ -7,6 +7,28 @@
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
 
+(setq frame-title-format
+      '(""
+        (:eval
+         (if (string-match-p (regexp-quote (or (bound-and-true-p org-roam-directory) "\u0000"))
+                             (or buffer-file-name ""))
+             (replace-regexp-in-string
+              ".*/[0-9]*-?" "☰ "
+              (subst-char-in-string ?_ ?\s buffer-file-name))
+           "%b"))
+        (:eval
+         (when-let ((project-name (and (featurep 'projectile) (projectile-project-name))))
+           (unless (string= "-" project-name)
+             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
+
+;; (set-face-background 'default "mac:windowBackgroundColor")
+;; (dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
+;; (setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
+;; (defface my/default-blurred
+;;    '((t :inherit 'default :stipple "alpha:30%"))
+;;    "Like 'default but blurred."
+;;    :group 'my)
+;;
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Luke Yao"
@@ -23,13 +45,6 @@
            ([(super r)] . doom/reload)
            ([(super j)] . +vterm/toggle))
 
-(map! :after vterm
-      :map vterm-mode-map
-      :ni "s-[" 'previous-buffer)
-
-(map! :after vterm
-      :map vterm-mode-map
-      :ni "s-]" 'next-buffer)
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
 ;; - `doom-font' -- the primary font to use
@@ -139,6 +154,8 @@
   )
 
 (after! org
+  (plist-put org-format-latex-options :background "Transparent")
+  (plist-put org-format-latex-options :zoom 0.93) ; Calibrated based on the TeX font and org-buffer font.
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
@@ -249,7 +266,6 @@
 
 (after! ox-hugo
   (setq org-hugo-use-code-for-kbd t))
-
 ;;; Behavior ────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 

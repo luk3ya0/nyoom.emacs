@@ -49,7 +49,7 @@ Can be an integer to determine the exact padding."
    ;; but can also be useful as a basis for subtle highlights (e.g. for hl-line
    ;; or region), especially when paired with the `doom-darken', `doom-lighten',
    ;; and `doom-blend' helper functions.
-   (bg-alt     '("#f0f0f0" "white"   "white"        ))
+   (bg-alt     '("#fafafa" "white"   "white"        ))
    (fg-alt     '("#c6c7c7" "#c7c7c7" "brightblack"  ))
 
    ;; These should represent a spectrum from bg to fg, where base0 is a starker
