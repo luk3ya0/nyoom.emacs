@@ -1,5 +1,4 @@
-(add-to-list 'load-path "~/.doom.d/config/")
-
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 ;;; UI ──────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
@@ -7,28 +6,6 @@
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
 
-(setq frame-title-format
-      '(""
-        (:eval
-         (if (string-match-p (regexp-quote (or (bound-and-true-p org-roam-directory) "\u0000"))
-                             (or buffer-file-name ""))
-             (replace-regexp-in-string
-              ".*/[0-9]*-?" "☰ "
-              (subst-char-in-string ?_ ?\s buffer-file-name))
-           "%b"))
-        (:eval
-         (when-let ((project-name (and (featurep 'projectile) (projectile-project-name))))
-           (unless (string= "-" project-name)
-             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
-
-;; (set-face-background 'default "mac:windowBackgroundColor")
-;; (dolist (f (face-list)) (set-face-stipple f "alpha:30%"))
-;; (setq face-remapping-alist (append face-remapping-alist '((default my/default-blurred))))
-;; (defface my/default-blurred
-;;    '((t :inherit 'default :stipple "alpha:30%"))
-;;    "Like 'default but blurred."
-;;    :group 'my)
-;;
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "Luke Yao"
@@ -44,6 +21,155 @@
            ([(super z)] . undo)
            ([(super r)] . doom/reload)
            ([(super j)] . +vterm/toggle))
+
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-[" 'previous-buffer)
+
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-]" 'next-buffer)
+;; [[file:config.org::*LSP][LSP:1]]
+(after! lsp-mode
+  (setq lsp-enable-symbol-highlighting nil))
+
+(after! lsp-ui
+  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+        lsp-ui-doc-enable nil))     ; redundant with K
+;; LSP:1 ends here
+
+(setq which-key-allow-multiple-replacements t
+      which-key-idle-delay 0.5) ;; I need the help, I really do
+(after! which-key
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . " \\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . " \\1"))))
+
+;; [[file:config.org::*Company][Company:1]]
+(after! company
+  (setq company-idle-delay 0.1
+        company-selection-wrap-around t
+        company-require-match 'never
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case t
+        company-dabbrev-other-buffers nil
+        company-tooltip-limit 5
+        company-tooltip-minimum-width 40)
+  (set-company-backend!
+    '(text-mode
+      markdown-mode
+      gfm-mode)
+    '(:seperate
+      company-files)))
+;; Company:1 ends here
+;;
+;; [[file:config.org::*Vertico][Vertico:1]]
+(after! vertico
+  ;; settings
+  (setq vertico-resize nil        ; How to resize the Vertico minibuffer window.
+        vertico-count 10          ; Maximal number of candidates to show.
+        vertico-count-format nil) ; No prefix with number of entries
+
+  ;; looks
+  (setq vertico-grid-separator
+        #("  |  " 2 3 (display (space :width (1))
+                               face (:background "#ECEFF1")))
+        vertico-group-format
+        (concat #(" " 0 1 (face vertico-group-title))
+                #(" " 0 1 (face vertico-group-separator))
+                #(" %s " 0 4 (face vertico-group-title))
+                #(" " 0 1 (face vertico-group-separator
+                            display (space :align-to (- right (-1 . right-margin) (- +1)))))))
+  (set-face-attribute 'vertico-group-separator nil
+                      :strike-through t)
+  (set-face-attribute 'vertico-current nil
+                      :inherit '(nano-strong nano-subtle))
+  (set-face-attribute 'completions-first-difference nil
+                      :inherit '(nano-default))
+
+  ;; minibuffer tweaks
+  (defun my/vertico--resize-window (height)
+    "Resize active minibuffer window to HEIGHT."
+      (setq-local truncate-lines t
+                  resize-mini-windows 'grow-only
+                  max-mini-window-height 1.0)
+    (unless (frame-root-window-p (active-minibuffer-window))
+      (unless vertico-resize
+        (setq height (max height vertico-count)))
+      (let* ((window-resize-pixelwise t)
+             (dp (- (max (cdr (window-text-pixel-size))
+                         (* (default-line-height) (1+ height)))
+                    (window-pixel-height))))
+        (when (or (and (> dp 0) (/= height 0))
+                  (and (< dp 0) (eq vertico-resize t)))
+          (window-resize nil dp nil nil 'pixelwise)))))
+
+  (advice-add #'vertico--resize-window :override #'my/vertico--resize-window)
+
+  ;; completion at point
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+  (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
+    (let ((prefix (if (= vertico--index index)
+                      "  "
+                    "   ")))
+      (funcall orig cand prefix suffix index _start)))
+  (advice-add #'vertico--format-candidate
+             :around #'minibuffer-format-candidate)
+  (defun vertico--prompt-selection ()
+    "Highlight the prompt"
+
+    (let ((inhibit-modification-hooks t))
+      (set-text-properties (minibuffer-prompt-end) (point-max)
+                           '(face (nano-strong nano-salient)))))
+  (defun minibuffer-vertico-setup ()
+    (setq truncate-lines t)
+    (setq completion-in-region-function
+          (if vertico-mode
+              #'consult-completion-in-region
+            #'completion--in-region)))
+
+  (add-hook 'vertico-mode-hook #'minibuffer-vertico-setup)
+  (add-hook 'minibuffer-setup-hook #'minibuffer-vertico-setup))
+;; Vertico:1 ends here
+
+
+;; [[file:config.org::*Pixel-scroll][Pixel-scroll:1]]
+(if (boundp 'mac-mouse-wheel-smooth-scroll)
+    (setq  mac-mouse-wheel-smooth-scroll t))
+
+(if (> emacs-major-version 28)
+    (pixel-scroll-precision-mode))
+;; Pixel-scroll:1 ends here
+
+
+;; [[file:config.org::*Ebooks][Ebooks:1]]
+(use-package! nov
+  :mode ("\\.epub\\'" . nov-mode)
+  :config
+  (map! :map nov-mode-map
+        :n "RET" #'nov-scroll-up)
+
+  (advice-add 'nov-render-title :override #'ignore)
+  (defun +nov-mode-setup ()
+    (face-remap-add-relative 'default :height 1.3)
+    (setq-local next-screen-context-lines 4
+                shr-use-colors nil)
+    (require 'visual-fill-column nil t)
+    (setq-local visual-fill-column-center-text t
+                visual-fill-column-width 81
+                nov-text-width 80)
+    (visual-fill-column-mode 1)
+    (add-to-list '+lookup-definition-functions #'+lookup/dictionary-definition)
+    (add-hook 'nov-mode-hook #'+nov-mode-setup)))
+;; Ebooks:1 ends here
+
+
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -160,17 +286,26 @@
                       :inherit 'org-progress-todo
                       :width 'ultra-condensed)
   (set-face-attribute 'org-checkbox-statistics-done nil
-                      :inherit 'org-progress-done :width 'ultra-condensed
-                      )
+                      :inherit 'org-progress-done
+                      :width 'ultra-condensed)
+  (setq org-emphasis-alist
+        '(("*" (bold))
+          ("/" italic)
+          ("_" nil)
+          ("=" (:background nil :foreground "pink4"))
+          ("~" (:background nil :foreground "tan"))))
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-hide-leading-stars nil
         org-startup-indented nil
         org-edit-src-content-indentation 0
+        org-display-inline-images t
+        org-redisplay-inline-images t
         org-image-actual-width nil
         org-startup-with-inline-images nil
         org-startup-with-latex-preview nil
         org-link-elisp-confirm-function nil
         org-link-frame-setup '((file . find-file))
+        org-format-latex-options (plist-put org-format-latex-options :scale 1.5)
         org-log-done t
         org-use-property-inheritance t
         org-confirm-babel-evaluate nil
@@ -185,80 +320,67 @@
         org-fontify-quote-and-verse-blocks t
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fold-catch-invisible-edits 'smart
-        )
-  (setq org-emphasis-alist
-        '(("*" (bold))
-          ("/" italic)
-          ("_" nil)
-          ("=" (:background nil :foreground "pink4"))
-          ("~" (:background nil :foreground "tan"))
-          ;; ("+" (:strike-through t))
-          )))
+        org-fold-catch-invisible-edits 'smart))
 
 ;;; Org-Latex ──────────────────────────────────────────────
 (after! org
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1))
-  (setq org-format-latex-options (plist-put org-format-latex-options :background "Transparent"))
-  (setq
-   org-latex-prefer-user-labels t
-   org-startup-with-latex-preview nil
-   org-latex-compiler "xelatex"
-   org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                           "biber %b"
-                           "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                           "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                           "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto")
-   org-latex-packages-alist '(("" "amsthm")
-                              ("" "amsfonts")
-                              ("" "ctex")
-                              ("" "tikz")
-                              ("" "xcolor" t)
-                              ("cache=false" "minted" t)
-                              "\\color{black}"
-                              "\\defaultfontfeatures{ Scale=MatchUppercase, Ligatures=TeX }"
-                              "\\setCJKmainfont{Noto Serif CJK sc}[Renderer=HarfBuzz]"
-                              "\\setCJKsansfont{Noto Sans CJK sc}[Renderer=HarfBuzz]"
-                              )
-   org-preview-latex-default-process 'xdvsvgm
-   org-preview-latex-process-alist'((dvisvgm :programs
-                                     ("xelatex" "dvisvgm")
-                                     :description "xdv > svg"
-                                     :message "you need to install the programs: xelatex and dvisvgm."
-                                     :use-xcolor t
-                                     :image-input-type "xdv"
-                                     :image-output-type "svg"
-                                     :image-size-adjust (1.2 . 1.2)
-                                     :latex-compiler
-                                     ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
-                                     :image-converter
-                                     ("dvisvgm %f -e -n -b min -c %S -o %O"))
-                                    (xdvsvgm :progams
-                                             ("xelatex" "dvisvgm")
-                                             :discription "xdv > svg"
-                                             :message "you need install the programs: xelatex and dvisvgm."
-                                             :use-xcolor nil
-                                             :image-input-type "xdv"
-                                             :image-output-type "svg"
-                                             :image-size-adjust (1.5 . 1.3)
-                                             :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
-                                             :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))
-                                    (imagemagick :programs
-                                                 ("xelatex" "convert")
-                                                 :description "pdf > png"
-                                                 :message "you need to install the programs: xelatex and imagemagick."
-                                                 :use-xcolor t
-                                                 :image-input-type "pdf"
-                                                 :image-output-type "png"
-                                                 :image-size-adjust (1.0 . 1.0)
-                                                 :latex-compiler
-                                                 ("xelatex -interaction nonstopmode -output-directory %o %f")
-                                                 :image-converter
-                                                 ("convert -density %D -trim -antialias %f -quality 100 %O")))))
+  (setq org-latex-prefer-user-labels t
+        org-startup-with-latex-preview nil
+        org-preview-latex-default-process 'dvisvgm
+        org-preview-latex-process-alist'((dvisvgm :programs
+                                          ("xelatex" "dvisvgm")
+                                          :description "xdv > svg"
+                                          :message "you need to install the programs: xelatex and dvisvgm."
+                                          :use-xcolor t
+                                          :image-input-type "xdv"
+                                          :image-output-type "svg"
+                                          :image-size-adjust (1 . 1)
+                                          :latex-compiler
+                                          ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
+                                          :image-converter
+                                          ("dvisvgm %f -e -n -b min -c %S -o %O"))
+                                         (imagemagick :programs
+                                                      ("xelatex" "convert")
+                                                      :description "pdf > png"
+                                                      :message "you need to install the programs: xelatex and imagemagick."
+                                                      :use-xcolor t
+                                                      :image-input-type "pdf"
+                                                      :image-output-type "png"
+                                                      :image-size-adjust (1.0 . 1.0)
+                                                      :latex-compiler
+                                                      ("xelatex -interaction nonstopmode -output-directory %o %f")
+                                                      :image-converter
+                                                      ("convert -density %D -trim -antialias %f -quality 100 %O")))
+        org-format-latex-options '(:foreground "Black"
+                                   :background "Transparent"
+                                   :scale 1.5
+                                   :html-foreground "Black"
+                                   :html-background "Transparent" :html-scale 1.0
+                                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
+        ;; org-latex-src-block-backend 'minted
+        ;; org-latex-minted-options '(("breaklines")
+        ;;                            ("bgcolor" "bg"))
+        org-latex-compiler "xelatex"
+        org-latex-packages-alist '(("" "amsthm")
+                                   ("" "amsfonts")
+                                   ("" "ctex" t ("xelatex"))
+                                   ("" "tikz")
+                                   ("" "xcolor" t)
+                                   ("cache=false" "minted" t)
+                                   "\\color{black}"
+                                   "\\def\\pgfsysdriver{pgfsys-tex4ht.def}"
+                                   )
+        org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "biber %b"
+                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                                "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
+                                )))
+
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
-                   (setq-local line-spacing 5)
+                   ;; (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
@@ -271,6 +393,36 @@
   :init
   (setq valign-fancy-bar t))
 
+(use-package! org-ol-tree
+  :init
+  (defface org-ol-tree-document-face
+    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
+    "Face used by org-ol-tree to display the root node."
+    :group 'org-ol-tree-faces)
+
+  (defface org-ol-tree-section-title-face
+    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
+    "Face used by org-ol-tree to display section titles."
+    :group 'org-ol-tree-faces)
+
+  (defface org-ol-tree-section-id-face
+    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
+    "Face used by org-ol-tree to display section titles."
+    :group 'org-ol-tree-faces)
+
+  :config
+  (setq org-ol-tree-ui-window-max-width 0.4
+        org-ol-tree-ui-window-min-width 0.4
+        org-ol-tree-action-move-to-target t
+        org-ol-tree-ui-window-auto-resize nil)
+
+  :commands org-ol-tree)
+
+(map! :map org-mode-map
+      :after org
+      :localleader
+      :desc "Outline" "O" #'org-ol-tree)
+
 (use-package! org-appear
   :after org
   :hook (org-mode . org-appear-mode)
@@ -281,6 +433,7 @@
 
 (after! ox-hugo
   (setq org-hugo-use-code-for-kbd t))
+
 ;;; Behavior ────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
@@ -526,9 +679,9 @@
 
 (setq-default history-length 1000)
 
-;; (use-package! hl-sentence
-;;   :after org
-;;   :diminish)
+(use-package! hl-sentence
+  :after org
+  :diminish)
 
 (defface fira-lock
   '((t (:font-family "Fira Code"
@@ -545,14 +698,14 @@
      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
     ("\\[\\([0-9]+/[0-9]+\\)\\]"
      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-    ;; ("\\(--\\)"
-    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-    ;; ("\\(──\\)"
-    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ("\\(--\\)"
+     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ("\\(──\\)"
+     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
     ))
 
-;; (defun dash-to-hyphen (value)
-;;   (format "%s" (make-string (length value) #x2500)))
+(defun dash-to-hyphen (value)
+  (format "%s" (make-string (length value) #x2500)))
 
 (defun fira-code-progress-count (value)
   (concat (fira-code-progress-bar value) " " value))
@@ -573,13 +726,17 @@
                         (make-string (round uncomp) #xee01)))
       (setq bar (substring bar 1 18))
       (if (= 0 comp)
-          (setq bar (concat "\uee00" bar "\uee02")))
+          (setq bar (concat "\uee00" bar "\uee02"))
+        )
       (if (and
            (> comp 0)
-           (< comp 20))
-          (setq bar (concat "\uee03" bar "\uee02")))
+           (< comp 20)
+           )
+          (setq bar (concat "\uee03" bar "\uee02"))
+        )
       (if (= 20 comp)
-          (setq bar (concat "\uee03" bar "\uee05")))
+          (setq bar (concat "\uee03" bar "\uee05"))
+        )
       bar
       )))
 
@@ -601,7 +758,6 @@
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
-;;; Helper ──────────────────────────────────────────────
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -633,3 +789,5 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;; Vertically align LaTeX preview in org mode
