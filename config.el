@@ -1,190 +1,36 @@
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+
+(setq user-full-name "Luke Yao"
+      user-mail-address "oneTOinf@163.com")
+
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-;;; UI ──────────────────────────────────────────────
+;;; UI ──────────────────────────────────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
 
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets. It is optional.
-(setq user-full-name "Luke Yao"
-      user-mail-address "oneTOinf@163.com")
+(setq doom-theme 'doom-smoooooth-light)
+;; (setq doom-theme 'doom-smoooooth)
 
-(bind-keys ([(super a)] . mark-whole-buffer)
-           ([(super c)] . kill-ring-save)
-           ([(super l)] . goto-line)
-           ([(super q)] . save-buffers-kill-emacs)
-           ([(super s)] . save-buffer)
-           ([(super v)] . yank)
-           ([(super w)] . kill-this-buffer)
-           ([(super z)] . undo)
-           ([(super r)] . doom/reload)
-           ([(super j)] . +vterm/toggle))
+(setq display-line-numbers-type nil)
 
-(map! :after vterm
-      :map vterm-mode-map
-      :ni "s-[" 'previous-buffer)
-
-(map! :after vterm
-      :map vterm-mode-map
-      :ni "s-]" 'next-buffer)
-;; [[file:config.org::*LSP][LSP:1]]
-(after! lsp-mode
-  (setq lsp-enable-symbol-highlighting nil))
-
-(after! lsp-ui
-  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
-        lsp-ui-doc-enable nil))     ; redundant with K
-;; LSP:1 ends here
-
-(setq which-key-allow-multiple-replacements t
-      which-key-idle-delay 0.5) ;; I need the help, I really do
-(after! which-key
-  (pushnew!
-   which-key-replacement-alist
-   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . " \\1"))
-   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . " \\1"))))
-
-;; [[file:config.org::*Company][Company:1]]
-(after! company
-  (setq company-idle-delay 0.1
-        company-selection-wrap-around t
-        company-require-match 'never
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case t
-        company-dabbrev-other-buffers nil
-        company-tooltip-limit 5
-        company-tooltip-minimum-width 40)
-  (set-company-backend!
-    '(text-mode
-      markdown-mode
-      gfm-mode)
-    '(:seperate
-      company-files)))
-;; Company:1 ends here
-;;
-;; [[file:config.org::*Vertico][Vertico:1]]
-(after! vertico
-  ;; settings
-  (setq vertico-resize nil        ; How to resize the Vertico minibuffer window.
-        vertico-count 10          ; Maximal number of candidates to show.
-        vertico-count-format nil) ; No prefix with number of entries
-
-  ;; looks
-  (setq vertico-grid-separator
-        #("  |  " 2 3 (display (space :width (1))
-                               face (:background "#ECEFF1")))
-        vertico-group-format
-        (concat #(" " 0 1 (face vertico-group-title))
-                #(" " 0 1 (face vertico-group-separator))
-                #(" %s " 0 4 (face vertico-group-title))
-                #(" " 0 1 (face vertico-group-separator
-                            display (space :align-to (- right (-1 . right-margin) (- +1)))))))
-  (set-face-attribute 'vertico-group-separator nil
-                      :strike-through t)
-  (set-face-attribute 'vertico-current nil
-                      :inherit '(nano-strong nano-subtle))
-  (set-face-attribute 'completions-first-difference nil
-                      :inherit '(nano-default))
-
-  ;; minibuffer tweaks
-  (defun my/vertico--resize-window (height)
-    "Resize active minibuffer window to HEIGHT."
-      (setq-local truncate-lines t
-                  resize-mini-windows 'grow-only
-                  max-mini-window-height 1.0)
-    (unless (frame-root-window-p (active-minibuffer-window))
-      (unless vertico-resize
-        (setq height (max height vertico-count)))
-      (let* ((window-resize-pixelwise t)
-             (dp (- (max (cdr (window-text-pixel-size))
-                         (* (default-line-height) (1+ height)))
-                    (window-pixel-height))))
-        (when (or (and (> dp 0) (/= height 0))
-                  (and (< dp 0) (eq vertico-resize t)))
-          (window-resize nil dp nil nil 'pixelwise)))))
-
-  (advice-add #'vertico--resize-window :override #'my/vertico--resize-window)
-
-  ;; completion at point
-  (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args)))
-  (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
-    (let ((prefix (if (= vertico--index index)
-                      "  "
-                    "   ")))
-      (funcall orig cand prefix suffix index _start)))
-  (advice-add #'vertico--format-candidate
-             :around #'minibuffer-format-candidate)
-  (defun vertico--prompt-selection ()
-    "Highlight the prompt"
-
-    (let ((inhibit-modification-hooks t))
-      (set-text-properties (minibuffer-prompt-end) (point-max)
-                           '(face (nano-strong nano-salient)))))
-  (defun minibuffer-vertico-setup ()
-    (setq truncate-lines t)
-    (setq completion-in-region-function
-          (if vertico-mode
-              #'consult-completion-in-region
-            #'completion--in-region)))
-
-  (add-hook 'vertico-mode-hook #'minibuffer-vertico-setup)
-  (add-hook 'minibuffer-setup-hook #'minibuffer-vertico-setup))
-;; Vertico:1 ends here
-
-
-;; [[file:config.org::*Pixel-scroll][Pixel-scroll:1]]
-(if (boundp 'mac-mouse-wheel-smooth-scroll)
-    (setq  mac-mouse-wheel-smooth-scroll t))
-
-(if (> emacs-major-version 28)
-    (pixel-scroll-precision-mode))
-;; Pixel-scroll:1 ends here
-
-
-;; [[file:config.org::*Ebooks][Ebooks:1]]
-(use-package! nov
-  :mode ("\\.epub\\'" . nov-mode)
-  :config
-  (map! :map nov-mode-map
-        :n "RET" #'nov-scroll-up)
-
-  (advice-add 'nov-render-title :override #'ignore)
-  (defun +nov-mode-setup ()
-    (face-remap-add-relative 'default :height 1.3)
-    (setq-local next-screen-context-lines 4
-                shr-use-colors nil)
-    (require 'visual-fill-column nil t)
-    (setq-local visual-fill-column-center-text t
-                visual-fill-column-width 81
-                nov-text-width 80)
-    (visual-fill-column-mode 1)
-    (add-to-list '+lookup-definition-functions #'+lookup/dictionary-definition)
-    (add-hook 'nov-mode-hook #'+nov-mode-setup)))
-;; Ebooks:1 ends here
-
-
-
-;; Doom exposes five (optional) variables for controlling fonts in Doom:
-;;
-;; - `doom-font' -- the primary font to use
-;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
-;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
-;;   presentations or streaming.
-;; - `doom-unicode-font' -- for unicode glyphs
-;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
-;;
-;; See 'C-h v doom-font' for documentation and more examples of what they
-;; accept. For example:
-;;
-;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
-;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 (setq doom-font (font-spec :family "Fira Code" :size 15)
       doom-serif-font doom-font
       doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 160)
@@ -206,24 +52,52 @@
   (setq emojify-display-style 'unicode)
   (setq emojify-emoji-styles '(unicode))
   (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
-;;
-;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
-;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
-;; refresh your font settings. If Emacs still can't find your font, it likely
-;; wasn't installed correctly. Font issues are rarely Doom issues!
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-;; (setq doom-theme 'doom-one-light)
-(setq doom-theme 'doom-smoooooth-light)
-;; (setq doom-theme 'doom-smoooooth)
+;;; Action ──────────────────────────────────────────────────────────────────────
+(bind-keys ([(super a)] . mark-whole-buffer)
+           ([(super c)] . kill-ring-save)
+           ([(super l)] . goto-line)
+           ([(super q)] . save-buffers-kill-emacs)
+           ([(super s)] . save-buffer)
+           ([(super v)] . yank)
+           ([(super w)] . kill-this-buffer)
+           ([(super z)] . undo)
+           ([(super r)] . doom/reload)
+           ([(super j)] . +vterm/toggle))
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type nil)
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-[" 'previous-buffer)
 
-;; Language mode
+(map! :after vterm
+      :map vterm-mode-map
+      :ni "s-]" 'next-buffer)
+
+;;; Completion ──────────────────────────────────────────────────────────────────
+(after! lsp-mode
+  (setq lsp-enable-symbol-highlighting nil))
+
+(after! lsp-ui
+  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+        lsp-ui-doc-enable nil))     ; redundant with K
+
+(after! company
+  (setq company-idle-delay 0.1
+        company-selection-wrap-around t
+        company-require-match 'never
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case t
+        company-dabbrev-other-buffers nil
+        company-tooltip-limit 5
+        company-tooltip-minimum-width 40)
+  (set-company-backend!
+    '(text-mode
+      markdown-mode
+      gfm-mode)
+    '(:seperate
+      company-files)))
+
+;;; Language mode & Tree sitter ─────────────────────────────────────────────────
 (add-hook 'ruby-mode-hook
           (lambda ()
             (setq-local tab-width 2)))
@@ -246,40 +120,35 @@
 (add-hook 'python-mode-hook (lambda ()
                               (setq python-indent 4)))
 
-;;; Org ──────────────────────────────────────────────
+;;; Org Visual ──────────────────────────────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Documents/Org")
-
-(defface org-link-green
-  '((t (:inherit org-link :foreground "medium sea green" :underline nil)))
-  "A green link."
-  :group `org-faces)
-
-(defface org-progress-todo
-  '((t (:inherit 'org-todo
-        :foreground "azure2"
-        :font-family "Fira Code"
-        :height 150
-        :avgwidth 160
-        :spacing 100
-        )))
-  "Org mode todo face"
-  :group 'org-face
-  )
-
-(defface org-progress-done
-  '((t (:inherit 'org-todo
-        :foreground "azure4"
-        :font-family "Fira Code"
-        :height 150
-        :avgwidth 160
-        :spacing 100)))
-  "Org mode todo face"
-  :group 'org-face
-  )
 
 (after! org
+  (setq org-directory "~/Documents/Org")
+  (defface org-link-green
+    '((t (:inherit org-link :foreground "medium sea green" :underline nil)))
+    "A green link."
+    :group `org-faces)
+  (defface org-progress-todo
+    '((t (:inherit 'org-todo
+          :foreground "azure2"
+          :font-family "Fira Code"
+          :height 150
+          :avgwidth 160
+          :spacing 100)))
+    "Org mode todo face"
+    :group 'org-face)
+
+  (defface org-progress-done
+    '((t (:inherit 'org-todo
+          :foreground "azure4"
+          :font-family "Fira Code"
+          :height 150
+          :avgwidth 160
+          :spacing 100)))
+    "Org mode todo face"
+    :group 'org-face)
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
@@ -322,7 +191,30 @@
         org-fontify-done-headline t
         org-fold-catch-invisible-edits 'smart))
 
-;;; Org-Latex ──────────────────────────────────────────────
+(dolist (hook '(org-mode-hook markdown-mode-hook))
+  (add-hook hook (lambda ()
+                   ;; (setq-local line-spacing 5)
+                   (visual-line-mode 1)
+                   (flyspell-mode -1)
+                   (hl-line-mode -1))))
+
+(use-package! valign
+  :after org
+  :diminish
+  :hook
+  (org-mode . valign-mode)
+  :init
+  (setq valign-fancy-bar t))
+
+(use-package! org-appear
+  :after org
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil))
+
+;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
@@ -377,77 +269,23 @@
                                 "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
                                 )))
 
-
-(dolist (hook '(org-mode-hook markdown-mode-hook))
-  (add-hook hook (lambda ()
-                   ;; (setq-local line-spacing 5)
-                   (visual-line-mode 1)
-                   (flyspell-mode -1)
-                   (hl-line-mode -1))))
-
-(use-package! valign
-  :after org
-  :diminish
-  :hook
-  (org-mode . valign-mode)
-  :init
-  (setq valign-fancy-bar t))
-
-(use-package! org-ol-tree
-  :init
-  (defface org-ol-tree-document-face
-    '((t :family "Fira Code" :size 14 :bold nil :foreground "#59B0CF"))
-    "Face used by org-ol-tree to display the root node."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-title-face
-    '((t :inherit font-lock-doc-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  (defface org-ol-tree-section-id-face
-    '((t :inherit treemacs-file-face :family "Fira Code" :size 14))
-    "Face used by org-ol-tree to display section titles."
-    :group 'org-ol-tree-faces)
-
-  :config
-  (setq org-ol-tree-ui-window-max-width 0.4
-        org-ol-tree-ui-window-min-width 0.4
-        org-ol-tree-action-move-to-target t
-        org-ol-tree-ui-window-auto-resize nil)
-
-  :commands org-ol-tree)
-
-(map! :map org-mode-map
-      :after org
-      :localleader
-      :desc "Outline" "O" #'org-ol-tree)
-
-(use-package! org-appear
-  :after org
-  :hook (org-mode . org-appear-mode)
-  :config
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks nil))
-
 (after! ox-hugo
   (setq org-hugo-use-code-for-kbd t))
 
-;;; Behavior ────────────────────────────────────────
+;;; Behavior ────────────────────────────────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
 (setq-default major-mode 'org-mode)
 
-;;; Editor > snippets & check ───────────────────────
+;;; Editor > snippets & check ───────────────────────────────────────────────────
 (with-eval-after-load 'flycheck
   (setq-default flycheck-disabled-checkers '(org-mode)))
 
 (use-package! doom-snippets
-  :load-path "~/.doom.d/snippets"
+  :load-path "~/.config/doom/snippets"
   :after yasnippet)
 
-;;; Editor > Motion ─────────────────────────────────
+;;; Editor > Motion ─────────────────────────────────────────────────────────────
 (setq undo-limit 80000000             ; Raise undo-limit to 80MB
       evil-want-fine-undo t           ; By default while in insert all changes are one big blob. Be more granular
       auto-save-default t             ; Nobody likes to loose work, I certainly don't
@@ -668,7 +506,7 @@
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
 
-;;; Log ─────────────────────────────────────────────
+;;; Log ─────────────────────────────────────────────────────────────────────────
 (use-package! command-log-mode
   :commands global-command-log-mode
   :config
@@ -679,115 +517,78 @@
 
 (setq-default history-length 1000)
 
-(use-package! hl-sentence
-  :after org
-  :diminish)
+;; (defface fira-lock
+;;   '((t (:font-family "Fira Code"
+;;         :height 160
+;;         :avgwidth 180
+;;         :spacing 100
+;;         )))
+;;   "Org mode todo face"
+;;   :group 'org-face)
 
-(defface fira-lock
-  '((t (:font-family "Fira Code"
-        :height 160
-        :avgwidth 180
-        :spacing 100
-        )))
-  "Org mode todo face"
-  :group 'org-face)
+;; (defvar log-font-lock-keywords
+;;   `(
+;;     ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
+;;      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
+;;     ("\\[\\([0-9]+/[0-9]+\\)\\]"
+;;      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
+;;     ("\\(--\\)"
+;;      (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+;;     ("\\(──\\)"
+;;      (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+;;     ))
 
-(defvar log-font-lock-keywords
-  `(
-    ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
-     (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
-    ("\\[\\([0-9]+/[0-9]+\\)\\]"
-     (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-    ("\\(--\\)"
-     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-    ("\\(──\\)"
-     (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-    ))
+;; (defun dash-to-hyphen (value)
+;;   (format "%s" (make-string (length value) #x2500)))
 
-(defun dash-to-hyphen (value)
-  (format "%s" (make-string (length value) #x2500)))
+;; (defun fira-code-progress-count (value)
+;;   (concat (fira-code-progress-bar value) " " value))
 
-(defun fira-code-progress-count (value)
-  (concat (fira-code-progress-bar value) " " value))
+;; (defun fira-code-progress-percent (value)
+;;   (concat (fira-code-progress-bar (concat value "/100")) " " value "%"))
 
-(defun fira-code-progress-percent (value)
-  (concat (fira-code-progress-bar (concat value "/100")) " " value "%"))
+;; (defun fira-code-progress-bar (value)
+;;   (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+;;          (count (float (car seq)))
+;;          (total (float (cadr seq))))
 
-(defun fira-code-progress-bar (value)
-  (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-         (count (float (car seq)))
-         (total (float (cadr seq))))
+;;     (let (comp uncomp bar)
+;;       (setq comp (* (/ count total) 20))
+;;       (setq uncomp (- 20 comp))
+;;       (setq bar (format "%s%s"
+;;                         (make-string (round comp) #xee04)
+;;                         (make-string (round uncomp) #xee01)))
+;;       (setq bar (substring bar 1 18))
+;;       (if (= 0 comp)
+;;           (setq bar (concat "\uee00" bar "\uee02"))
+;;         )
+;;       (if (and
+;;            (> comp 0)
+;;            (< comp 20)
+;;            )
+;;           (setq bar (concat "\uee03" bar "\uee02"))
+;;         )
+;;       (if (= 20 comp)
+;;           (setq bar (concat "\uee03" bar "\uee05"))
+;;         )
+;;       bar
+;;       )))
 
-    (let (comp uncomp bar)
-      (setq comp (* (/ count total) 20))
-      (setq uncomp (- 20 comp))
-      (setq bar (format "%s%s"
-                        (make-string (round comp) #xee04)
-                        (make-string (round uncomp) #xee01)))
-      (setq bar (substring bar 1 18))
-      (if (= 0 comp)
-          (setq bar (concat "\uee00" bar "\uee02"))
-        )
-      (if (and
-           (> comp 0)
-           (< comp 20)
-           )
-          (setq bar (concat "\uee03" bar "\uee02"))
-        )
-      (if (= 20 comp)
-          (setq bar (concat "\uee03" bar "\uee05"))
-        )
-      bar
-      )))
+;; (add-hook 'org-mode-hook  (lambda ()
+;;                             (push 'display font-lock-extra-managed-props)
+;;                             (font-lock-add-keywords nil log-font-lock-keywords)
+;;                             (font-lock-flush (point-min) (point-max))
+;;                             ))
 
-(add-hook 'org-mode-hook  (lambda ()
-                            (push 'display font-lock-extra-managed-props)
-                            (font-lock-add-keywords nil log-font-lock-keywords)
-                            (font-lock-flush (point-min) (point-max))
-                            ))
+;; (add-hook 'emacs-lisp-mode-hook  (lambda ()
+;;                                    (push 'display font-lock-extra-managed-props)
+;;                                    (font-lock-add-keywords nil log-font-lock-keywords)
+;;                                    (font-lock-flush (point-min) (point-max))
+;;                                    ))
 
-(add-hook 'emacs-lisp-mode-hook  (lambda ()
-                                   (push 'display font-lock-extra-managed-props)
-                                   (font-lock-add-keywords nil log-font-lock-keywords)
-                                   (font-lock-flush (point-min) (point-max))
-                                   ))
+;; (defun org-summary-todo (n-done n-not-done)
+;;   "Switch entry to DONE when all subentries are done, to TODO otherwise."
+;;   (let (org-log-done org-log-states)   ; turn off logging
+;;     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
-(defun org-summary-todo (n-done n-not-done)
-  "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
-    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-
-(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
-;;
-;;   (after! PACKAGE
-;;     (setq x y))
-;;
-;; The exceptions to this rule:
-;;
-;;   - Setting file/directory variables (like `org-directory')
-;;   - Setting variables which explicitly tell you to set them before their
-;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
-;;   - Setting doom variables (which start with 'doom-' or '+').
-;;
-;; Here are some additional functions/macros that will help you configure Doom.
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
-;; etc).
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-
-;; Vertically align LaTeX preview in org mode
+;; (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
