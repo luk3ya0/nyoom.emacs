@@ -43,7 +43,7 @@ Can be an integer to determine the exact padding."
 
   ;; name        default   256       16
   ((bg         '("#fafafa" "white"   "white"        ))
-   (fg         '("#383a42" "#424242" "black"        ))
+   (fg         '("#000000" "black"   "black"        ))
 
    ;; These are off-color variants of bg/fg, used primarily for `solaire-mode',
    ;; but can also be useful as a basis for subtle highlights (e.g. for hl-line

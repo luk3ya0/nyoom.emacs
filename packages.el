@@ -73,3 +73,7 @@
 (package! svg-lib
   :recipe (:host github :repo "luk3ya0/svg-lib"
           :files ("*.el" "lisp/*.el")))
+
+(package! iscroll
+  :recipe (:host github :repo "luk3ya0/iscroll"
+          :files ("*.el" "lisp/*.el")))

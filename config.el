@@ -154,17 +154,13 @@
   )
 
 (after! org
-  (plist-put org-format-latex-options :background "Transparent")
-  (plist-put org-format-latex-options :zoom 0.93) ; Calibrated based on the TeX font and org-buffer font.
   (org-link-set-parameters "file"
                            :face 'org-link-green)
   (set-face-attribute 'org-checkbox-statistics-todo nil
                       :inherit 'org-progress-todo
-                      :width 'ultra-condensed
-                      )
+                      :width 'ultra-condensed)
   (set-face-attribute 'org-checkbox-statistics-done nil
-                      :inherit 'org-progress-done
-                      :width 'ultra-condensed
+                      :inherit 'org-progress-done :width 'ultra-condensed
                       )
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-hide-leading-stars nil
@@ -190,47 +186,6 @@
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
         org-fold-catch-invisible-edits 'smart
-        org-latex-prefer-user-labels t
-        org-startup-with-latex-preview nil
-        org-format-latex-options (plist-put org-format-latex-options :scale 1.3)
-        org-preview-latex-default-process 'dvisvgm
-        org-preview-latex-process-alist'((dvisvgm :programs
-                                          ("xelatex" "dvisvgm")
-                                          :description "xdv > svg"
-                                          :message "you need to install the programs: xelatex and dvisvgm."
-                                          :use-xcolor t
-                                          :image-input-type "xdv"
-                                          :image-output-type "svg"
-                                          :image-size-adjust (1.2 . 1.2)
-                                          :latex-compiler
-                                          ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
-                                          :image-converter
-                                          ("dvisvgm %f -e -n -b min -c %S -o %O"))
-                                         (imagemagick :programs
-                                                      ("xelatex" "convert")
-                                                      :description "pdf > png"
-                                                      :message "you need to install the programs: xelatex and imagemagick."
-                                                      :use-xcolor t
-                                                      :image-input-type "pdf"
-                                                      :image-output-type "png"
-                                                      :image-size-adjust (1.0 . 1.0)
-                                                      :latex-compiler
-                                                      ("xelatex -interaction nonstopmode -output-directory %o %f")
-                                                      :image-converter
-                                                      ("convert -density %D -trim -antialias %f -quality 100 %O")))
-        org-latex-compiler "xelatex"
-        org-latex-packages-alist '(("" "amsthm")
-                                   ("" "amsfonts")
-                                   ("" "ctex")
-                                   ("" "tikz")
-                                   ("" "xcolor" t)
-                                   ("cache=false" "minted" t))
-        org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                                "biber %b"
-                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                                "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
-                                )
         )
   (setq org-emphasis-alist
         '(("*" (bold))
@@ -240,6 +195,66 @@
           ("~" (:background nil :foreground "tan"))
           ;; ("+" (:strike-through t))
           )))
+
+;;; Org-Latex ──────────────────────────────────────────────
+(after! org
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1))
+  (setq org-format-latex-options (plist-put org-format-latex-options :background "Transparent"))
+  (setq
+   org-latex-prefer-user-labels t
+   org-startup-with-latex-preview nil
+   org-latex-compiler "xelatex"
+   org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                           "biber %b"
+                           "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                           "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
+                           "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto")
+   org-latex-packages-alist '(("" "amsthm")
+                              ("" "amsfonts")
+                              ("" "ctex")
+                              ("" "tikz")
+                              ("" "xcolor" t)
+                              ("cache=false" "minted" t)
+                              "\\color{black}"
+                              "\\defaultfontfeatures{ Scale=MatchUppercase, Ligatures=TeX }"
+                              "\\setCJKmainfont{Noto Serif CJK sc}[Renderer=HarfBuzz]"
+                              "\\setCJKsansfont{Noto Sans CJK sc}[Renderer=HarfBuzz]"
+                              )
+   org-preview-latex-default-process 'xdvsvgm
+   org-preview-latex-process-alist'((dvisvgm :programs
+                                     ("xelatex" "dvisvgm")
+                                     :description "xdv > svg"
+                                     :message "you need to install the programs: xelatex and dvisvgm."
+                                     :use-xcolor t
+                                     :image-input-type "xdv"
+                                     :image-output-type "svg"
+                                     :image-size-adjust (1.2 . 1.2)
+                                     :latex-compiler
+                                     ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
+                                     :image-converter
+                                     ("dvisvgm %f -e -n -b min -c %S -o %O"))
+                                    (xdvsvgm :progams
+                                             ("xelatex" "dvisvgm")
+                                             :discription "xdv > svg"
+                                             :message "you need install the programs: xelatex and dvisvgm."
+                                             :use-xcolor nil
+                                             :image-input-type "xdv"
+                                             :image-output-type "svg"
+                                             :image-size-adjust (1.5 . 1.3)
+                                             :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
+                                             :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))
+                                    (imagemagick :programs
+                                                 ("xelatex" "convert")
+                                                 :description "pdf > png"
+                                                 :message "you need to install the programs: xelatex and imagemagick."
+                                                 :use-xcolor t
+                                                 :image-input-type "pdf"
+                                                 :image-output-type "png"
+                                                 :image-size-adjust (1.0 . 1.0)
+                                                 :latex-compiler
+                                                 ("xelatex -interaction nonstopmode -output-directory %o %f")
+                                                 :image-converter
+                                                 ("convert -density %D -trim -antialias %f -quality 100 %O")))))
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
@@ -586,6 +601,7 @@
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+;;; Helper ──────────────────────────────────────────────
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
