@@ -1,3 +1,12 @@
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets. It is optional.
+
 ;;; Config Helpers ──────────────────────────────────────────────────────────────
 ;; `load!' for loading external *.el files relative to this one
 ;; - `use-package!' for configuring packages
@@ -38,8 +47,8 @@
            (unless (string= "-" project-name)
              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
-(setq doom-theme 'doom-smoooooth-light)
-;; (setq doom-theme 'doom-smoooooth)
+;; (setq doom-theme 'doom-smoooooth-light)
+(setq doom-theme 'doom-smoooooth)
 
 (setq display-line-numbers-type nil)
 
@@ -185,10 +194,6 @@ and a list of files which contain phrase components.")
       :ni "s-]" 'next-buffer)
 
 ;;; Language mode & Tree sitter ─────────────────────────────────────────────────
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (setq-local tab-width 2)))
-
 (use-package! web-mode
   :custom
   (web-mode-markup-indent-offset 2)
@@ -206,7 +211,6 @@ and a list of files which contain phrase components.")
 
 (add-hook 'python-mode-hook (lambda ()
                               (setq python-indent 4)))
-
 ;;; Org Visual ──────────────────────────────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -300,58 +304,6 @@ and a list of files which contain phrase components.")
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
-
-(after! org
-  (defadvice! +org-latex-link (orig-fn link desc info)
-    "Acts as `org-latex-link', but supports remote images."
-    :around #'org-latex-link
-    (setq o-link link
-          o-desc desc
-          o-info info)
-    (if (and (member (plist-get (cadr link) :type) '("http" "https"))
-             (member (file-name-extension (plist-get (cadr link) :path))
-                     '("png" "jpg" "jpeg" "pdf" "svg")))
-        (org-latex-link--remote link desc info)
-      (funcall orig-fn link desc info)))
-
-  (defun org-latex-link--remote (link _desc info)
-    (let* ((url (plist-get (cadr link) :raw-link))
-           (ext (file-name-extension url))
-           (target (format "%s%s.%s"
-                           (temporary-file-directory)
-                           (replace-regexp-in-string "[./]" "-"
-                                                     (file-name-sans-extension (substring (plist-get (cadr link) :path) 2)))
-                           ext)))
-      (unless (file-exists-p target)
-        (url-copy-file url target))
-      (setcdr link (--> (cadr link)
-                        (plist-put it :type "file")
-                        (plist-put it :path target)
-                        (plist-put it :raw-link (concat "file:" target))
-                        (list it)))
-      (concat "% fetched from " url "\n"
-              (org-latex--inline-image link info)))))
-
-(after! org
-  (setq org-highlight-latex-and-related '(native script entities))
-  (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
-
-(defun +org-mode--fontlock-only-mode ()
-  "Just apply org-mode's font-lock once."
-  (let (org-mode-hook
-        org-hide-leading-stars
-        org-hide-emphasis-markers)
-    (org-set-font-lock-defaults)
-    (font-lock-ensure))
-  (setq-local major-mode #'fundamental-mode))
-
-(defun +org-export-babel-mask-org-config (_backend)
-  "Use `+org-mode--fontlock-only-mode' instead of `org-mode'."
-  (setq-local org-src-lang-modes
-              (append org-src-lang-modes
-                      (list (cons "org" #'+org-mode--fontlock-only)))))
-
-(add-hook 'org-export-before-processing-functions#'+org-export-babel-mask-org-config)
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
