@@ -53,6 +53,104 @@
   (setq emojify-emoji-styles '(unicode))
   (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
 
+;; (setq fancy-splash-image (expand-file-name "misc/splash-images/kaori.png" doom-private-dir) ;; ibm, kaori, fennel
+(setq fancy-splash-image (expand-file-name "misc/splash-images/avatar.png" doom-private-dir) ;; ibm, kaori, fennel
+      +doom-dashboard-banner-padding '(0 . 0))
+
+(defvar splash-phrase-source-folder
+  (expand-file-name "misc/splash-phrases" doom-private-dir)
+  "A folder of text files with a fun phrase on each line.")
+
+(defvar splash-phrase-sources
+  (let* ((files (directory-files splash-phrase-source-folder nil "\\.txt\\'"))
+         (sets (delete-dups (mapcar
+                             (lambda (file)
+                               (replace-regexp-in-string "\\(?:-[0-9]+-\\w+\\)?\\.txt" "" file))
+                             files))))
+    (mapcar (lambda (sset)
+              (cons sset
+                    (delq nil (mapcar
+                               (lambda (file)
+                                 (when (string-match-p (regexp-quote sset) file)
+                                   file))
+                               files))))
+            sets))
+  "A list of cons giving the phrase set name, and a list of files which contain phrase components.")
+
+(defvar splash-phrase-set
+  (nth (random (length splash-phrase-sources)) (mapcar #'car splash-phrase-sources))
+  "The default phrase set. See `splash-phrase-sources'.")
+
+(defun splase-phrase-set-random-set ()
+  "Set a new random splash phrase set."
+  (interactive)
+  (setq splash-phrase-set
+        (nth (random (1- (length splash-phrase-sources)))
+             (cl-set-difference (mapcar #'car splash-phrase-sources) (list splash-phrase-set))))
+  (+doom-dashboard-reload t))
+
+(defvar splase-phrase--cache nil)
+
+(defun splash-phrase-get-from-file (file)
+  "Fetch a random line from FILE."
+  (let ((lines (or (cdr (assoc file splase-phrase--cache))
+                   (cdar (push (cons file
+                                     (with-temp-buffer
+                                       (insert-file-contents (expand-file-name file splash-phrase-source-folder))
+                                       (split-string (string-trim (buffer-string)) "\n")))
+                               splase-phrase--cache)))))
+    (nth (random (length lines)) lines)))
+
+(defun splash-phrase (&optional set)
+  "Construct a splash phrase from SET. See `splash-phrase-sources'."
+  (mapconcat
+   #'splash-phrase-get-from-file
+   (cdr (assoc (or set splash-phrase-set) splash-phrase-sources))
+   " "))
+
+(defun doom-dashboard-phrase ()
+  "Get a splash phrase, flow it over multiple lines as needed, and make fontify it."
+  (mapconcat
+   (lambda (line)
+     (+doom-dashboard--center
+      +doom-dashboard--width
+      (with-temp-buffer
+        (insert-text-button
+         line
+         'action
+         (lambda (_) (+doom-dashboard-reload t))
+         'face 'doom-dashboard-menu-title
+         'mouse-face 'doom-dashboard-menu-title
+         'help-echo "Random phrase"
+         'follow-link t)
+        (buffer-string))))
+   (split-string
+    (with-temp-buffer
+      (insert (splash-phrase))
+      (setq fill-column (min 70 (/ (* 2 (window-width)) 3)))
+      (fill-region (point-min) (point-max))
+      (buffer-string))
+    "\n")
+   "\n"))
+
+(defadvice! doom-dashboard-widget-loaded-with-phrase ()
+  :override #'doom-dashboard-widget-loaded
+  (setq line-spacing 0.2)
+  (insert
+   "\n\n"
+   (propertize
+    (+doom-dashboard--center
+     +doom-dashboard--width
+     (doom-display-benchmark-h 'return))
+    'face 'doom-dashboard-loaded)
+   "\n"
+   (doom-dashboard-phrase)
+   "\n"))
+
+;; remove useless dashboard info
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+(add-hook! '+doom-dashboard-mode-hook (hide-mode-line-mode 1) (hl-line-mode -1))
+(setq-hook! '+doom-dashboard-mode-hook evil-normal-state-cursor (list nil))
 ;;; Action ──────────────────────────────────────────────────────────────────────
 (bind-keys ([(super a)] . mark-whole-buffer)
            ([(super c)] . kill-ring-save)
@@ -214,6 +312,58 @@
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
 
+(after! org
+  (defadvice! +org-latex-link (orig-fn link desc info)
+    "Acts as `org-latex-link', but supports remote images."
+    :around #'org-latex-link
+    (setq o-link link
+          o-desc desc
+          o-info info)
+    (if (and (member (plist-get (cadr link) :type) '("http" "https"))
+             (member (file-name-extension (plist-get (cadr link) :path))
+                     '("png" "jpg" "jpeg" "pdf" "svg")))
+        (org-latex-link--remote link desc info)
+      (funcall orig-fn link desc info)))
+
+  (defun org-latex-link--remote (link _desc info)
+    (let* ((url (plist-get (cadr link) :raw-link))
+           (ext (file-name-extension url))
+           (target (format "%s%s.%s"
+                           (temporary-file-directory)
+                           (replace-regexp-in-string "[./]" "-"
+                                                     (file-name-sans-extension (substring (plist-get (cadr link) :path) 2)))
+                           ext)))
+      (unless (file-exists-p target)
+        (url-copy-file url target))
+      (setcdr link (--> (cadr link)
+                        (plist-put it :type "file")
+                        (plist-put it :path target)
+                        (plist-put it :raw-link (concat "file:" target))
+                        (list it)))
+      (concat "% fetched from " url "\n"
+              (org-latex--inline-image link info)))))
+
+(after! org
+  (setq org-highlight-latex-and-related '(native script entities))
+  (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
+
+(defun +org-mode--fontlock-only-mode ()
+  "Just apply org-mode's font-lock once."
+  (let (org-mode-hook
+        org-hide-leading-stars
+        org-hide-emphasis-markers)
+    (org-set-font-lock-defaults)
+    (font-lock-ensure))
+  (setq-local major-mode #'fundamental-mode))
+
+(defun +org-export-babel-mask-org-config (_backend)
+  "Use `+org-mode--fontlock-only-mode' instead of `org-mode'."
+  (setq-local org-src-lang-modes
+              (append org-src-lang-modes
+                      (list (cons "org" #'+org-mode--fontlock-only)))))
+
+(add-hook 'org-export-before-processing-hook #'+org-export-babel-mask-org-config)
+
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
   (setq org-latex-prefer-user-labels t
@@ -275,7 +425,7 @@
 ;;; Behavior ────────────────────────────────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
-(setq-default major-mode 'org-mode)
+;; (setq-default major-mode 'org-mode)
 
 ;;; Editor > snippets & check ───────────────────────────────────────────────────
 (with-eval-after-load 'flycheck
