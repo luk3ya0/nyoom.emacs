@@ -93,7 +93,8 @@
        ;;fsharp                     ; ML stands for Microsoft's Language
        ;;fstar                      ; (dependent) types and (monadic) effects and Z3
        ;;gdscript                   ; the language you waited for
-       go                           ; the hipster dialect
+       (go                          ; the hipster dialect
+	 +lsp)
        ;;(graphql +lsp)             ; Give queries a REST
        ;;(haskell +lsp)             ; a language that's lazier than I am
        ;;hy                         ; readability of scheme w/ speed of python
@@ -110,7 +111,7 @@
         +lsp)
        ;;lean                       ; for folks with too much to prove
        ;;ledger                     ; be audit you can be
-       (lua +lsp +fennel)                    ; one-based indices? one-based indices
+       (lua +lsp +fennel)           ; one-based indices? one-based indices
        markdown                     ; writing docs for people to ignore
        ;;nim                        ; python + lisp at the speed of c
        ;;nix                        ; I hereby declare "nix geht mehr!"
@@ -131,7 +132,6 @@
         +pyright
         +tree-sitter
         +conda)
-       go
        ;;qt                         ; the 'cutest' gui framework ever
        ;;racket                     ; a DSL for DSLs
        ;;raku                       ; the artist formerly known as perl6

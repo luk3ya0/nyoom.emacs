@@ -184,30 +184,6 @@ and a list of files which contain phrase components.")
       :map vterm-mode-map
       :ni "s-]" 'next-buffer)
 
-;;; Completion ──────────────────────────────────────────────────────────────────
-(after! lsp-mode
-  (setq lsp-enable-symbol-highlighting nil))
-
-(after! lsp-ui
-  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
-        lsp-ui-doc-enable nil))     ; redundant with K
-
-(after! company
-  (setq company-idle-delay 0.1
-        company-selection-wrap-around t
-        company-require-match 'never
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case t
-        company-dabbrev-other-buffers nil
-        company-tooltip-limit 5
-        company-tooltip-minimum-width 40)
-  (set-company-backend!
-    '(text-mode
-      markdown-mode
-      gfm-mode)
-    '(:seperate
-      company-files)))
-
 ;;; Language mode & Tree sitter ─────────────────────────────────────────────────
 (add-hook 'ruby-mode-hook
           (lambda ()

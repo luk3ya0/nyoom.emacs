@@ -48,40 +48,17 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
-;; org-mode
+;;; Org Packages ────────────────────────────────────────────────────────────────
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
 
 ;; (package! org-fragtog)
-(package! preview-dvisvgm)
 
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 
-;; (package! elisp-format
-;;   :recipe (:host github :repo "luk3ya0/elisp-format"))
-
-;; (package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree")
-;;   :pin "207c748aa5fea8626be619e8c55bdb1c16118c25")
-
 (disable-packages! htmlsize org-superstar)
-
-(package! nov :pin "8f5b42e9d9f304b422c1a7918b43ee323a7d3532")
-
-(package! scroll-on-jump)
-
-(package! pyenv)
-
-(package! command-log-mode)
-
-(package! hl-sentence
-  :recipe (:host github :repo "luk3ya0/hl-sentence"
-          :files ("*.el" "lisp/*.el")))
-
-(package! svg-lib
-  :recipe (:host github :repo "luk3ya0/svg-lib"
-          :files ("*.el" "lisp/*.el")))
 
 (package! org
   :recipe (:host github
@@ -115,15 +92,25 @@
                          "(provide 'org-version)\n")))))
   :pin "7bdafd2428dac9618353b93e33a962b8dab24975")
 
-;;latex
+;; (package! hl-sentence
+;;   :recipe (:host github :repo "luk3ya0/hl-sentence"
+;;           :files ("*.el" "lisp/*.el")))
+
+(package! svg-lib
+  :recipe (:host github :repo "luk3ya0/svg-lib"
+          :files ("*.el" "lisp/*.el")))
+
+;;; Motion & Log ────────────────────────────────────────────────────────────────
+(package! scroll-on-jump)
+
+(package! command-log-mode)
+
+;;; Latex ───────────────────────────────────────────────────────────────────────
 (package! aas)
 (package! laas)
 (package! engrave-faces)
 (package! ox-chameleon
   :recipe (:host github :repo "tecosaur/ox-chameleon"))
 
-;;emacs additions
-(package! nov)
-(package! lexic)
-(package! info-colors)
+;;; Magit Packages ──────────────────────────────────────────────────────────────
 (package! magit-delta :recipe (:host github :repo "dandavison/magit-delta"))
