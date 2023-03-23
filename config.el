@@ -1,4 +1,5 @@
-;; - `load!' for loading external *.el files relative to this one
+;;; Config Helpers ──────────────────────────────────────────────────────────────
+;; `load!' for loading external *.el files relative to this one
 ;; - `use-package!' for configuring packages
 ;; - `after!' for running code after a package has loaded
 ;; - `add-load-path!' for adding directories to the `load-path', relative to
@@ -11,20 +12,31 @@
 ;; This will open documentation for it, including demos of how they are used.
 ;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
 ;; etc).
-;;
+;;; Private Info ────────────────────────────────────────────────────────────────
 
 (setq user-full-name "Luke Yao"
       user-mail-address "oneTOinf@163.com")
 
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 ;;; UI ──────────────────────────────────────────────────────────────────────────
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
+
+(setq frame-title-format
+      '(""
+        (:eval
+         (if (string-match-p (regexp-quote (or (bound-and-true-p org-roam-directory) "\u0000"))
+                             (or buffer-file-name ""))
+             (replace-regexp-in-string
+              ".*/[0-9]*-?" "☰ "
+              (subst-char-in-string ?_ ?\s buffer-file-name))
+           "%b"))
+        (:eval
+         (when-let ((project-name (and (featurep 'projectile) (projectile-project-name))))
+           (unless (string= "-" project-name)
+             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
 (setq doom-theme 'doom-smoooooth-light)
 ;; (setq doom-theme 'doom-smoooooth)
@@ -53,12 +65,12 @@
   (setq emojify-emoji-styles '(unicode))
   (bind-key* (kbd "C-c .") #'emojify-insert-emoji))
 
-;; (setq fancy-splash-image (expand-file-name "misc/splash-images/kaori.png" doom-private-dir) ;; ibm, kaori, fennel
-(setq fancy-splash-image (expand-file-name "misc/splash-images/avatar.png" doom-private-dir) ;; ibm, kaori, fennel
+(setq fancy-splash-image
+      (expand-file-name "misc/splash-images/avatar.png" doom-user-dir)
       +doom-dashboard-banner-padding '(0 . 0))
 
 (defvar splash-phrase-source-folder
-  (expand-file-name "misc/splash-phrases" doom-private-dir)
+  (expand-file-name "misc/splash-phrases" doom-user-dir)
   "A folder of text files with a fun phrase on each line.")
 
 (defvar splash-phrase-sources
@@ -75,7 +87,8 @@
                                    file))
                                files))))
             sets))
-  "A list of cons giving the phrase set name, and a list of files which contain phrase components.")
+  "A list of cons giving the phrase set name,
+and a list of files which contain phrase components.")
 
 (defvar splash-phrase-set
   (nth (random (length splash-phrase-sources)) (mapcar #'car splash-phrase-sources))
@@ -362,7 +375,7 @@
               (append org-src-lang-modes
                       (list (cons "org" #'+org-mode--fontlock-only)))))
 
-(add-hook 'org-export-before-processing-hook #'+org-export-babel-mask-org-config)
+(add-hook 'org-export-before-processing-functions#'+org-export-babel-mask-org-config)
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
@@ -410,7 +423,6 @@
                                    ("" "xcolor" t)
                                    ("cache=false" "minted" t)
                                    "\\color{black}"
-                                   "\\def\\pgfsysdriver{pgfsys-tex4ht.def}"
                                    )
         org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "biber %b"
@@ -667,6 +679,7 @@
 
 (setq-default history-length 1000)
 
+;;; TODO ────────────────────────────────────────────────────────────────────────
 ;; (defface fira-lock
 ;;   '((t (:font-family "Fira Code"
 ;;         :height 160
