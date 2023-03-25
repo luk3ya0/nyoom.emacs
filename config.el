@@ -362,6 +362,13 @@ and a list of files which contain phrase components.")
 (after! ox-hugo
   (setq org-hugo-use-code-for-kbd t))
 
+;;; Latex ───────────────────────────────────────────────────────────────────────
+;; AUCTEX
+(eval-after-load "tex"
+    '(add-to-list 'TeX-command-list
+                   '("LaTeXmk" "latexmk %s" TeX-run-command t t :help "Run LaTeXmk")
+                   t))
+(setq +latex-viewers '(pdf-tools))
 ;;; Behavior ────────────────────────────────────────────────────────────────────
 (global-subword-mode 1)      ; Iterate through CamelCase words
 
