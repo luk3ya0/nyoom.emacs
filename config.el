@@ -173,6 +173,31 @@ and a list of files which contain phrase components.")
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 (add-hook! '+doom-dashboard-mode-hook (hide-mode-line-mode 1) (hl-line-mode -1))
 (setq-hook! '+doom-dashboard-mode-hook evil-normal-state-cursor (list nil))
+
+;;; Completion ──────────────────────────────────────────────────────────────────
+(after! lsp-mode
+  (setq lsp-enable-symbol-highlighting nil))
+
+(after! lsp-ui
+  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+        lsp-ui-doc-enable nil))     ; redundant with K
+
+(after! company
+  (setq company-idle-delay 0.1
+        company-selection-wrap-around t
+        company-require-match 'never
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case t
+        company-dabbrev-other-buffers nil
+        company-tooltip-limit 5
+        company-tooltip-minimum-width 40)
+  (set-company-backend!
+    '(text-mode
+      markdown-mode
+      gfm-mode)
+    '(:seperate
+      company-files)))
+
 ;;; Action ──────────────────────────────────────────────────────────────────────
 (bind-keys ([(super a)] . mark-whole-buffer)
            ([(super c)] . kill-ring-save)
@@ -366,7 +391,7 @@ and a list of files which contain phrase components.")
 ;; AUCTEX
 (eval-after-load "tex"
     '(add-to-list 'TeX-command-list
-                   '("LaTeXmk" "latexmk %s" TeX-run-command t t :help "Run LaTeXmk")
+                   '("LaTeXmk" "latexmk -xelatex %s" TeX-run-command t t :help "Run LaTeXmk")
                    t))
 (setq +latex-viewers '(pdf-tools))
 ;;; Behavior ────────────────────────────────────────────────────────────────────
