@@ -1,6 +1,3 @@
 [submodule "snippets"]
 	path = snippets
-	url = git@github.com:doomemacs/snippets.git
-[submodule "packages/hl-sentence"]
-	path = packages/hl-sentence
-	url = git@github.com:luk3ya0/hl-sentence.git
+	url = git@github.com:luk3ya0/snippets.git
