@@ -1,0 +1,9 @@
+#+title: Readme
+
+** TODO Build and Learn More about Org GTD
+
+** Some Resources
+
+[[https:https://www.youtube.com/@SystemCrafters][System Crafters - Youtube Channel]]
+
+[[https:https://www.youtube.com/@DistroTube][DistroTube - Youtube Channel]]
