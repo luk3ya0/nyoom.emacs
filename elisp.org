@@ -1,0 +1,13 @@
+#+title: Elisp
+
+** org-element.el
+
+#+begin_src emacs-lisp
+(require 'org-element)
+(message (org-element-property :language (org-element-at-point)))
+;; (message (org-element-property :value (org-element-at-point)))
+;; (message (org-element-property :begin (org-element-at-point))) ;; TODO transform to string
+#+end_src
+
+#+RESULTS:
+: emacs-lisp

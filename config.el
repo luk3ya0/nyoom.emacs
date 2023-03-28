@@ -435,7 +435,7 @@ and a list of files which contain phrase components.")
     (require 'org-element)
     (message "element type of %s, parent type of %s"
              (org-element-type (org-element-at-point))
-             (org-element-type (org-element-property :parent (org-element-at-point)))))
+             (org-element-property :language (org-element-at-point))))
 
   (defun normal-previous-line()
     (interactive)
@@ -451,13 +451,30 @@ and a list of files which contain phrase components.")
 
   (defun cycle-format ()
     (interactive)
-    (org-edit-special)
-    (indent-region (point-min) (point-max))
+    (require 'org-element)
+    (setq lang (org-element-property :language (org-element-at-point)))
+    (message "src block lang %s" lang)
+    (if (string-equal lang "java")
+        (progn
+          (org-edit-special)
+          (kill-region (point-min) (point-max))
+          ;; (shell-command "pbpaste | google-java-format --aosp - | pbcopy")
+          (insert (shell-command-to-string "pbpaste | google-java-format --aosp"))
+          ))
+
+    (if (string-equal lang "go")
+        (progn
+          (org-edit-special)
+          (kill-region (point-min) (point-max))
+          ;; (shell-command "pbpaste | gofmt | gsed 's/\t/    /g' | pbcopy")
+          (insert (shell-command-to-string "pbpaste | gofmt | gsed 's/\t/    /g'"))
+          ))
+
+    ;; indent the region anyway
+    (if (not (string-equal lang "go"))
+        (indent-region (point-min) (point-max)))
     (org-edit-src-exit)
-    (save-buffer)
-    ;; (evil-beginning-of-line)
-    ;; (org-cycle)
-    )
+    (save-buffer))
 
   (defun quickb ()
     (interactive)
