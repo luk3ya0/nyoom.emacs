@@ -459,7 +459,7 @@ and a list of files which contain phrase components.")
           (org-edit-special)
           (kill-region (point-min) (point-max))
           ;; (shell-command "pbpaste | google-java-format --aosp - | pbcopy")
-          (insert (shell-command-to-string "pbpaste | google-java-format --aosp"))
+          (insert (shell-command-to-string "pbpaste | google-java-format --aosp -"))
           ))
 
     (if (string-equal lang "go")
