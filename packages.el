@@ -105,12 +105,25 @@
 
 (package! command-log-mode)
 
-;;; Latex ───────────────────────────────────────────────────────────────────────
-(package! aas)
-(package! laas)
-(package! engrave-faces)
-(package! ox-chameleon
-  :recipe (:host github :repo "tecosaur/ox-chameleon"))
-
 ;;; Magit Packages ──────────────────────────────────────────────────────────────
 (package! magit-delta :recipe (:host github :repo "dandavison/magit-delta"))
+
+;;; Language mode ───────────────────────────────────────────────────────────────
+;;; These packages are only to support syntax highlight in org mode src block
+(package! go-mode)
+
+(package! dart-mode)
+
+(package! swift-mode)
+
+(package! kotlin-mode)
+
+(package! lua-mode)
+
+(package! json-mode)
+
+(package! rustic)
+
+(package! rjsx-mode)
+
+(package! typescript-mode)

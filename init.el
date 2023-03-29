@@ -57,30 +57,30 @@
        direnv
        docker
        biblio                       ; Writes a PhD for you (citation needed)
-       (debugger +lsp)              ; FIXME stepping through code, to help you add bugs
+       ;; (debugger +lsp)           ; FIXME stepping through code, to help you add bugs
        (eval +overlay)              ; run code, run (also, repls)
        (lookup                      ; helps you navigate your code and documentation
         +dictionary                 ; dictionary/thesaurus is nice
         +docsets)                   ; ...or in Dash docsets locally
-       lsp                          ; Language Server Protocol
+       ;; lsp                       ; Language Server Protocol
        (magit                       ; a git porcelain for Emacs
         +forge)                     ; interface with git forges
        pdf                          ; pdf enhancements
        rgb                          ; creating color strings
-       tree-sitter                  ; Syntax and Parsing sitting in a tree
+       ;; tree-sitter               ; Syntax and Parsing sitting in a tree
 
        :os
        (:if IS-MAC macos)           ; improve compatibility with macOS
 
        :lang
-       (cc +lsp +tree-sitter)       ; C/C++/Obj-C madness
+       ;; (cc +lsp +tree-sitter)    ; C/C++/Obj-C madness
        ;;clojure                    ; java with a lisp
        ;;common-lisp                ; if you've seen one lisp, you've seen them all
        ;;coq                        ; proofs-as-programs
        ;;crystal                    ; ruby at the speed of c
        ;;csharp                     ; unity, .NET, and mono shenanigans
-       data                         ; config/data formats
-       (dart +flutter)              ; paint ui and not much else
+       ;; data                      ; config/data formats
+       ;; (dart +flutter)           ; paint ui and not much else
        ;;dhall
        ;;elixir                     ; erlang done right
        ;;elm                        ; care for a cup of TEA?
@@ -93,59 +93,58 @@
        ;;fsharp                     ; ML stands for Microsoft's Language
        ;;fstar                      ; (dependent) types and (monadic) effects and Z3
        ;;gdscript                   ; the language you waited for
-       (go +lsp)                    ; the hipster dialect
+       ;; (go +lsp)                 ; the hipster dialect
        ;;(graphql +lsp)             ; Give queries a REST
        ;;(haskell +lsp)             ; a language that's lazier than I am
        ;;hy                         ; readability of scheme w/ speed of python
        ;;idris                      ; a language you can depend on
-       json                         ; At least it ain't XML
-       java                         ; the poster child for carpal tunnel syndrome
-       javascript                   ; all(hope(abandon(ye(who(enter(here))))))
+       ;; json                      ; At least it ain't XML
+       ;; java                      ; the poster child for carpal tunnel syndrome
+       ;; javascript                ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia                      ; a better, faster MATLAB
-       kotlin                       ; a better, slicker Java(Script)
-       (latex                       ; writing papers in Emacs has never been so fun
-        ;;+fold                     ; fold the clutter away nicities
-        +latexmk                    ; modern latex plz
-        ;;+cdlatex                  ; quick maths symbols
-        +lsp)
+       ;; kotlin                    ; a better, slicker Java(Script)
+       ;; (latex                    ; writing papers in Emacs has never been so fun
+       ;;  ;;+fold                  ; fold the clutter away nicities
+       ;;  +latexmk                 ; modern latex plz
+       ;;+cdlatex                   ; quick maths symbols
        ;;lean                       ; for folks with too much to prove
        ;;ledger                     ; be audit you can be
-       (lua +lsp +fennel)                    ; one-based indices? one-based indices
-       markdown                     ; writing docs for people to ignore
+       ;; (lua +lsp +fennel)        ; one-based indices? one-based indices
+       ;; markdown                  ; writing docs for people to ignore
        ;;nim                        ; python + lisp at the speed of c
        ;;nix                        ; I hereby declare "nix geht mehr!"
        ;;ocaml                      ; an objective camel
        (org                         ; organize your plain life in plain text
-        +pretty                     ; yessss my pretties! (nice unicode symbols)
+        ;; +pretty                  ; yessss my pretties! (nice unicode symbols)
         ;;+dragndrop                ; drag & drop files/images into org buffers
-        +hugo                       ; use Emacs for hugo blogging
-        +noter                      ; enhanced PDF notetaking
-        +jupyter                    ; ipython/jupyter support for babel
-        +pandoc                     ; export-with-pandoc support
-        +gnuplot                    ; who doesn't like pretty pictures
-        +pomodoro                   ; be fruitful with the tomato technique
-        +present                    ; using org-mode for presentations
-        +roam2)                     ; wander around notes
-       (python                      ; beautiful is better than ugly
-        +lsp
-        +pyright
-        +tree-sitter
-        +conda)
-       go
+        +hugo)                      ; use Emacs for hugo blogging
+        ;; +noter                   ; enhanced PDF notetaking
+        ;; +jupyter                 ; ipython/jupyter support for babel
+        ;; +pandoc                  ; export-with-pandoc support
+        ;; +gnuplot                 ; who doesn't like pretty pictures
+        ;; +pomodoro                ; be fruitful with the tomato technique
+        ;; +present                 ; using org-mode for presentations
+        ;; +roam2)                  ; wander around notes
+       ;; (python                   ; beautiful is better than ugly
+       ;;  +lsp
+       ;;  +pyright
+       ;;  +tree-sitter
+       ;;  +conda)
+       ;; go
        ;;qt                         ; the 'cutest' gui framework ever
        ;;racket                     ; a DSL for DSLs
        ;;raku                       ; the artist formerly known as perl6
        ;;rest                       ; Emacs as a REST client
        ;;rst                        ; ReST in peace
        ;;(ruby +rails)              ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust
-        +lsp
-        +tree-sitter)               ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;; (rust
+       ;;  +lsp
+       ;;  +tree-sitter)            ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala                      ; java, but good
-       sh                           ; she sells {ba,z,fi}sh shells on the C xor
-       swift                        ; who asked for emoji variables?
-       web                          ; the tubes
-       yaml                         ; JSON, but readable
+       ;; sh                        ; she sells {ba,z,fi}sh shells on the C xor
+       ;; swift                     ; who asked for emoji variables?
+       ;; web                       ; the tubes
+       ;; yaml                      ; JSON, but readable
 
        :config
        (default +bindings +smartparens))
