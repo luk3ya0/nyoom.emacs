@@ -175,12 +175,12 @@ and a list of files which contain phrase components.")
 (setq-hook! '+doom-dashboard-mode-hook evil-normal-state-cursor (list nil))
 
 ;;; Completion ──────────────────────────────────────────────────────────────────
-(after! lsp-mode
-  (setq lsp-enable-symbol-highlighting nil))
+;; (after! lsp-mode
+;;   (setq lsp-enable-symbol-highlighting nil))
 
-(after! lsp-ui
-  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
-        lsp-ui-doc-enable nil))     ; redundant with K
+;; (after! lsp-ui
+;;   (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+;;         lsp-ui-doc-enable nil))     ; redundant with K
 
 (after! company
   (setq company-idle-delay 0.1
@@ -219,23 +219,23 @@ and a list of files which contain phrase components.")
       :ni "s-]" 'next-buffer)
 
 ;;; Language mode & Tree sitter ─────────────────────────────────────────────────
-(use-package! web-mode
-  :custom
-  (web-mode-markup-indent-offset 2)
-  (web-mode-css-indent-offset 2)
-  (web-mode-code-indent-offset 2))
+;; (use-package! web-mode
+;;   :custom
+;;   (web-mode-markup-indent-offset 2)
+;;   (web-mode-css-indent-offset 2)
+;;   (web-mode-code-indent-offset 2))
 
-(defalias 'vue-mode 'web-mode)
+;; (defalias 'vue-mode 'web-mode)
 
-(setq js-indent-level 2)
+;; (setq js-indent-level 2)
 
-(add-hook 'html-mode-hook
-          (lambda()
-            (setq-local sgml-basic-offset 2)
-            (setq-local indent-tabs-mode nil)))
+;; (add-hook 'html-mode-hook
+;;           (lambda()
+;;             (setq-local sgml-basic-offset 2)
+;;             (setq-local indent-tabs-mode nil)))
 
-(add-hook 'python-mode-hook (lambda ()
-                              (setq python-indent 4)))
+;; (add-hook 'python-mode-hook (lambda ()
+;;                               (setq python-indent 4)))
 ;;; Org Visual ──────────────────────────────────────────────────────────────────
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -657,78 +657,78 @@ and a list of files which contain phrase components.")
 (setq-default history-length 1000)
 
 ;;; TODO ────────────────────────────────────────────────────────────────────────
-;; (defface fira-lock
-;;   '((t (:font-family "Fira Code"
-;;         :height 160
-;;         :avgwidth 180
-;;         :spacing 100
-;;         )))
-;;   "Org mode todo face"
-;;   :group 'org-face)
+(defface fira-lock
+  '((t (:font-family "Fira Code"
+        :height 160
+        :avgwidth 180
+        :spacing 100
+        )))
+  "Org mode todo face"
+  :group 'org-face)
 
-;; (defvar log-font-lock-keywords
-;;   `(
-;;     ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
-;;      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
-;;     ("\\[\\([0-9]+/[0-9]+\\)\\]"
-;;      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-;;     ("\\(--\\)"
-;;      (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-;;     ("\\(──\\)"
-;;      (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-;;     ))
+(defvar log-font-lock-keywords
+  `(
+    ("\\[\\([0-9]\\{1,3\\}\\)%\\]"
+     (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
+    ("\\[\\([0-9]+/[0-9]+\\)\\]"
+     (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
+    ;; ("\\(--\\)"
+    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ;; ("\\(──\\)"
+    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ))
 
 ;; (defun dash-to-hyphen (value)
 ;;   (format "%s" (make-string (length value) #x2500)))
 
-;; (defun fira-code-progress-count (value)
-;;   (concat (fira-code-progress-bar value) " " value))
+(defun fira-code-progress-count (value)
+  (concat (fira-code-progress-bar value) " " value))
 
-;; (defun fira-code-progress-percent (value)
-;;   (concat (fira-code-progress-bar (concat value "/100")) " " value "%"))
+(defun fira-code-progress-percent (value)
+  (concat (fira-code-progress-bar (concat value "/100")) " " value "%"))
 
-;; (defun fira-code-progress-bar (value)
-;;   (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-;;          (count (float (car seq)))
-;;          (total (float (cadr seq))))
+(defun fira-code-progress-bar (value)
+  (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+         (count (float (car seq)))
+         (total (float (cadr seq))))
 
-;;     (let (comp uncomp bar)
-;;       (setq comp (* (/ count total) 20))
-;;       (setq uncomp (- 20 comp))
-;;       (setq bar (format "%s%s"
-;;                         (make-string (round comp) #xee04)
-;;                         (make-string (round uncomp) #xee01)))
-;;       (setq bar (substring bar 1 18))
-;;       (if (= 0 comp)
-;;           (setq bar (concat "\uee00" bar "\uee02"))
-;;         )
-;;       (if (and
-;;            (> comp 0)
-;;            (< comp 20)
-;;            )
-;;           (setq bar (concat "\uee03" bar "\uee02"))
-;;         )
-;;       (if (= 20 comp)
-;;           (setq bar (concat "\uee03" bar "\uee05"))
-;;         )
-;;       bar
-;;       )))
+     (let (comp uncomp bar)
+       (setq comp (* (/ count total) 20))
+       (setq uncomp (- 20 comp))
+       (setq bar (format "%s%s"
+                         (make-string (round comp) #xee04)
+                         (make-string (round uncomp) #xee01)))
+       (setq bar (substring bar 1 18))
+       (if (= 0 comp)
+           (setq bar (concat "\uee00" bar "\uee02"))
+         )
+       (if (and
+            (> comp 0)
+            (< comp 20)
+            )
+           (setq bar (concat "\uee03" bar "\uee02"))
+         )
+       (if (= 20 comp)
+           (setq bar (concat "\uee03" bar "\uee05"))
+         )
+       bar
+       )))
 
-;; (add-hook 'org-mode-hook  (lambda ()
-;;                             (push 'display font-lock-extra-managed-props)
-;;                             (font-lock-add-keywords nil log-font-lock-keywords)
-;;                             (font-lock-flush (point-min) (point-max))
-;;                             ))
+(add-hook 'org-mode-hook  (lambda ()
+                            (push 'display font-lock-extra-managed-props)
+                            (font-lock-add-keywords nil log-font-lock-keywords)
+                            (font-lock-flush (point-min) (point-max))
+                            ))
 
-;; (add-hook 'emacs-lisp-mode-hook  (lambda ()
-;;                                    (push 'display font-lock-extra-managed-props)
-;;                                    (font-lock-add-keywords nil log-font-lock-keywords)
-;;                                    (font-lock-flush (point-min) (point-max))
-;;                                    ))
+(add-hook 'emacs-lisp-mode-hook  (lambda ()
+                                   (push 'display font-lock-extra-managed-props)
+                                   (font-lock-add-keywords nil log-font-lock-keywords)
+                                   (font-lock-flush (point-min) (point-max))
+                                   ))
 
-;; (defun org-summary-todo (n-done n-not-done)
-;;   "Switch entry to DONE when all subentries are done, to TODO otherwise."
-;;   (let (org-log-done org-log-states)   ; turn off logging
-;;     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
-;; (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
