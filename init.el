@@ -56,7 +56,7 @@
        :tools
        direnv
        docker
-       biblio                       ; Writes a PhD for you (citation needed)
+       ;; biblio                    ; Writes a PhD for you (citation needed)
        ;; (debugger +lsp)           ; FIXME stepping through code, to help you add bugs
        (eval +overlay)              ; run code, run (also, repls)
        (lookup                      ; helps you navigate your code and documentation

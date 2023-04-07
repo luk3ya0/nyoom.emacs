@@ -9,3 +9,49 @@
 [[https:https://www.youtube.com/@DistroTube][DistroTube - Youtube Channel]]
 
 [[http:http://xahlee.info/emacs/emacs/elisp_basics.html][Xah Lee - Nice Collections to Learn Emacs Lisp]]
+
+** Problem
+
+*** Tikz in Org Mode
+
+https://ionizing.page/post/a-new-journey/
+
+*** CJK in Org Mode Latex
+
+https://q3yi.me/post/4_use_xelatex_instead_of_latex_in_org_preview_latex_process/
+
+*** Beautify the Latex in Org Mode
+
+https://emacs-china.org/t/org-mode-latex-mode/22490
+
+*** Fast ox-hugo setup
+
+https://ox-hugo.scripter.co
+
+*** Anim GIF in Org Mode
+
+https://github.com/shg/org-inline-anim.el
+
+*** Emacs: configuring mixed fonts in Org mode
+
+https://protesilaos.com/codelog/2020-07-17-emacs-mixed-fonts-org/
+
+*** Symbols in Org-mode
+
+https://orgmode.org/worg/org-symbols.html
+
+*** Emacs, fonts and fontsets
+
+https://idiocy.org/emacs-fonts-and-fontsets.html
+
+*** Emacs Lisp Object Finalizers
+
+https://nullprogram.com/blog/2014/01/27/
+
+
+
+** Awesome Configuration
+
+https://sachachua.com/dotemacs/index.html
+
+https://ianyepan.github.io/posts/emacs-ide/
