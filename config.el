@@ -54,8 +54,8 @@
 
 (setq doom-font (font-spec :family "Fira Code" :size 15)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 160)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 160))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 150)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 150))
 
 (setq use-default-font-for-symbols nil)
 
@@ -330,83 +330,134 @@ and a list of files which contain phrase components.")
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
 
+(use-package! texfrag
+  :after org
+  :hook (org-mode . texfrag-mode))
+
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
+  (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams
+                                                  ("xelatex" "dvisvgm")
+                                                  :discription "xdv > svg"
+                                                  :message "you need install the programs: xelatex and dvisvgm."
+                                                  :image-input-type "xdv"
+                                                  :image-output-type "svg"
+                                                  :image-size-adjust (1.7 . 1.5)
+                                                  :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
+                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
+  (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
-        org-preview-latex-default-process 'dvisvgm
-        org-preview-latex-process-alist'((dvisvgm :programs
-                                          ("xelatex" "dvisvgm")
-                                          :description "xdv > svg"
-                                          :message "you need to install the programs: xelatex and dvisvgm."
-                                          :use-xcolor t
-                                          :image-input-type "xdv"
-                                          :image-output-type "svg"
-                                          :image-size-adjust (1 . 1)
-                                          :latex-compiler
-                                          ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
-                                          :image-converter
-                                          ("dvisvgm %f -e -n -b min -c %S -o %O"))
-                                         (imagemagick :programs
-                                                      ("xelatex" "convert")
-                                                      :description "pdf > png"
-                                                      :message "you need to install the programs: xelatex and imagemagick."
-                                                      :use-xcolor t
-                                                      :image-input-type "pdf"
-                                                      :image-output-type "png"
-                                                      :image-size-adjust (1.0 . 1.0)
-                                                      :latex-compiler
-                                                      ("xelatex -interaction nonstopmode -output-directory %o %f")
-                                                      :image-converter
-                                                      ("convert -density %D -trim -antialias %f -quality 100 %O")))
+        org-latex-compiler "xelatex"
+        org-latex-packages-alist '(("" "ctex" t ("xelatex"))
+                                   ("" "tikz" t)
+                                   ("" "xcolor" t)
+                                   ("" "fontspec" t)
+                                   ("" "amsmath" t)
+                                   ("cache=false" "minted" t)
+                                   ("mathrm=sym" "unicode-math" t)
+                                   "\\color{black}"
+                                   "\\setmathfont{Fira Math}"
+                                   )
         org-format-latex-options '(:foreground "Black"
                                    :background "Transparent"
-                                   :scale 1.5
+                                   :scale 0.8
                                    :html-foreground "Black"
                                    :html-background "Transparent" :html-scale 1.0
                                    :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
-        ;; org-latex-src-block-backend 'minted
-        ;; org-latex-minted-options '(("breaklines")
-        ;;                            ("bgcolor" "bg"))
-        org-latex-compiler "xelatex"
-        org-latex-packages-alist '(("" "amsthm")
-                                   ("" "amsfonts")
-                                   ("" "ctex" t ("xelatex"))
-                                   ("" "tikz")
-                                   ("" "xcolor" t)
-                                   ("cache=false" "minted" t)
-                                   "\\color{black}"
-                                   )
         org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "biber %b"
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
-                                )))
+                                ))
 
-(after! ox-hugo
-  (setq org-hugo-use-code-for-kbd t))
+  
+  (defun my/org-latex--get-tex-string ()
+    "Return the content of the LaTeX fragment at point."
+    (let ((datum (org-element-context)))
+      (org-element-property :value datum)))
 
-;;; Latex ───────────────────────────────────────────────────────────────────────
-;; AUCTEX
-(eval-after-load "tex"
-    '(add-to-list 'TeX-command-list
-                   '("LaTeXmk" "latexmk -xelatex %s" TeX-run-command t t :help "Run LaTeXmk")
-                   t))
-(setq +latex-viewers '(pdf-tools))
-;;; Behavior ────────────────────────────────────────────────────────────────────
-(global-subword-mode 1)      ; Iterate through CamelCase words
+  (defun my/latex-fragment-superscript-p ()
+    "Return `t' if '^' in current LaTeX fragment."
+    (memq 94 (string-to-list (my/org-latex--get-tex-string))))
 
-;; (setq-default major-mode 'org-mode)
+  (defun my/latex-fragment-subscript-p ()
+    "Return `t' if '_' in current LaTeX fragment."
+    (memq 95 (string-to-list (my/org-latex--get-tex-string))))
 
-;;; Editor > snippets & check ───────────────────────────────────────────────────
-(with-eval-after-load 'flycheck
-  (setq-default flycheck-disabled-checkers '(org-mode)))
+  (defun my/latex-fragment-script-p ()
+    "Return `t' if both '_' &  '^' in current LaTeX fragment."
+    (and (memq 94 (string-to-list (my/org-latex--get-tex-string)))
+         (memq 95 (string-to-list (my/org-latex--get-tex-string)))))
 
-(use-package! doom-snippets
-  :load-path "~/.config/doom/snippets"
-  :after yasnippet)
+  (defun org--make-preview-overlay (beg end image &optional imagetype)
+    "Build an overlay between BEG and END using IMAGE file.
+Argument IMAGETYPE is the extension of the displayed image,
+as a string.  It defaults to \"png\"."
+    (setq my/position 'center)
+    (cond ((my/latex-fragment-script-p)
+           (setq my/position 'center))
+          ((my/latex-fragment-superscript-p)
+           (setq my/position 100))
+          ((my/latex-fragment-subscript-p)
+           (setq my/position 70)))
+    (let ((ov (make-overlay beg end))
+          (imagetype (or (intern imagetype) 'png)))
+      (overlay-put ov 'org-overlay-type 'org-latex-overlay)
+      (overlay-put ov 'evaporate t)
+      (overlay-put ov
+                   'modification-hooks
+                   (list (lambda (o _flag _beg _end &optional _l)
+                           (delete-overlay o))))
+      (overlay-put ov
+                   'display
+                   (list 'image :type imagetype :file image :ascent my/position))))
 
+  
+
+  (require 'ov)
+  ;; * Fragment justification
+  (defun scimax-org-latex-fragment-justify (justification)
+    "Justify the latex fragment at point with JUSTIFICATION.
+JUSTIFICATION is a symbol for 'left, 'center or 'right."
+    (interactive
+     (list (intern-soft
+            (completing-read "Justification (left): " '(left center right)
+                             nil t nil nil 'left))))
+    (let* ((ov (ov-at))
+           (beg (ov-beg ov))
+           (end (ov-end ov))
+           (shift (- beg (line-beginning-position)))
+           (img (overlay-get ov 'display))
+           (img (and (and img (consp img) (eq (car img) 'image)
+                          (image-type-available-p (plist-get (cdr img) :type)))
+                     img))
+           space-left offset)
+      (when (and img
+                 ;; This means the equation is at the start of the line
+                 (= beg (line-beginning-position))
+                 (or
+                  (string= "" (s-trim (buffer-substring end (line-end-position))))
+                  (eq 'latex-environment (car (org-element-context)))))
+        (setq space-left (- (window-max-chars-per-line) (car (image-size img)))
+              offset (floor (cond
+                             ((eq justification 'center)
+                              (- (/ space-left 2) shift))
+                             ((eq justification 'right)
+                              (- space-left shift))
+                             (t
+                              0))))
+        (when (>= offset 0)
+          (overlay-put ov 'before-string (make-string offset ?\ ))))))
+
+  (defun scimax-org-latex-fragment-justify-advice (beg end image imagetype)
+    "After advice function to justify fragments."
+    (scimax-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'center)))
+
+
+  (advice-add 'org--make-preview-overlay :after 'scimax-org-latex-fragment-justify-advice)
+  )
 ;;; Editor > Motion ─────────────────────────────────────────────────────────────
 (setq undo-limit 80000000             ; Raise undo-limit to 80MB
       evil-want-fine-undo t           ; By default while in insert all changes are one big blob. Be more granular
@@ -644,7 +695,6 @@ and a list of files which contain phrase components.")
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
-
 ;;; Log ─────────────────────────────────────────────────────────────────────────
 (use-package! command-log-mode
   :commands global-command-log-mode
@@ -729,6 +779,7 @@ and a list of files which contain phrase components.")
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
   (let (org-log-done org-log-states)   ; turn off logging
+    (message (format "%s" n-done))
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)

@@ -53,12 +53,23 @@
   :recipe (:host github :repo "casouri/valign"
            :files ("*.el")))
 
-;; (package! org-fragtog)
+(package! texfrag)
 
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 
+(package! ov
+  :recipe (:host github :repo "emacsorphanage/ov"))
+
 (disable-packages! htmlsize org-superstar)
+
+(package! hl-sentence
+  :recipe (:host github :repo "luk3ya0/hl-sentence"
+          :files ("*.el" "lisp/*.el")))
+
+(package! svg-lib
+  :recipe (:host github :repo "luk3ya0/svg-lib"
+          :files ("*.el" "lisp/*.el")))
 
 (package! org
   :recipe (:host github
@@ -89,17 +100,7 @@
                  (insert (format "(defun org-release () %S)\n" version)
                          (format "(defun org-git-version (&rest _) \"%s-??-%s\")\n"
                                  version (cdr (doom-call-process "git" "rev-parse" "--short" "HEAD")))
-                         "(provide 'org-version)\n")))))
-  :pin "7bdafd2428dac9618353b93e33a962b8dab24975")
-
-;; (package! hl-sentence
-;;   :recipe (:host github :repo "luk3ya0/hl-sentence"
-;;           :files ("*.el" "lisp/*.el")))
-
-(package! svg-lib
-  :recipe (:host github :repo "luk3ya0/svg-lib"
-          :files ("*.el" "lisp/*.el")))
-
+                         "(provide 'org-version)\n"))))))
 ;;; Motion & Log ────────────────────────────────────────────────────────────────
 (package! scroll-on-jump)
 
@@ -127,3 +128,4 @@
 (package! rjsx-mode)
 
 (package! typescript-mode)
+

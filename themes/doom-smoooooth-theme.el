@@ -45,14 +45,14 @@ Can be an integer to determine the exact padding."
   "A dark theme inspired by Atom One Dark."
 
   ;; name        default   256           16
-  ((bg         '("#121212" "black"       "black"  ))
+  ((bg         '("#15191E" "black"       "black"  ))
    (fg         '("#bbc2cf" "#bfbfbf"     "brightwhite"  ))
 
    ;; These are off-color variants of bg/fg, used primarily for `solaire-mode',
    ;; but can also be useful as a basis for subtle highlights (e.g. for hl-line
    ;; or region), especially when paired with the `doom-darken', `doom-lighten',
    ;; and `doom-blend' helper functions.
-   (bg-alt     '("#121212" "black"       "black"        ))
+   (bg-alt     '("#15191E" "black"       "black"        ))
    (fg-alt     '("#5B6268" "#2d2d2d"     "white"        ))
 
    ;; These should represent a spectrum from bg to fg, where base0 is a starker
@@ -61,7 +61,7 @@ Can be an integer to determine the exact padding."
    (base0      '("#1B2229" "black"       "black"        ))
    (base1      '("#1c1f24" "#1e1e1e"     "brightblack"  ))
    (base2      '("#202328" "#2e2e2e"     "brightblack"  ))
-   (base3      '("#121212" "#262626"     "brightblack"  ))
+   (base3      '("#15191E" "#262626"     "brightblack"  ))
    (base4      '("#3f444a" "#3f3f3f"     "brightblack"  ))
    (base5      '("#5B6268" "#525252"     "brightblack"  ))
    (base6      '("#73797e" "#6b6b6b"     "brightblack"  ))
