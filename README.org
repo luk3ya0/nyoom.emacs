@@ -1,5 +1,7 @@
 #+title: Readme
 
+[[file:misc/show-case.png]]
+
 ** TODO Build and Learn More about Org GTD
 
 ** Some Resources
