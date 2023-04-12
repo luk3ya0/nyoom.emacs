@@ -51,7 +51,7 @@
 
 (setq display-line-numbers-type nil)
 
-(setq doom-font (font-spec :family "Fira Code" :size 15)
+(setq doom-font (font-spec :family "Fira Code" :size 14)
       doom-serif-font doom-font
       doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 150)
       doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 150))
@@ -329,10 +329,6 @@ and a list of files which contain phrase components.")
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
 
-(use-package! texfrag
-  :after org
-  :hook (org-mode . texfrag-mode))
-
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
   (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams
@@ -342,25 +338,22 @@ and a list of files which contain phrase components.")
                                                   :image-input-type "xdv"
                                                   :image-output-type "svg"
                                                   :image-size-adjust (1.7 . 1.5)
-                                                  :latex-compiler ("xelatex -interaction nonstopmode -no-pdf -output-directory %o %f")
+                                                  :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f && cat %f > /Users/luke/file-bak.tex && xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
                                                   :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
         org-latex-compiler "xelatex"
-        org-latex-packages-alist '(("" "ctex" t ("xelatex"))
-                                   ("" "tikz" t)
-                                   ("" "xcolor" t)
+        org-latex-packages-alist '(("" "tikz" t)
                                    ("" "fontspec" t)
                                    ("" "amsmath" t)
                                    ("cache=false" "minted" t)
                                    ("mathrm=sym" "unicode-math" t)
-                                   "\\color{black}"
                                    "\\setmathfont{Fira Math}"
                                    )
         org-format-latex-options '(:foreground "Black"
                                    :background "Transparent"
-                                   :scale 0.8
+                                   :scale 1.0
                                    :html-foreground "Black"
                                    :html-background "Transparent" :html-scale 1.0
                                    :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
@@ -368,8 +361,9 @@ and a list of files which contain phrase components.")
                                 "biber %b"
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                                "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
-                                ))
+                                ;; "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
+                                )
+        )
 
   
   (defun my/org-latex--get-tex-string ()
@@ -387,8 +381,13 @@ and a list of files which contain phrase components.")
 
   (defun my/latex-fragment-script-p ()
     "Return `t' if both '_' &  '^' in current LaTeX fragment."
-    (and (memq 94 (string-to-list (my/org-latex--get-tex-string)))
-         (memq 95 (string-to-list (my/org-latex--get-tex-string)))))
+     (and (memq 94 (string-to-list (my/org-latex--get-tex-string)))
+          (memq 95 (string-to-list (my/org-latex--get-tex-string))))
+     )
+
+  (defun my/latex-fragment-frac-p()
+    "Return `t' if contain frac in current LaTeX fragment."
+     (string-match "frac" (my/org-latex--get-tex-string)))
 
   (defun org--make-preview-overlay (beg end image &optional imagetype)
     "Build an overlay between BEG and END using IMAGE file.
@@ -396,9 +395,11 @@ Argument IMAGETYPE is the extension of the displayed image,
 as a string.  It defaults to \"png\"."
     (setq my/position 'center)
     (cond ((my/latex-fragment-script-p)
-           (setq my/position 'center))
+           (setq my/position 73))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
+          ((my/latex-fragment-frac-p)
+           (setq my/position 'center))
           ((my/latex-fragment-subscript-p)
            (setq my/position 70)))
     (let ((ov (make-overlay beg end))

@@ -50,8 +50,6 @@ https://idiocy.org/emacs-fonts-and-fontsets.html
 
 https://nullprogram.com/blog/2014/01/27/
 
-
-
 ** Awesome Configuration
 
 https://sachachua.com/dotemacs/index.html
