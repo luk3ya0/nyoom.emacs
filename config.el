@@ -339,13 +339,14 @@ and a list of files which contain phrase components.")
                                                   :image-output-type "svg"
                                                   :image-size-adjust (1.7 . 1.5)
                                                   :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f && cat %f > /Users/luke/file-bak.tex && xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
-                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
+                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O && gsed -i 's/#000/none/g' %O")))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
         org-latex-compiler "xelatex"
         org-latex-packages-alist '(("" "tikz" t)
                                    ("" "fontspec" t)
+                                   ("" "amssymb" t)
                                    ("" "amsmath" t)
                                    ("cache=false" "minted" t)
                                    ("mathrm=sym" "unicode-math" t)
@@ -362,8 +363,7 @@ and a list of files which contain phrase components.")
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 ;; "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
-                                )
-        )
+                                ))
 
   
   (defun my/org-latex--get-tex-string ()
@@ -389,17 +389,23 @@ and a list of files which contain phrase components.")
     "Return `t' if contain frac in current LaTeX fragment."
      (string-match "frac" (my/org-latex--get-tex-string)))
 
+  (defun my/latex-fragment-bracket-p ()
+    "Return `t' if '(' in current LaTeX fragment."
+    (memq 40 (string-to-list (my/org-latex--get-tex-string))))
+
   (defun org--make-preview-overlay (beg end image &optional imagetype)
     "Build an overlay between BEG and END using IMAGE file.
 Argument IMAGETYPE is the extension of the displayed image,
 as a string.  It defaults to \"png\"."
     (setq my/position 'center)
-    (cond ((my/latex-fragment-script-p)
+    (cond ((my/latex-fragment-frac-p)
+           (setq my/position 70))
+          ((my/latex-fragment-bracket-p)
+           (setq my/position 83))
+          ((my/latex-fragment-script-p)
            (setq my/position 73))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
-          ((my/latex-fragment-frac-p)
-           (setq my/position 'center))
           ((my/latex-fragment-subscript-p)
            (setq my/position 70)))
     (let ((ov (make-overlay beg end))
@@ -783,3 +789,17 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+
+(add-hook 'LaTeX-mode-hook
+              (lambda ()
+                  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))))
+
+(use-package! latex-preview-pane
+  :init
+  (setq pdf-latex-command "xelatex"))
+
+(use-package! lsp-mode
+  :config
+  (setq
+   lsp-latex-texlab-executable-argument-list
+   '("-xelatex","-verbose","-file-line-error","-synctex=1","-interaction=nonstopmode","%f")))
