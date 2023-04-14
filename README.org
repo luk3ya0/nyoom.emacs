@@ -16,11 +16,15 @@ brew install basictex font-firacode font-firamath
 sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 #+end_src
 
-** TODO Precise Lsp Server Texlab Configuration
+** TODO
 
-** TODO Flycheck Errors Ignore List
+- [ ] Precise Lsp Server Texlab Configuration
 
-** TODO AUC-Tex Command Recipes
+- [ ] Flycheck Errors Ignore List
+
+- [ ] AUC-Tex Command Recipes
+
+- [ ] Checkout a -Q Develop Branch
 
 ** Some Resources
 
