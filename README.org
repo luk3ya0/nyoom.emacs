@@ -3,6 +3,25 @@
 #+attr_org: :width 1440
 [[file:misc/show-case.png]]
 
+** Prerequisite
+
+#+begin_src shell
+# install emacs-mac with some options
+brew install emacs-mac --build-from-source --with-imagemagick --with-librsvg --with-no-title-bar
+
+# install basictex other than huge mactex
+brew install basictex font-firacode font-firamath
+
+# install some critical packages of latex
+sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
+#+end_src
+
+** TODO Precise Lsp Server Texlab Configuration
+
+** TODO Flycheck Errors Ignore List
+
+** TODO AUC-Tex Command Recipes
+
 ** Some Resources
 
 [[https://www.gnu.org/software/emacs/manual/html_node/eintr/index.html#Top][An Introduction to Programming in Emacs Lisp]]
