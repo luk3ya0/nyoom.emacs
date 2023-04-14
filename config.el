@@ -338,8 +338,11 @@ and a list of files which contain phrase components.")
                                                   :image-input-type "xdv"
                                                   :image-output-type "svg"
                                                   :image-size-adjust (1.7 . 1.5)
-                                                  :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f && cat %f > /Users/luke/file-bak.tex && xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
-                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O && gsed -i 's/#000/none/g' %O")))
+                                                  :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
+                                                                   "cat %f > ~/file-bak.tex"
+                                                                   "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
+                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O"
+                                                                    "gsed -i 's/#000/none/g' %O")))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
