@@ -609,11 +609,12 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
       (org-narrow-to-subtree)))
 
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
   (define-key evil-insert-state-map (kbd "C-n") 'evil-next-visual-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-visual-line)
+  (define-key evil-insert-state-map (kbd "C-h") 'backward-delete-char)
+  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
   (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
   (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
 
