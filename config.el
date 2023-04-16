@@ -313,6 +313,12 @@ and a list of files which contain phrase components.")
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
 
+(use-package! iscroll
+  :after org
+  :diminish
+  :hook
+  (org-mode . iscroll-mode))
+
 (use-package! valign
   :after org
   :diminish
@@ -611,6 +617,18 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
         (widen)
       (org-narrow-to-subtree)))
 
+  (defun scroll-up-org-mode()
+    (interactive)
+    (if (eq major-mode 'org-mode)
+        (iscroll-up)
+      (evil-next-visual-line)))
+
+  (defun scroll-down-org-mode()
+    (interactive)
+    (if (eq major-mode 'org-mode)
+        (iscroll-down)
+      (evil-previous-visual-line)))
+
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
@@ -628,8 +646,8 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (define-key evil-normal-state-map (kbd "s-]") 'next-buffer)
   (define-key evil-normal-state-map (kbd "s-f") 'cycle-format)
   (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
-  (define-key evil-normal-state-map (kbd "C-n") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "C-p") 'evil-previous-visual-line)
+  (define-key evil-normal-state-map (kbd "C-n") 'scroll-up-org-mode)
+  (define-key evil-normal-state-map (kbd "C-p") 'scroll-down-org-mode)
   (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
   (define-key evil-normal-state-map (kbd "s-o") 'what-org)

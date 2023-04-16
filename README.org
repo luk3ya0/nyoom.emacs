@@ -44,6 +44,10 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 
 + [[https://emacs-china.org/t/org-mode-latex-mode/22490][Beautify the Latex in Org Mode]]
 
++ [[https://emacs-china.org/t/org-latex-preview/22288][Align Baseline of Latex Fragment in Org Mode]]
+
++ [[https://list.orgmode.org/874k9oxy48.fsf@gmail.com/#Z32lisp:org.el][Patch to align latex fragment for org mode]]
+
 + [[https://ox-hugo.scripter.co][Fast ox-hugo setup]]
 
 + [[https://github.com/shg/org-inline-anim.el][Anim GIF in Org Mode]]
