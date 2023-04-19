@@ -51,7 +51,7 @@
 
 (setq display-line-numbers-type nil)
 
-(setq doom-font (font-spec :family "Fira Code" :size 14)
+(setq doom-font (font-spec :family "Fira Code" :size 15)
       doom-serif-font doom-font
       doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 150)
       doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 150))
@@ -308,7 +308,7 @@ and a list of files which contain phrase components.")
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
-                   ;; (setq-local line-spacing 5)
+                   (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
@@ -343,7 +343,7 @@ and a list of files which contain phrase components.")
                                                   :message "you need install the programs: xelatex and dvisvgm."
                                                   :image-input-type "xdv"
                                                   :image-output-type "svg"
-                                                  :image-size-adjust (1.7 . 1.5)
+                                                  :image-size-adjust (2.1 . 1.5)
                                                   :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                                                    "cat %f > ~/file-bak.tex"
                                                                    "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
@@ -359,7 +359,19 @@ and a list of files which contain phrase components.")
                                    ("" "amsmath" t)
                                    ("cache=false" "minted" t)
                                    ("mathrm=sym" "unicode-math" t)
-                                   "\\setmathfont{Fira Math}"
+                                   "\\setmainfont[Mapping=tex-text,Ligatures={NoRequired,NoCommon,NoContextual}]{Calibri}"
+                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+                                   "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
+                                   "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
+                                   "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
+                                   "\\setmathfont[range={\"0030,\"0039}]{Fira Code}"
+                                   "\\setmathfont[range={\"0041,\"005A}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"0061,\"007A}]{Fira Code}"
+                                   "\\setmathfont[range=up]{Calibri}"
+                                   "\\setmathfont[range=sfup]{Calibri}"
+                                   "\\setmathfont[range=it]{Calibri Italic}"
+                                   "\\setmathfont[range=bfup]{Calibri Bold}"
+                                   "\\setmathfont[range=bfit]{Calibri Bold Italic}"
                                    )
         org-format-latex-options '(:foreground "Black"
                                    :background "Transparent"
@@ -406,17 +418,17 @@ and a list of files which contain phrase components.")
     "Build an overlay between BEG and END using IMAGE file.
 Argument IMAGETYPE is the extension of the displayed image,
 as a string.  It defaults to \"png\"."
-    (setq my/position 'center)
+    (setq my/position 100)
     (cond ((my/latex-fragment-frac-p)
-           (setq my/position 70))
+           (setq my/position 67))
           ((my/latex-fragment-bracket-p)
            (setq my/position 83))
           ((my/latex-fragment-script-p)
-           (setq my/position 73))
+           (setq my/position 72))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
           ((my/latex-fragment-subscript-p)
-           (setq my/position 70)))
+           (setq my/position 78)))
     (let ((ov (make-overlay beg end))
           (imagetype (or (intern imagetype) 'png)))
       (overlay-put ov 'org-overlay-type 'org-latex-overlay)
@@ -428,8 +440,6 @@ as a string.  It defaults to \"png\"."
       (overlay-put ov
                    'display
                    (list 'image :type imagetype :file image :ascent my/position))))
-
-  
 
   (require 'ov)
   ;; * Fragment justification
