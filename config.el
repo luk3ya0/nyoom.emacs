@@ -308,6 +308,7 @@ and a list of files which contain phrase components.")
 
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
+                   (setq-local underline-minimum-offset 5)
                    (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
@@ -329,7 +330,7 @@ and a list of files which contain phrase components.")
 
 (use-package! org-appear
   :after org
-  :hook (org-mode . org-appear-mode)
+  ;; :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
@@ -362,24 +363,50 @@ and a list of files which contain phrase components.")
         org-latex-packages-alist '(("" "tikz" t)
                                    ("" "fontspec" t)
                                    ;; ("" "amssymb" t) ;; adding default
-                                   ;; ("" "amsmath" t)
+                                   ("" "mathptmx" t)
                                    ("cache=false" "minted" t)
                                    ("mathrm=sym" "unicode-math" t)
+                                   "\\DeclareSymbolFont{Xlargesymbols}{OMX}{cmex}{m}{n}"
+                                   "\\DeclareMathSymbol{\\sum}{\\mathop}{Xlargesymbols}{80}"
                                    "\\usetikzlibrary{arrows.meta}"
                                    "\\usetikzlibrary{intersections}"
                                    "\\usetikzlibrary{angles,quotes}"
-                                   "\\setmainfont[Mapping=tex-text,Ligatures={NoRequired,NoCommon,NoContextual}]{Calibri}"
+                                   "\\setmainfont[Mapping=tex-text]{Calibri}"
                                    "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+                                   "\\setmathfont{Fira Math}"
+
+                                   ;; brackets
                                    "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
                                    "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
                                    "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
+                                   ;; 0-9
                                    "\\setmathfont[range={\"0030,\"0039}]{Fira Code}"
+                                   "\\setmathfont[range={\"0031,\"0038}]{Fira Code}"
+                                   "\\setmathfont[range={\"0032,\"0037}]{Fira Code}"
+                                   "\\setmathfont[range={\"0033,\"0036}]{Fira Code}"
+                                   "\\setmathfont[range={\"0034,\"0035}]{Fira Code}"
+                                   ;; A-Z
                                    "\\setmathfont[range={\"0041,\"005A}]{Fira Code}"
-                                   "\\setmathfont[range=up]{Calibri}"
-                                   "\\setmathfont[range=sfup]{Calibri}"
-                                   "\\setmathfont[range=it]{Calibri Italic}"
-                                   "\\setmathfont[range=bfup]{Calibri Bold}"
-                                   "\\setmathfont[range=bfit]{Calibri Bold Italic}"
+                                   "\\setmathfont[range={\"0042,\"0059}]{Fira Code}"
+                                   "\\setmathfont[range={\"0043,\"0058}]{Fira Code}"
+                                   "\\setmathfont[range={\"0044,\"0057}]{Fira Code}"
+                                   "\\setmathfont[range={\"0045,\"0056}]{Fira Code}"
+                                   "\\setmathfont[range={\"0046,\"0055}]{Fira Code}"
+                                   "\\setmathfont[range={\"0047,\"0054}]{Fira Code}"
+                                   "\\setmathfont[range={\"0048,\"0053}]{Fira Code}"
+                                   "\\setmathfont[range={\"0049,\"0052}]{Fira Code}"
+                                   "\\setmathfont[range={\"0050,\"0051}]{Fira Code}"
+                                   ;; a-z
+                                   "\\setmathfont[range={\"0061,\"007A}]{Fira Code}"
+                                   "\\setmathfont[range={\"0062,\"0079}]{Fira Code}"
+                                   "\\setmathfont[range={\"0063,\"0078}]{Fira Code}"
+                                   "\\setmathfont[range={\"0064,\"0077}]{Fira Code}"
+                                   "\\setmathfont[range={\"0065,\"0076}]{Fira Code}"
+                                   "\\setmathfont[range={\"0066,\"0075}]{Fira Code}"
+                                   "\\setmathfont[range={\"0067,\"0074}]{Fira Code}"
+                                   "\\setmathfont[range={\"0068,\"0073}]{Fira Code}"
+                                   "\\setmathfont[range={\"0069,\"0072}]{Fira Code}"
+                                   "\\setmathfont[range={\"0070,\"0071}]{Fira Code}"
                                    )
         org-format-latex-options '(:foreground "Black"
                                    :background "Transparent"
@@ -502,9 +529,17 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (not (equal (- (point-max) (point-min)) (buffer-size))))
 
 (with-eval-after-load 'evil
+  (require 'ov)
+
+  (setq sentence-end-base "[.?!…‽][]\\n\"'”’)}»›]*")
+
   (defun normal-next-line()
     (interactive)
     (forward-line 1))
+
+  (defun normal-previous-line()
+    (interactive)
+    (forward-line -1))
 
   (defun what-face ()
     "Get the actual face at point."
@@ -520,10 +555,6 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (message "element type of %s, parent type of %s"
              (org-element-type (org-element-at-point))
              (org-element-property :language (org-element-at-point))))
-
-  (defun normal-previous-line()
-    (interactive)
-    (forward-line -1))
 
   (defun emit-ocr ()
     (interactive)
@@ -646,6 +677,85 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (if (eq major-mode 'org-mode)
         (iscroll-down)
       (evil-previous-visual-line)))
+
+  (require 'org-element)
+  (defun plainp ()
+    "Check current sentence is paragraph and it's parent is section."
+    (and
+     (eq (org-element-type (org-element-at-point)) 'paragraph)
+     (or
+      (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
+      (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'item)
+      )))
+
+  (setq ov-map
+        #s(hash-table
+           size 1000
+           test equal
+           data (
+                 "0-0" 1)))
+
+  (defun ov-exist (beg end)
+    (interactive)
+    (gethash (format "%s-%s" beg end) ov-map))
+
+  (defun current-point ()
+    (interactive)
+    (message (format "%s" (point))))
+
+  (defun ov-must-rem (beg end)
+    (interactive)
+    (remhash (format "%s-%s" beg end) ov-map)
+    (ov-clear beg end))
+
+  (defun ov-must-put (beg end)
+    (interactive)
+    (puthash (format "%s-%s" beg end) 1 ov-map)
+    (ov-set (ov-make beg end) 'face '(:underline "plum")))
+
+  (defun ov-map-put (beg end)
+    (interactive)
+    (if (ov-exist beg end)
+        (ov-must-rem beg end)
+      (ov-must-put beg end)))
+
+  (defun current-sentence-end ()
+    (interactive)
+    (if (bounds-of-thing-at-point 'sentence)
+        (cdr (bounds-of-thing-at-point 'sentence))
+      (cdr (bounds-of-thing-at-point 'line))))
+
+  (defun current-sentence-beg ()
+    (interactive)
+    (if (bounds-of-thing-at-point 'sentence)
+        (car (bounds-of-thing-at-point 'sentence))
+      (car (bounds-of-thing-at-point 'line))))
+
+  (defun underline-current-line-toggle ()
+    (interactive)
+    (if (plainp)
+        (ov-map-put (current-sentence-beg) (current-sentence-end))
+      ))
+
+  (defun underline-forward ()
+    (interactive)
+    (ov-must-rem (current-sentence-beg) (current-sentence-end))
+    (goto-char (+ (current-sentence-end) 2))
+    (goto-char (current-sentence-beg))
+    (underline-current-line-toggle)
+    )
+
+  (defun underline-backward ()
+    (interactive)
+    (ov-must-rem (current-sentence-beg) (current-sentence-end))
+    (goto-char (- (current-sentence-beg) 2))
+    (goto-char (current-sentence-beg))
+    (underline-current-line-toggle)
+    )
+
+  (define-key evil-normal-state-map (kbd "M-o") 'underline-current-line-toggle)
+  (define-key evil-normal-state-map (kbd "M-n") 'underline-forward)
+  (define-key evil-normal-state-map (kbd "M-p") 'underline-backward)
 
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
