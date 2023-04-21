@@ -110,4 +110,6 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 \end{tikzpicture}
 ```
 
+<center>
 ![](./misc/radial-tree.svg)
+</center>
