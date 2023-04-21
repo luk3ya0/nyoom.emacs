@@ -1,8 +1,5 @@
 #+title: Readme
 
-#+attr_org: :width 1440
-[[file:misc/show-case.png]]
-
 ** Prerequisite
 
 #+begin_src shell
