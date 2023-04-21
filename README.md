@@ -1,4 +1,12 @@
-![](./misc/show-case.gif)
+<p align="center">
+  <img src="./misc/radial-tree.svg" width="480" title="hover text">
+  <small>org mode latex babel svg output</small>
+</p>
+
+<p align="center">
+  <img src="./misc/show-case.gif" width="480" title="hover text">
+  <small>highlight sentence to focus reading</small>
+</p>
 
 ## Prerequisite
 
@@ -110,6 +118,3 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 \end{tikzpicture}
 ```
 
-<p align="center">
-  <img src="./misc/radial-tree.svg" width="480" title="hover text">
-</p>
