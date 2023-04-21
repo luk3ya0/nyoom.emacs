@@ -65,3 +65,53 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 https://sachachua.com/dotemacs/index.html
 
 https://ianyepan.github.io/posts/emacs-ide/
+
+** Org babel LaTeX
+
+#+header: :headers '("\\usepackage{tikz}\n" "\\usepackage{xcolor}\n")
+#+header: :results file graphics :file ./misc/radial-tree.svg
+#+header: :exports results
+#+begin_src latex
+\begin{tikzpicture}
+\draw[red] (7,8.5) -- (4,5.5);
+\draw[red] (7,8.5) -- (10,5.5);
+
+\draw[red] (4,5.5) -- (2.5,2);
+\draw[red] (4,5.5) -- (5.5,2);
+
+\draw[red] (10,5.5) -- (8.5,2);
+\draw[red] (10,5.5) -- (11.5,2);
+
+\definecolor{redI}{HTML}{FF8D8D}
+\definecolor{redO}{HTML}{FFC2C2}
+\filldraw[even odd rule,inner color=redI,outer color=redO] (7,8.5) circle (1);
+
+\definecolor{orangeI}{HTML}{FFB090}
+\definecolor{orangeO}{HTML}{FFD3C2}
+\filldraw[even odd rule,inner color=orangeI,outer color=orangeO] (4,5.5) circle (1);
+
+\definecolor{blueI}{HTML}{99AEEA}
+\definecolor{blueO}{HTML}{C8D3F2}
+\filldraw[even odd rule,inner color=blueI,outer color=blueO] (10,5.5) circle (1);
+
+\definecolor{yellowI}{HTML}{FFE187}
+\definecolor{yellowO}{HTML}{FFECC1}
+\filldraw[even odd rule,inner color=yellowI,outer color=yellowO] (2.5,2) circle (1);
+
+\definecolor{greenI}{HTML}{AEC5A4}
+\definecolor{greenO}{HTML}{D2DDCD}
+\filldraw[even odd rule,inner color=greenI,outer color=greenO] (5.5,2) circle (1);
+
+\definecolor{purpleI}{HTML}{B69DD5}
+\definecolor{purpleO}{HTML}{D5C5E5}
+\filldraw[even odd rule,inner color=purpleI,outer color=purpleO] (8.5,2) circle (1);
+
+\definecolor{grayI}{HTML}{A9AEB8}
+\definecolor{grayO}{HTML}{D2D4DA}
+\filldraw[even odd rule,inner color=grayI,outer color=grayO] (11.5,2) circle (1);
+\end{tikzpicture}
+#+end_src
+
+#+ATTR_ORG: :width 360
+#+RESULTS:
+[[file:./misc/radial-tree.svg]]
