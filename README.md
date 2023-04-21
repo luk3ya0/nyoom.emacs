@@ -1,10 +1,12 @@
 <p align="center">
-  <img src="./misc/radial-tree.svg" width="480" title="hover text">
+  <img src="./misc/radial-tree.svg" title="hover text">
+  <hr>
   <small>org mode latex babel svg output</small>
 </p>
 
 <p align="center">
-  <img src="./misc/show-case.gif" width="480" title="hover text">
+  <img src="./misc/show-case.gif" title="hover text">
+  <hr>
   <small>highlight sentence to focus reading</small>
 </p>
 
