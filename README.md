@@ -110,6 +110,6 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 \end{tikzpicture}
 ```
 
-<center>
-![](./misc/radial-tree.svg)
-</center>
+<p align="center">
+  <img src="./misc/radial-tree.svg" width="480" title="hover text">
+</p>
