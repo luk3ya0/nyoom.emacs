@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./misc/radial-tree.svg" title="hover text">
+  <img src="./misc/radial-tree.svg" width="540" title="hover text">
   <small display="block">org mode latex babel svg output</small>
 </p>
 
