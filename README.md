@@ -1,6 +1,4 @@
----
-title: Readme
----
+![](./misc/show-case.gif)
 
 ## Prerequisite
 
