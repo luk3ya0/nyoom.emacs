@@ -69,15 +69,15 @@ https://ianyepan.github.io/posts/emacs-ide/
 #+header: :results file graphics :file ./misc/radial-tree.svg
 #+header: :exports results
 #+begin_src latex
-\begin{tikzpicture}
-\draw[red] (7,8.5) -- (4,5.5);
-\draw[red] (7,8.5) -- (10,5.5);
-
-\draw[red] (4,5.5) -- (2.5,2);
-\draw[red] (4,5.5) -- (5.5,2);
-
-\draw[red] (10,5.5) -- (8.5,2);
-\draw[red] (10,5.5) -- (11.5,2);
+\begin{tikzpicture}[scale=3]
+\begin{scope}[red!40,very thick]
+\draw (7,8.5) -- (4,5.5);
+\draw (7,8.5) -- (10,5.5);
+\draw (4,5.5) -- (2.5,2);
+\draw (4,5.5) -- (5.5,2);
+\draw (10,5.5) -- (8.5,2);
+\draw (10,5.5) -- (11.5,2);
+\end{scope}
 
 \definecolor{redI}{HTML}{FF8D8D}
 \definecolor{redO}{HTML}{FFC2C2}
