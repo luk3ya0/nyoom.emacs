@@ -1,0 +1,10 @@
+#!/bin/bash
+
+filename=$1
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+# echo ${filename}
+# echo ${extension}
+
+xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory=. ${filename}.tex && dvisvgm ${filename}.xdv -n -c 1.7 -o ${filename}.svg

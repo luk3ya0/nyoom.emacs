@@ -337,6 +337,12 @@ and a list of files which contain phrase components.")
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
+  (defun ob-latex-preamble (params)
+    (message (format "%s" params))
+    (format "%s\n" "\\documentclass{standalone}"))
+  (setq org-babel-latex-htlatex "tex2svg"
+        org-babel-latex-preamble #'ob-latex-preamble
+        )
   (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams
                                                   ("xelatex" "dvisvgm")
                                                   :discription "xdv > svg"
@@ -355,10 +361,13 @@ and a list of files which contain phrase components.")
         org-latex-compiler "xelatex"
         org-latex-packages-alist '(("" "tikz" t)
                                    ("" "fontspec" t)
-                                   ("" "amssymb" t)
-                                   ("" "amsmath" t)
+                                   ;; ("" "amssymb" t) ;; adding default
+                                   ;; ("" "amsmath" t)
                                    ("cache=false" "minted" t)
                                    ("mathrm=sym" "unicode-math" t)
+                                   "\\usetikzlibrary{arrows.meta}"
+                                   "\\usetikzlibrary{intersections}"
+                                   "\\usetikzlibrary{angles,quotes}"
                                    "\\setmainfont[Mapping=tex-text,Ligatures={NoRequired,NoCommon,NoContextual}]{Calibri}"
                                    "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
                                    "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
@@ -366,7 +375,6 @@ and a list of files which contain phrase components.")
                                    "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
                                    "\\setmathfont[range={\"0030,\"0039}]{Fira Code}"
                                    "\\setmathfont[range={\"0041,\"005A}]{Fira Code}"
-                                   ;; "\\setmathfont[range={\"0061,\"007A}]{Fira Code}"
                                    "\\setmathfont[range=up]{Calibri}"
                                    "\\setmathfont[range=sfup]{Calibri}"
                                    "\\setmathfont[range=it]{Calibri Italic}"
@@ -835,3 +843,4 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (setq
    lsp-latex-texlab-executable-argument-list
    '("-xelatex","-verbose","-file-line-error","-synctex=1","-interaction=nonstopmode","%f")))
+
