@@ -338,19 +338,17 @@ and a list of files which contain phrase components.")
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
-  (defun ob-latex-preamble (params)
-    (message (format "%s" params))
+  (defun ob-latex-preamble (_)
+    ;; (message (format "%s" params))
     (format "%s\n" "\\documentclass{standalone}"))
-  (setq org-babel-latex-htlatex "tex2svg"
-        org-babel-latex-preamble #'ob-latex-preamble
-        )
+  (setq org-babel-latex-preamble #'ob-latex-preamble)
   (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams
                                                   ("xelatex" "dvisvgm")
                                                   :discription "xdv > svg"
                                                   :message "you need install the programs: xelatex and dvisvgm."
                                                   :image-input-type "xdv"
                                                   :image-output-type "svg"
-                                                  :image-size-adjust (2.1 . 1.5)
+                                                  :image-size-adjust (1.8 . 1.5)
                                                   :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                                                    "cat %f > ~/file-bak.tex"
                                                                    "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
@@ -361,63 +359,38 @@ and a list of files which contain phrase components.")
         org-startup-with-latex-preview nil
         org-latex-compiler "xelatex"
         org-latex-packages-alist '(("" "tikz" t)
-                                   ("" "fontspec" t)
-                                   ;; ("" "amssymb" t) ;; adding default
-                                   ("" "mathptmx" t)
-                                   ("cache=false" "minted" t)
-                                   ("mathrm=sym" "unicode-math" t)
-                                   "\\DeclareSymbolFont{Xlargesymbols}{OMX}{cmex}{m}{n}"
-                                   "\\DeclareMathSymbol{\\sum}{\\mathop}{Xlargesymbols}{80}"
                                    "\\usetikzlibrary{arrows.meta}"
                                    "\\usetikzlibrary{intersections}"
                                    "\\usetikzlibrary{angles,quotes}"
-                                   "\\setmainfont[Mapping=tex-text]{Calibri}"
-                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+
+                                   ("" "fontspec" t)
+                                   ("math-style=upright" "unicode-math" t)
+
                                    "\\setmathfont{Fira Math}"
 
-                                   ;; brackets
+                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+
+                                   "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=it,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=bfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=bfit,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+
+                                   "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
+
                                    "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
                                    "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
-                                   "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
-                                   ;; 0-9
-                                   "\\setmathfont[range={\"0030,\"0039}]{Fira Code}"
-                                   "\\setmathfont[range={\"0031,\"0038}]{Fira Code}"
-                                   "\\setmathfont[range={\"0032,\"0037}]{Fira Code}"
-                                   "\\setmathfont[range={\"0033,\"0036}]{Fira Code}"
-                                   "\\setmathfont[range={\"0034,\"0035}]{Fira Code}"
-                                   ;; A-Z
-                                   "\\setmathfont[range={\"0041,\"005A}]{Fira Code}"
-                                   "\\setmathfont[range={\"0042,\"0059}]{Fira Code}"
-                                   "\\setmathfont[range={\"0043,\"0058}]{Fira Code}"
-                                   "\\setmathfont[range={\"0044,\"0057}]{Fira Code}"
-                                   "\\setmathfont[range={\"0045,\"0056}]{Fira Code}"
-                                   "\\setmathfont[range={\"0046,\"0055}]{Fira Code}"
-                                   "\\setmathfont[range={\"0047,\"0054}]{Fira Code}"
-                                   "\\setmathfont[range={\"0048,\"0053}]{Fira Code}"
-                                   "\\setmathfont[range={\"0049,\"0052}]{Fira Code}"
-                                   "\\setmathfont[range={\"0050,\"0051}]{Fira Code}"
-                                   ;; a-z
-                                   "\\setmathfont[range={\"0061,\"007A}]{Fira Code}"
-                                   "\\setmathfont[range={\"0062,\"0079}]{Fira Code}"
-                                   "\\setmathfont[range={\"0063,\"0078}]{Fira Code}"
-                                   "\\setmathfont[range={\"0064,\"0077}]{Fira Code}"
-                                   "\\setmathfont[range={\"0065,\"0076}]{Fira Code}"
-                                   "\\setmathfont[range={\"0066,\"0075}]{Fira Code}"
-                                   "\\setmathfont[range={\"0067,\"0074}]{Fira Code}"
-                                   "\\setmathfont[range={\"0068,\"0073}]{Fira Code}"
-                                   "\\setmathfont[range={\"0069,\"0072}]{Fira Code}"
-                                   "\\setmathfont[range={\"0070,\"0071}]{Fira Code}"
+                                   "\\setmathfont[range={\"002A,\"002B}]{Fira Code}"
                                    )
-        org-format-latex-options '(:foreground "Black"
-                                   :background "Transparent"
+        org-format-latex-options '(
+                                   ;; :foreground "Black"
+                                   ;; :background "Transparent"
                                    :scale 1.0
                                    :html-foreground "Black"
-                                   :html-background "Transparent" :html-scale 1.0
+                                   ;; :html-background "Transparent" :html-scale 1.0
                                    :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
         org-latex-pdf-process '("xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 "biber %b"
-                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
-                                "xelatex -8bit --shell-escape -interaction nonstopmode -output-directory=%o %f"
                                 ;; "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
                                 ))
 
@@ -431,19 +404,37 @@ and a list of files which contain phrase components.")
     "Return `t' if '^' in current LaTeX fragment."
     (memq 94 (string-to-list (my/org-latex--get-tex-string))))
 
+  (defun my/latex-tail-latin-p()
+    (or
+    (memq 103 (string-to-list (string-replace "igma" "" ;; Sigma
+                                              (my/org-latex--get-tex-string))))
+    (memq 106 (string-to-list (my/org-latex--get-tex-string)))
+    (memq 112 (string-to-list (my/org-latex--get-tex-string)))
+    (memq 113 (string-to-list (string-replace "equiv" "" ;; equiv
+                                              (my/org-latex--get-tex-string))))
+    (memq 121 (string-to-list (string-replace "infty" "" ;; infty
+                                              (my/org-latex--get-tex-string))))
+     ))
+
   (defun my/latex-fragment-subscript-p ()
     "Return `t' if '_' in current LaTeX fragment."
-    (memq 95 (string-to-list (my/org-latex--get-tex-string))))
+     (memq 95 (string-to-list (my/org-latex--get-tex-string))))
 
   (defun my/latex-fragment-script-p ()
     "Return `t' if both '_' &  '^' in current LaTeX fragment."
      (and (memq 94 (string-to-list (my/org-latex--get-tex-string)))
-          (memq 95 (string-to-list (my/org-latex--get-tex-string))))
-     )
+          (memq 95 (string-to-list (my/org-latex--get-tex-string)))))
 
-  (defun my/latex-fragment-frac-p()
+  (defun my/latex-fragment-frac-p ()
     "Return `t' if contain frac in current LaTeX fragment."
      (string-match "frac" (my/org-latex--get-tex-string)))
+
+  (defun my/latex-fragment-cfrac-and-subscript-p ()
+    "Return `t' if contain frac in current LaTeX fragment."
+    (and
+     (my/latex-fragment-subscript-p)
+     (string-match "cfrac" (my/org-latex--get-tex-string))
+     ))
 
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
@@ -454,11 +445,15 @@ and a list of files which contain phrase components.")
 Argument IMAGETYPE is the extension of the displayed image,
 as a string.  It defaults to \"png\"."
     (setq my/position 100)
-    (cond ((my/latex-fragment-frac-p)
+    (cond ((my/latex-fragment-cfrac-and-subscript-p)
+           (setq my/position 59))
+          ((my/latex-fragment-frac-p)
            (setq my/position 67))
           ((my/latex-fragment-bracket-p)
-           (setq my/position 83))
-          ((my/latex-fragment-script-p)
+           (setq my/position 87))
+          ((and (my/latex-fragment-subscript-p) (my/latex-tail-latin-p))
+           (setq my/position 69))
+          ((or (my/latex-fragment-script-p) (my/latex-tail-latin-p))
            (setq my/position 72))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
@@ -712,12 +707,16 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (interactive)
     (puthash (format "%s-%s" beg end) 1 ov-map)
     (ov-set (ov-make beg end) 'face '(:underline "plum")))
+    ;; (ov-set (ov-make beg end) 'face '(:box "plum")))
 
   (defun ov-map-put (beg end)
     (interactive)
     (if (ov-exist beg end)
         (ov-must-rem beg end)
       (ov-must-put beg end)))
+
+  ;; (ov-map-put 28100 28127)
+  ;; (ov-clear 28100 28127)
 
   (defun current-sentence-end ()
     (interactive)
