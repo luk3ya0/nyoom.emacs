@@ -190,12 +190,17 @@ and a list of files which contain phrase components.")
         company-dabbrev-other-buffers nil
         company-tooltip-limit 5
         company-tooltip-minimum-width 40)
+
   (set-company-backend!
     '(text-mode
       markdown-mode
       gfm-mode)
     '(:seperate
       company-files)))
+
+(use-package doom-snippets
+  :load-path "~/.config/doom/snippets"
+  :after yasnippet)
 
 ;;; Action ──────────────────────────────────────────────────────────────────────
 (bind-keys ([(super a)] . mark-whole-buffer)
@@ -378,9 +383,9 @@ and a list of files which contain phrase components.")
 
                                    "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
 
-                                   "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
-                                   "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
-                                   "\\setmathfont[range={\"002A,\"002B}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"002A,\"002B}]{Fira Code}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
