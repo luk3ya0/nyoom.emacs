@@ -371,6 +371,7 @@ and a list of files which contain phrase components.")
                                    ("" "fontspec" t)
                                    ("math-style=upright" "unicode-math" t)
 
+                                   "\\setmainfont[Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont{Fira Math}"
 
                                    "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
@@ -383,9 +384,8 @@ and a list of files which contain phrase components.")
 
                                    "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
 
-                                   ;; "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
-                                   ;; "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
-                                   ;; "\\setmathfont[range={\"002A,\"002B}]{Fira Code}"
+                                   "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
+                                   "\\setmathfont[range={\"0021-\"003C}]{Fira Code}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
@@ -723,6 +723,26 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   ;; (ov-map-put 28100 28127)
   ;; (ov-clear 28100 28127)
 
+  (defun current-visual-sentence-end ()
+    (interactive)
+    (let (current-poi visual-end)
+      (setq current-poi (point))
+      (evil-end-of-visual-line)
+      (setq visual-end (point))
+      (goto-char current-poi)
+      (message "%d" visual-end)
+      visual-end))
+
+  (defun next-visual-sentence-start ()
+    (interactive)
+    (let (current-poi visual-end)
+      (setq current-poi (point))
+      (evil-end-of-visual-line)
+      (setq visual-end (point))
+      (goto-char current-poi)
+      (message "%d" visual-end)
+      (+ 1 (current-visual-sentence-end))))
+
   (defun current-sentence-end ()
     (interactive)
     (if (bounds-of-thing-at-point 'sentence)
@@ -738,24 +758,37 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (defun underline-current-line-toggle ()
     (interactive)
     (if (plainp)
-        (ov-map-put (current-sentence-beg) (current-sentence-end))
+        (if (< (current-visual-sentence-end) (current-sentence-end))
+            (progn
+              (ov-map-put (current-sentence-beg) (current-visual-sentence-end))
+              (ov-map-put (next-visual-sentence-start) (current-sentence-end)))
+          (ov-map-put (current-sentence-beg) (current-sentence-end))
+          )
       ))
 
   (defun underline-forward ()
     (interactive)
-    (ov-must-rem (current-sentence-beg) (current-sentence-end))
+    (if (< (current-visual-sentence-end) (current-sentence-end))
+        (progn
+          (ov-must-rem (current-sentence-beg) (current-visual-sentence-end))
+          (ov-must-rem (next-visual-sentence-start) (current-sentence-end))
+          )
+      (ov-must-rem (current-sentence-beg) (current-sentence-end)))
     (goto-char (+ (current-sentence-end) 2))
     (goto-char (current-sentence-beg))
-    (underline-current-line-toggle)
-    )
+    (underline-current-line-toggle))
 
   (defun underline-backward ()
     (interactive)
-    (ov-must-rem (current-sentence-beg) (current-sentence-end))
+    (if (< (current-visual-sentence-end) (current-sentence-end))
+        (progn
+          (ov-must-rem (current-sentence-beg) (current-visual-sentence-end))
+          (ov-must-rem (next-visual-sentence-start) (current-sentence-end))
+          )
+      (ov-must-rem (current-sentence-beg) (current-sentence-end)))
     (goto-char (- (current-sentence-beg) 2))
     (goto-char (current-sentence-beg))
-    (underline-current-line-toggle)
-    )
+    (underline-current-line-toggle))
 
   (define-key evil-normal-state-map (kbd "M-o") 'underline-current-line-toggle)
   (define-key evil-normal-state-map (kbd "M-n") 'underline-forward)
