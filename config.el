@@ -385,6 +385,8 @@ and a list of files which contain phrase components.")
                                    "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
 
                                    "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
+                                   "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
+                                   "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
                                    "\\setmathfont[range={\"0021-\"003C}]{Fira Code}"
                                    )
         org-format-latex-options '(
@@ -410,16 +412,16 @@ and a list of files which contain phrase components.")
     (memq 94 (string-to-list (my/org-latex--get-tex-string))))
 
   (defun my/latex-tail-latin-p()
-    (or
-    (memq 103 (string-to-list (string-replace "igma" "" ;; Sigma
-                                              (my/org-latex--get-tex-string))))
-    (memq 106 (string-to-list (my/org-latex--get-tex-string)))
-    (memq 112 (string-to-list (my/org-latex--get-tex-string)))
-    (memq 113 (string-to-list (string-replace "equiv" "" ;; equiv
-                                              (my/org-latex--get-tex-string))))
-    (memq 121 (string-to-list (string-replace "infty" "" ;; infty
-                                              (my/org-latex--get-tex-string))))
-     ))
+    (let (tex-string)
+      (setq tex-string (my/org-latex--get-tex-string))
+      (dolist (ele '("emptyset" "equiv" "subseteq" "supseteq" "geq" "neq" "igma" "infty"))
+        (setq tex-string (string-replace ele "" tex-string)))
+      (or
+       (memq 106 (string-to-list tex-string))
+       (memq 112 (string-to-list tex-string))
+       (memq 113 (string-to-list tex-string))
+       (memq 121 (string-to-list tex-string))
+       )))
 
   (defun my/latex-fragment-subscript-p ()
     "Return `t' if '_' in current LaTeX fragment."
