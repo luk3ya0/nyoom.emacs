@@ -461,7 +461,7 @@ as a string.  It defaults to \"png\"."
           ((or (my/latex-fragment-script-p) (my/latex-tail-latin-p))
            (setq my/position 72))
           ((my/latex-fragment-superscript-p)
-           (setq my/position 100))
+           (setq my/position 98))
           ((my/latex-fragment-subscript-p)
            (setq my/position 78)))
     (let ((ov (make-overlay beg end))
@@ -511,7 +511,7 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
         (when (>= offset 0)
           (overlay-put ov 'before-string (make-string offset ?\ ))))))
 
-  (defun scimax-org-latex-fragment-justify-advice (beg end image imagetype)
+  (defun scimax-org-latex-fragment-justify-advice (_ _ _ _)
     "After advice function to justify fragments."
     (scimax-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'center)))
 
@@ -938,7 +938,8 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
+  ;; (let (org-log-done org-log-states)   ; turn off logging
+  (let (org-log-done)   ; turn off logging
     (message (format "%s" n-done))
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
