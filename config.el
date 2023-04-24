@@ -353,7 +353,7 @@ and a list of files which contain phrase components.")
                                                   :message "you need install the programs: xelatex and dvisvgm."
                                                   :image-input-type "xdv"
                                                   :image-output-type "svg"
-                                                  :image-size-adjust (1.8 . 1.5)
+                                                  :image-size-adjust (1.9 . 1.5)
                                                   :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                                                    "cat %f > ~/file-bak.tex"
                                                                    "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
@@ -387,7 +387,7 @@ and a list of files which contain phrase components.")
                                    "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
                                    "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
                                    "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
-                                   "\\setmathfont[range={\"0021-\"003C}]{Fira Code}"
+                                   "\\setmathfont[range={\"0021-\"003E}]{Fira Code}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
@@ -414,9 +414,22 @@ and a list of files which contain phrase components.")
   (defun my/latex-tail-latin-p()
     (let (tex-string)
       (setq tex-string (my/org-latex--get-tex-string))
-      (dolist (ele '("emptyset" "equiv" "subseteq" "supseteq" "geq" "neq" "igma" "infty"))
+      (dolist (ele '("alpha" "Alpha" "gamma" "Gamma" "pi" "Pi" "epsilon" "Epsilon"
+                     "sigma" "Sigma" "upsilon" "Upsilon" "kappa" "Kappa" "psi" "Psi"
+                     "omega" "Omega" ;; greek symbol
+                     "rightarrow" "Rightarrow" "leftrightarrow" "Leftrightarrow"
+                     "uparrow" "Uparrow" "updownarrow" "Updownarrow"
+                     "mapsto" "longmapsto" "leftharpoonup" "rightharpoonup"
+                     "leftharpoondown" "rightharpoondown" ;; arrow
+                     "infty" "partial" "emptyset" "varnothing" "complement"
+                     "neg" "square" "blacksquare" "triangle" ;; miscellaneous symbols
+                     "cap" "cup" "bigcap" "bigcup" "neq" "leq" "geq" "perp"
+                     "simeq" "approx" "wedge" "oplus" "equiv" "cong" ;; binary operation/relation symbol
+                     "subseteq" "supseteq" "sqrt" "angle" "measuredangle"
+                     "sphericalangle" "varangle"))
         (setq tex-string (string-replace ele "" tex-string)))
       (or
+       (memq 44 (string-to-list tex-string))
        (memq 106 (string-to-list tex-string))
        (memq 112 (string-to-list tex-string))
        (memq 113 (string-to-list tex-string))
@@ -463,7 +476,7 @@ as a string.  It defaults to \"png\"."
           ((or (my/latex-fragment-script-p) (my/latex-tail-latin-p))
            (setq my/position 72))
           ((my/latex-fragment-superscript-p)
-           (setq my/position 98))
+           (setq my/position 100))
           ((my/latex-fragment-subscript-p)
            (setq my/position 78)))
     (let ((ov (make-overlay beg end))
