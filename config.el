@@ -2,10 +2,8 @@
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
-
 ;;; Config Helpers ──────────────────────────────────────────────────────────────
 ;; `load!' for loading external *.el files relative to this one
 ;; - `use-package!' for configuring packages
@@ -323,7 +321,8 @@ and a list of files which contain phrase components.")
   :after org
   :diminish
   :hook
-  (org-mode . iscroll-mode))
+  (org-mode . iscroll-mode)
+  (nov-mode . iscroll-mode))
 
 (use-package! valign
   :after org
@@ -341,24 +340,29 @@ and a list of files which contain phrase components.")
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
 
+(use-package! org-appear
+  :after org
+  :hook (org-mode . org-fragtog-mode))
+
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
   (defun ob-latex-preamble (_)
     ;; (message (format "%s" params))
     (format "%s\n" "\\documentclass{standalone}"))
   (setq org-babel-latex-preamble #'ob-latex-preamble)
-  (add-to-list 'org-preview-latex-process-alist '(xdvsvgm :progams
-                                                  ("xelatex" "dvisvgm")
-                                                  :discription "xdv > svg"
-                                                  :message "you need install the programs: xelatex and dvisvgm."
-                                                  :image-input-type "xdv"
-                                                  :image-output-type "svg"
-                                                  :image-size-adjust (1.9 . 1.5)
-                                                  :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
-                                                                   "cat %f > ~/file-bak.tex"
-                                                                   "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
-                                                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O"
-                                                                    "gsed -i 's/#000/none/g' %O")))
+  (add-to-list 'org-preview-latex-process-alist
+               '(xdvsvgm :progams
+                 ("xelatex" "dvisvgm")
+                 :discription "xdv > svg"
+                 :message "you need install the programs: xelatex and dvisvgm."
+                 :image-input-type "xdv"
+                 :image-output-type "svg"
+                 :image-size-adjust (1.87 . 1.5)
+                 :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
+                                  "cat %f > ~/file-bak.tex"
+                                  "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
+                 :image-converter ("dvisvgm %f -n -b min -c %S -o %O"
+                                   "gsed -i 's/#000/none/g' %O")))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
@@ -429,12 +433,14 @@ and a list of files which contain phrase components.")
                      "sphericalangle" "varangle"))
         (setq tex-string (string-replace ele "" tex-string)))
       (or
-       (memq 44 (string-to-list tex-string))
        (memq 106 (string-to-list tex-string))
        (memq 112 (string-to-list tex-string))
        (memq 113 (string-to-list tex-string))
        (memq 121 (string-to-list tex-string))
        )))
+
+  (defun my/latex-tail-pun-p ()
+    (memq 44 (string-to-list (my/org-latex--get-tex-string))))
 
   (defun my/latex-fragment-subscript-p ()
     "Return `t' if '_' in current LaTeX fragment."
@@ -469,16 +475,21 @@ as a string.  It defaults to \"png\"."
            (setq my/position 59))
           ((my/latex-fragment-frac-p)
            (setq my/position 67))
+          ((my/latex-tail-latin-p)
+           (setq my/position 82))
           ((my/latex-fragment-bracket-p)
            (setq my/position 87))
-          ((and (my/latex-fragment-subscript-p) (my/latex-tail-latin-p))
+          ((my/latex-fragment-subscript-p)
            (setq my/position 69))
-          ((or (my/latex-fragment-script-p) (my/latex-tail-latin-p))
-           (setq my/position 72))
+          ((my/latex-fragment-script-p)
+           (setq my/position 77))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
           ((my/latex-fragment-subscript-p)
-           (setq my/position 78)))
+           (setq my/position 78))
+          ((my/latex-tail-pun-p)
+           (setq my/position 83))
+          )
     (let ((ov (make-overlay beg end))
           (imagetype (or (intern imagetype) 'png)))
       (overlay-put ov 'org-overlay-type 'org-latex-overlay)
@@ -683,13 +694,13 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 
   (defun scroll-up-org-mode()
     (interactive)
-    (if (eq major-mode 'org-mode)
+    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
         (iscroll-up)
       (evil-next-visual-line)))
 
   (defun scroll-down-org-mode()
     (interactive)
-    (if (eq major-mode 'org-mode)
+    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
         (iscroll-down)
       (evil-previous-visual-line)))
 
@@ -903,6 +914,7 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-center)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-top)
   (scroll-on-jump-with-scroll-advice-add evil-scroll-line-to-bottom))
+
 ;;; Log ─────────────────────────────────────────────────────────────────────────
 (use-package! command-log-mode
   :commands global-command-log-mode
@@ -915,6 +927,15 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 (setq-default history-length 1000)
 
 ;;; TODO ────────────────────────────────────────────────────────────────────────
+(defface space-lock
+  '((t (:font-family "Space Mono"
+        :height 160
+        :avgwidth 180
+        :spacing 100
+        )))
+  "Org mode todo face"
+  :group 'org-face)
+
 (defface fira-lock
   '((t (:font-family "Fira Code"
         :height 160
@@ -930,7 +951,7 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
     ("\\[\\([0-9]+/[0-9]+\\)\\]"
      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-    ;; ("\\(--\\)"
+    ;; ("\\(-\\)"
     ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
     ;; ("\\(──\\)"
     ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
