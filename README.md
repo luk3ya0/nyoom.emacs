@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./misc/radial-tree.svg" width="540" title="hover text">
+  <img src="./misc/radial-tree.svg" width="30%" max-with="360" title="hover text">
 </p>
 <small display="block">org mode latex babel svg output</small>
 
@@ -30,6 +30,8 @@ sudo tlmgr install dvisvgm xelatex xcolor firamath unicode-math
 - [ ] AUC-Tex Command Recipes
 
 - [ ] Checkout a -Q Develop Branch
+
+- [ ] Completion on Org Mode src block
 
 ## Some Resources
 
