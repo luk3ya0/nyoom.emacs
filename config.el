@@ -172,12 +172,12 @@ and a list of files which contain phrase components.")
 (setq-hook! '+doom-dashboard-mode-hook evil-normal-state-cursor (list nil))
 
 ;;; Completion ──────────────────────────────────────────────────────────────────
-;; (after! lsp-mode
-;;   (setq lsp-enable-symbol-highlighting nil))
+(after! lsp-mode
+  (setq lsp-enable-symbol-highlighting nil))
 
-;; (after! lsp-ui
-;;   (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
-;;         lsp-ui-doc-enable nil))     ; redundant with K
+(after! lsp-ui
+  (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+        lsp-ui-doc-enable nil))     ; redundant with K
 
 (after! company
   (setq company-idle-delay 0.1
@@ -190,11 +190,9 @@ and a list of files which contain phrase components.")
         company-tooltip-minimum-width 40)
 
   (set-company-backend!
-    '(text-mode
-      markdown-mode
-      gfm-mode)
-    '(:seperate
-      company-files)))
+    '(org-mode gfm-mode text-mode
+      markdown-mode)
+    '(:seperate company-files)))
 
 (use-package doom-snippets
   :load-path "~/.config/doom/snippets"
@@ -252,134 +250,23 @@ and a list of files which contain phrase components.")
 
 (add-hook 'python-mode-hook (lambda ()
                               (setq python-indent 4)))
+
+;;; Log ─────────────────────────────────────────────────────────────────────────
+(use-package! command-log-mode
+  :commands global-command-log-mode
+  :config
+  (setq command-log-mode-auto-show t
+        command-log-mode-open-log-turns-on-mode nil
+        command-log-mode-is-global t
+        command-log-mode-window-size 50))
+
+(setq-default history-length 1000)
+
 ;;; Editor > Motion ─────────────────────────────────────────────────────────────
 (setq undo-limit 80000000             ; Raise undo-limit to 80MB
       evil-want-fine-undo t           ; By default while in insert all changes are one big blob. Be more granular
       auto-save-default t             ; Nobody likes to loose work, I certainly don't
       )
-
-(defun narrow-p ()
-  "Return t if a buffer is narrowed"
-  (not (equal (- (point-max) (point-min)) (buffer-size))))
-
-(with-eval-after-load 'evil
-  (setq sentence-end-base "[.?!…‽][]\\n\"'”’)}»›]*")
-  (require 'ov)
-  (require 'org-element)
-  (defun plainp ()
-    "Check current sentence is paragraph and it's parent is section."
-    (and
-     (eq (org-element-type (org-element-at-point)) 'paragraph)
-     (or
-      (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'section)
-      (eq (org-element-type (org-element-property :parent (org-element-at-point))) 'item)
-      )))
-
-  (setq ov-map
-        #s(hash-table
-           size 1000
-           test equal
-           data (
-                 "0-0" 1)))
-
-  (defun ov-exist (beg end)
-    (interactive)
-    (gethash (format "%s-%s" beg end) ov-map))
-
-  (defun current-point ()
-    (interactive)
-    (message (format "%s" (point))))
-
-  (defun ov-must-rem (beg end)
-    (interactive)
-    (remhash (format "%s-%s" beg end) ov-map)
-    (ov-clear beg end))
-
-  (defun ov-must-put (beg end)
-    (interactive)
-    (puthash (format "%s-%s" beg end) 1 ov-map)
-    (ov-set (ov-make beg end) 'face '(:underline "plum")))
-  ;; (ov-set (ov-make beg end) 'face '(:box "plum")))
-
-  (defun ov-map-put (beg end)
-    (interactive)
-    (if (ov-exist beg end)
-        (ov-must-rem beg end)
-      (ov-must-put beg end)))
-
-  ;; (ov-map-put 28100 28127)
-  ;; (ov-clear 28100 28127)
-
-  (defun current-visual-sentence-end ()
-    (interactive)
-    (let (current-poi visual-end)
-      (setq current-poi (point))
-      (evil-end-of-visual-line)
-      (setq visual-end (point))
-      (goto-char current-poi)
-      (message "%d" visual-end)
-      visual-end))
-
-  (defun next-visual-sentence-start ()
-    (interactive)
-    (let (current-poi visual-end)
-      (setq current-poi (point))
-      (evil-end-of-visual-line)
-      (setq visual-end (point))
-      (goto-char current-poi)
-      (message "%d" visual-end)
-      (+ 1 (current-visual-sentence-end))))
-
-  (defun current-sentence-end ()
-    (interactive)
-    (if (bounds-of-thing-at-point 'sentence)
-        (cdr (bounds-of-thing-at-point 'sentence))
-      (cdr (bounds-of-thing-at-point 'line))))
-
-  (defun current-sentence-beg ()
-    (interactive)
-    (if (bounds-of-thing-at-point 'sentence)
-        (car (bounds-of-thing-at-point 'sentence))
-      (car (bounds-of-thing-at-point 'line))))
-
-  (defun underline-current-line-toggle ()
-    (interactive)
-    (if (plainp)
-        (if (< (current-visual-sentence-end) (current-sentence-end))
-            (progn
-              (ov-map-put (current-sentence-beg) (current-visual-sentence-end))
-              (ov-map-put (next-visual-sentence-start) (current-sentence-end)))
-          (ov-map-put (current-sentence-beg) (current-sentence-end))
-          )
-      ))
-
-  (defun underline-forward ()
-    (interactive)
-    (if (< (current-visual-sentence-end) (current-sentence-end))
-        (progn
-          (ov-must-rem (current-sentence-beg) (current-visual-sentence-end))
-          (ov-must-rem (next-visual-sentence-start) (current-sentence-end))
-          )
-      (ov-must-rem (current-sentence-beg) (current-sentence-end)))
-    (goto-char (+ (current-sentence-end) 2))
-    (goto-char (current-sentence-beg))
-    (underline-current-line-toggle))
-
-  (defun underline-backward ()
-    (interactive)
-    (if (< (current-visual-sentence-end) (current-sentence-end))
-        (progn
-          (ov-must-rem (current-sentence-beg) (current-visual-sentence-end))
-          (ov-must-rem (next-visual-sentence-start) (current-sentence-end))
-          )
-      (ov-must-rem (current-sentence-beg) (current-sentence-end)))
-    (goto-char (- (current-sentence-beg) 2))
-    (goto-char (current-sentence-beg))
-    (underline-current-line-toggle))
-
-  (define-key evil-normal-state-map (kbd "M-o") 'underline-current-line-toggle)
-  (define-key evil-normal-state-map (kbd "M-n") 'underline-forward)
-  (define-key evil-normal-state-map (kbd "M-p") 'underline-backward))
 
 (with-eval-after-load 'evil
   (defun normal-next-line()
@@ -405,7 +292,7 @@ and a list of files which contain phrase components.")
     (interactive)
     (insert (string-trim (shell-command-to-string "/opt/homebrew/bin/ocr -l zh"))))
 
-
+  ;; cursor movement
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
@@ -413,9 +300,12 @@ and a list of files which contain phrase components.")
   (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-visual-line)
   (define-key evil-insert-state-map (kbd "C-h") 'backward-delete-char)
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+
+  ;; text helper
   (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
   (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
 
+  ;; edit helper
   (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
 
@@ -423,8 +313,7 @@ and a list of files which contain phrase components.")
   (define-key evil-normal-state-map (kbd "s-]") 'next-buffer)
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-  )
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
 ;; scroll on jump with evil
 (with-eval-after-load 'evil
@@ -468,13 +357,3 @@ and a list of files which contain phrase components.")
   (define-key evil-normal-state-map (kbd "j") 'scroll-up-org-mode)
   (define-key evil-normal-state-map (kbd "k") 'scroll-down-org-mode))
 
-;;; Log ─────────────────────────────────────────────────────────────────────────
-(use-package! command-log-mode
-  :commands global-command-log-mode
-  :config
-  (setq command-log-mode-auto-show t
-        command-log-mode-open-log-turns-on-mode nil
-        command-log-mode-is-global t
-        command-log-mode-window-size 50))
-
-(setq-default history-length 1000)

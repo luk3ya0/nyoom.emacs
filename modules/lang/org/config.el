@@ -389,6 +389,10 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 
 ;; org mode motion
 (with-eval-after-load 'evil
+  (defun narrow-p ()
+    "Return t if a buffer is narrowed"
+    (not (equal (- (point-max) (point-min)) (buffer-size))))
+
   (defun what-org ()
     "Get the org-element-type at point."
     (interactive)
