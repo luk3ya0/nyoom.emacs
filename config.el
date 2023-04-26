@@ -339,21 +339,32 @@ and a list of files which contain phrase components.")
 
 ;; scroll on image at cursor
 (with-eval-after-load 'evil
-  (defun scroll-up-org-mode()
+  (defun scroll-up-visual-org-mode()
     (interactive)
-    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
+    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode)) ;; TODO: handle detect point at image
         (iscroll-up)
       (evil-next-visual-line)))
 
-  (defun scroll-down-org-mode()
+  (defun scroll-down-visual-org-mode()
     (interactive)
-    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
+    (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode)) ;; TODO: handle detect point at image
         (iscroll-down)
       (evil-previous-visual-line)))
 
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (define-key evil-normal-state-map (kbd "C-n") 'scroll-up-org-mode)
-  (define-key evil-normal-state-map (kbd "C-p") 'scroll-down-org-mode)
-  (define-key evil-normal-state-map (kbd "j") 'scroll-up-org-mode)
-  (define-key evil-normal-state-map (kbd "k") 'scroll-down-org-mode))
+  ;; (defun scroll-up-org-mode()
+  ;;   (interactive)
+  ;;   (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
+  ;;       (iscroll-up)
+  ;;     (evil-next-line)))
 
+  ;; (defun scroll-down-org-mode()
+  ;;   (interactive)
+  ;;   (if (or (eq major-mode 'org-mode) (eq major-mode 'nov-mode))
+  ;;       (iscroll-down)
+  ;;     (evil-previous-line)))
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (define-key evil-normal-state-map (kbd "C-n") 'scroll-up-visual-org-mode)
+  (define-key evil-normal-state-map (kbd "C-p") 'scroll-down-visual-org-mode)
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+  )

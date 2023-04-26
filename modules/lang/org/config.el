@@ -135,7 +135,6 @@
                                    ("" "fontspec" t)
                                    ("math-style=upright" "unicode-math" t)
 
-                                   "\\setmainfont[Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont{Fira Math}"
 
                                    "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
@@ -224,7 +223,14 @@
 
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
-    (memq 40 (string-to-list (my/org-latex--get-tex-string))))
+    (let (tex-string)
+      (setq tex-string (my/org-latex--get-tex-string))
+      (dolist (ele '("_{" "^{"))
+        (setq tex-string (string-replace ele "" tex-string)))
+      (or
+       (memq 40 (string-to-list tex-string))
+       (memq 123 (string-to-list tex-string)))
+      ))
 
   (defun org--make-preview-overlay (beg end image &optional imagetype)
     "Build an overlay between BEG and END using IMAGE file.
