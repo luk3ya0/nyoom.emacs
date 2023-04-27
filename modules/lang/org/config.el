@@ -102,7 +102,8 @@
 
 (use-package! org-fragtog
   :after org
-  :hook (org-mode . org-fragtog-mode))
+  ;; :hook (org-mode . org-fragtog-mode)
+  )
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
@@ -117,7 +118,7 @@
                  :message "you need install the programs: xelatex and dvisvgm."
                  :image-input-type "xdv"
                  :image-output-type "svg"
-                 :image-size-adjust (1.87 . 1.5)
+                 :image-size-adjust (1.86 . 1.5)
                  :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                   "cat %f > ~/file-bak.tex"
                                   "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
@@ -137,7 +138,7 @@
 
                                    "\\setmathfont{Fira Math}"
 
-                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+                                   ;; "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
 
                                    "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
@@ -189,13 +190,16 @@
                      "cap" "cup" "bigcap" "bigcup" "neq" "leq" "geq" "perp"
                      "simeq" "approx" "wedge" "oplus" "equiv" "cong" ;; binary operation/relation symbol
                      "subseteq" "supseteq" "sqrt" "angle" "measuredangle"
-                     "sphericalangle" "varangle"))
+                     "sphericalangle" "varangle"
+                     "^{g" "^{j" "^{p" "^{q" "^{y"
+                     ))
         (setq tex-string (string-replace ele "" tex-string)))
       (or
-       (memq 106 (string-to-list tex-string))
-       (memq 112 (string-to-list tex-string))
-       (memq 113 (string-to-list tex-string))
-       (memq 121 (string-to-list tex-string))
+       ;; (memq 103 (string-to-list tex-string)) ;; g
+       (memq 106 (string-to-list tex-string)) ;; j
+       (memq 112 (string-to-list tex-string)) ;; p
+       (memq 113 (string-to-list tex-string)) ;; q
+       (memq 121 (string-to-list tex-string)) ;; y
        )))
 
   (defun my/latex-tail-pun-p ()
@@ -214,6 +218,13 @@
     "Return `t' if contain frac in current LaTeX fragment."
      (string-match "frac" (my/org-latex--get-tex-string)))
 
+  (defun my/latex-fragment-tail-and-subscript-p ()
+    "Return `t' if contain frac in current LaTeX fragment."
+    (and
+     (my/latex-fragment-subscript-p)
+     (my/latex-tail-latin-p)
+     ))
+
   (defun my/latex-fragment-cfrac-and-subscript-p ()
     "Return `t' if contain frac in current LaTeX fragment."
     (and
@@ -221,11 +232,15 @@
      (string-match "cfrac" (my/org-latex--get-tex-string))
      ))
 
+  (defun my/latex-fragment-floor-p ()
+    "Return `t' if contain frac in current LaTeX fragment."
+    (string-match "lfloor" (my/org-latex--get-tex-string)))
+
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
     (let (tex-string)
       (setq tex-string (my/org-latex--get-tex-string))
-      (dolist (ele '("_{" "^{"))
+      (dolist (ele '("^{(" "_{(" "_{" "^{"))
         (setq tex-string (string-replace ele "" tex-string)))
       (or
        (memq 40 (string-to-list tex-string))
@@ -241,20 +256,22 @@ as a string.  It defaults to \"png\"."
            (setq my/position 59))
           ((my/latex-fragment-frac-p)
            (setq my/position 67))
+          ((my/latex-fragment-tail-and-subscript-p)
+           (setq my/position 63))
+          ((my/latex-fragment-script-p)
+           (setq my/position 74))
           ((my/latex-tail-latin-p)
            (setq my/position 82))
-          ((my/latex-fragment-bracket-p)
-           (setq my/position 87))
           ((my/latex-fragment-subscript-p)
            (setq my/position 69))
-          ((my/latex-fragment-script-p)
-           (setq my/position 77))
-          ((my/latex-fragment-superscript-p)
-           (setq my/position 100))
-          ((my/latex-fragment-subscript-p)
-           (setq my/position 78))
+          ((my/latex-fragment-bracket-p)
+           (setq my/position 88))
           ((my/latex-tail-pun-p)
            (setq my/position 83))
+          ((my/latex-fragment-floor-p)
+           (setq my/position 83))
+          ((my/latex-fragment-superscript-p)
+           (setq my/position 100))
           )
     (let ((ov (make-overlay beg end))
           (imagetype (or (intern imagetype) 'png)))

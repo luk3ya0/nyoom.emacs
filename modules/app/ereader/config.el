@@ -143,7 +143,9 @@
       (ov-must-rem (current-sentence-beg) (current-sentence-end)))
     (goto-char (+ (current-sentence-end) 2))
     (goto-char (current-sentence-beg))
-    (underline-current-line-toggle))
+    (underline-current-line-toggle)
+    (if (eq major-mode 'org-mode)
+        (org-latex-preview)))
 
   (defun underline-backward ()
     (interactive)
@@ -155,7 +157,9 @@
       (ov-must-rem (current-sentence-beg) (current-sentence-end)))
     (goto-char (- (current-sentence-beg) 2))
     (goto-char (current-sentence-beg))
-    (underline-current-line-toggle))
+    (underline-current-line-toggle)
+    (if (eq major-mode 'org-mode)
+        (org-latex-preview)))
 
   (define-key evil-normal-state-map (kbd "M-o") 'underline-current-line-toggle)
   (define-key evil-normal-state-map (kbd "M-n") 'underline-forward)
