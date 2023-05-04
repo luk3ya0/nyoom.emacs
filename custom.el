@@ -3,12 +3,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(org-ml))
+ '(package-selected-packages '(beacon svg-clock org-ml))
  '(warning-suppress-log-types '((with-editor) (with-editor) (defvaralias)))
- '(warning-suppress-types '((with-editor) (defvaralias))))
+ '(warning-suppress-types '((with-editor) (defvaralias)) t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'set-goal-column 'disabled nil)

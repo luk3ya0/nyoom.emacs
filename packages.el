@@ -86,3 +86,4 @@
 
 (package! typescript-mode)
 
+(package! beacon :recipe (:host github :repo "Malabarba/beacon"))

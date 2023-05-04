@@ -43,7 +43,7 @@
 (add-hook 'nov-post-html-render-hook 'nov-center-images)
 
 (with-eval-after-load 'evil
-  (setq sentence-end-base "[.?!…‽][]\\n\"'”’)}»›]*")
+  (setq sentence-end-base "[.?!…‽;,][]\\n\"'”’)}»›]*")
   (require 'ov)
   (require 'org-element)
   (defun plainp ()
@@ -129,9 +129,8 @@
             (progn
               (ov-map-put (current-sentence-beg) (current-visual-sentence-end))
               (ov-map-put (next-visual-sentence-start) (current-sentence-end)))
-          (ov-map-put (current-sentence-beg) (current-sentence-end))
-          )
-      ))
+          (ov-map-put (current-sentence-beg) (current-sentence-end))))
+    )
 
   (defun underline-forward ()
     (interactive)
@@ -145,7 +144,8 @@
     (goto-char (current-sentence-beg))
     (underline-current-line-toggle)
     (if (eq major-mode 'org-mode)
-        (org-latex-preview)))
+        (org-latex-preview))
+    )
 
   (defun underline-backward ()
     (interactive)
@@ -159,7 +159,8 @@
     (goto-char (current-sentence-beg))
     (underline-current-line-toggle)
     (if (eq major-mode 'org-mode)
-        (org-latex-preview)))
+        (org-latex-preview))
+    )
 
   (define-key evil-normal-state-map (kbd "M-o") 'underline-current-line-toggle)
   (define-key evil-normal-state-map (kbd "M-n") 'underline-forward)

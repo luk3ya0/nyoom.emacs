@@ -24,6 +24,33 @@
       user-mail-address "oneTOinf@163.com")
 
 ;;; UI ──────────────────────────────────────────────────────────────────────────
+;; Crazy example
+;; (mac-start-animation nil :type 'page-curl-with-shadow
+;;                      :duration 1.0 :direction 'right :angle 45)
+;; Less crazy
+;; (mac-start-animation (selected-window) :type 'move-out
+;;                      :duration 1.0 :direction 'right)
+
+;; Implement fade-outs
+(defcustom mac-animation-duration 0.5
+  "Duration of transition animations")
+(defvar mac-animation-locked-p nil)
+(defun mac-animation-toggle-lock ()
+  (setq mac-animation-locked-p (not mac-animation-locked-p)))
+
+(defun animate-frame-fade-out (&rest args)
+  (unless mac-animation-locked-p
+    (mac-animation-toggle-lock)
+    (mac-start-animation nil :type 'fade-out :duration mac-animation-duration)
+    (run-with-timer mac-animation-duration nil 'mac-animation-toggle-lock)))
+
+;; Fade outs everywhere!
+(advice-add 'set-window-buffer :before 'animate-frame-fade-out)
+(advice-add 'split-window :before 'animate-frame-fade-out)
+(advice-add 'delete-window :before 'animate-frame-fade-out)
+(advice-add 'delete-other-windows :before 'animate-frame-fade-out)
+(advice-add 'window-toggle-side-windows :before 'animate-frame-fade-out)
+
 (push '(width  . 91)                         default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
@@ -204,7 +231,8 @@ and a list of files which contain phrase components.")
 
 (use-package! latex-preview-pane
   :init
-  (setq pdf-latex-command "xelatex"))
+  (setq pdf-latex-command "xelatex"
+        preview-orientation 'right))
 
 (use-package! lsp-mode
   :config
@@ -269,6 +297,9 @@ and a list of files which contain phrase components.")
       )
 
 (with-eval-after-load 'evil
+  (setq evil-split-window-below t
+        evil-vsplit-window-right t)
+
   (defun normal-next-line()
     (interactive)
     (forward-line 1))
@@ -305,15 +336,34 @@ and a list of files which contain phrase components.")
   (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
   (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
 
+  (defun blink-on-scroll-up ()
+    (interactive)
+    (evil-scroll-up (/ (window-body-height) 2))
+    (beacon-blink))
+
+  (defun blink-on-scroll-down ()
+    (interactive)
+    (evil-scroll-down (/ (window-body-height) 2))
+    (beacon-blink))
+
   ;; edit helper
   (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
+
+  (define-key evil-normal-state-map (kbd "C-u") 'blink-on-scroll-up)
+  (define-key evil-normal-state-map (kbd "C-d") 'blink-on-scroll-down)
 
   (define-key evil-normal-state-map (kbd "s-[") 'previous-buffer)
   (define-key evil-normal-state-map (kbd "s-]") 'next-buffer)
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal))
+
+(use-package! beacon
+  :after evil
+  :hook (org-mode . beacon-mode)
+  :config
+  (setq beacon-blink-when-point-moves-vertically 1))
 
 ;; scroll on jump with evil
 (with-eval-after-load 'evil

@@ -119,7 +119,9 @@
                  :image-input-type "xdv"
                  :image-output-type "svg"
                  :image-size-adjust (1.86 . 1.5)
-                 :latex-compiler ("gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
+                 :latex-compiler (
+                                  "gsed -i 's/\{article\}/\[dvisvgm\]\{article\}/g' %f"
+                                  ;; "gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                   "cat %f > ~/file-bak.tex"
                                   "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O"
@@ -136,9 +138,10 @@
                                    ("" "fontspec" t)
                                    ("math-style=upright" "unicode-math" t)
 
+                                   "\\setmainfont{Fira Code}"
                                    "\\setmathfont{Fira Math}"
 
-                                   ;; "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
 
                                    "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
@@ -148,9 +151,12 @@
 
                                    "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
 
-                                   "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
-                                   "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
-                                   "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
+                                   ;; "\\setmathfont[range=\\bigcup]{Cambria Math}"
+
+                                   "\\setmathfont[range={\"2261,\"2262},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
+                                   ;; "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
+                                   ;; "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
                                    "\\setmathfont[range={\"0021-\"003E}]{Fira Code}"
                                    )
         org-format-latex-options '(
@@ -189,9 +195,9 @@
                      "neg" "square" "blacksquare" "triangle" ;; miscellaneous symbols
                      "cap" "cup" "bigcap" "bigcup" "neq" "leq" "geq" "perp"
                      "simeq" "approx" "wedge" "oplus" "equiv" "cong" ;; binary operation/relation symbol
-                     "subseteq" "supseteq" "sqrt" "angle" "measuredangle"
+                     "subseteq" "supseteq" "sqrt" "angle" "measuredangle" "pm"
                      "sphericalangle" "varangle"
-                     "^{g" "^{j" "^{p" "^{q" "^{y"
+                     "^{g" "^{j" "^{p" "^{q" "^{y" "]{"
                      ))
         (setq tex-string (string-replace ele "" tex-string)))
       (or
@@ -200,6 +206,8 @@
        (memq 112 (string-to-list tex-string)) ;; p
        (memq 113 (string-to-list tex-string)) ;; q
        (memq 121 (string-to-list tex-string)) ;; y
+       (string-match "\\xi" tex-string)       ;; ξ
+       (string-match "\\zeta" tex-string)     ;; ζ
        )))
 
   (defun my/latex-tail-pun-p ()
@@ -236,6 +244,12 @@
     "Return `t' if contain frac in current LaTeX fragment."
     (string-match "lfloor" (my/org-latex--get-tex-string)))
 
+  (defun my/latex-fragment-matrix-p ()
+    "Return `t' if contain frac in current LaTeX fragment."
+    (or
+     (string-match "matrix}" (my/org-latex--get-tex-string))
+     (string-match "array}" (my/org-latex--get-tex-string))))
+
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
     (let (tex-string)
@@ -247,23 +261,31 @@
        (memq 123 (string-to-list tex-string)))
       ))
 
+  (defun my/latex-fragment-radical-p ()
+    (string-match "sqrt" (my/org-latex--get-tex-string)))
+
   (defun org--make-preview-overlay (beg end image &optional imagetype)
     "Build an overlay between BEG and END using IMAGE file.
 Argument IMAGETYPE is the extension of the displayed image,
 as a string.  It defaults to \"png\"."
     (setq my/position 100)
-    (cond ((my/latex-fragment-cfrac-and-subscript-p)
+    (cond
+          ((my/latex-fragment-matrix-p)
+           (setq my/position 61))
+          ((my/latex-fragment-cfrac-and-subscript-p)
            (setq my/position 59))
           ((my/latex-fragment-frac-p)
            (setq my/position 67))
           ((my/latex-fragment-tail-and-subscript-p)
            (setq my/position 63))
           ((my/latex-fragment-script-p)
-           (setq my/position 74))
+           (setq my/position 72))
+          ((my/latex-fragment-subscript-p)
+           (setq my/position 68))
           ((my/latex-tail-latin-p)
            (setq my/position 82))
-          ((my/latex-fragment-subscript-p)
-           (setq my/position 69))
+          ((my/latex-fragment-radical-p)
+           (setq my/position 89))
           ((my/latex-fragment-bracket-p)
            (setq my/position 88))
           ((my/latex-tail-pun-p)
