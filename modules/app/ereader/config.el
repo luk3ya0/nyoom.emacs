@@ -46,7 +46,7 @@
 ;; (advice-add #'org-display-inline-images :after #'nov-center-images)
 
 (with-eval-after-load 'evil
-  (setq sentence-end-base "[.?!…‽;,][]\\n\"'”’)}»›]*")
+  (setq sentence-end-base "[.?!…‽;][]\\n\"'”’)}»›]*")
   (require 'ov)
   (require 'org-element)
   (defun plainp ()

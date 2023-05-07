@@ -72,7 +72,7 @@
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
                    (setq-local underline-minimum-offset 5)
-                   (setq-local line-spacing 5)
+                   ;; (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
