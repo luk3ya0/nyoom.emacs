@@ -11,6 +11,7 @@
   :hook (nov-mode . nov-font-setup)
   :hook (nov-mode . pangu-spacing-mode)
   :hook (nov-mode . visual-line-mode)
+  ;; :hook (nov-mode . org-mode)
   ;; :hook (nov-mode . visual-fill-column-mode)
   :custom
   (nov-text-width t)
@@ -23,24 +24,26 @@
   :defer t)
 
 (defun nov-center-images ()
-            "Center images in document."
-            (let* ((pixel-buffer-width (shr-pixel-buffer-width))
-                   match)
-              (save-excursion
-                (goto-char (point-min))
-                (while (setq match (text-property-search-forward
-                                    'display nil
-                                    (lambda (_ p) (eq (car-safe p) 'image))))
-                  (when-let ((size (car (image-size
-                                         (prop-match-value match) 'pixels)))
-                             ((> size 150))
-                             (center-pixel (floor (- pixel-buffer-width size) 2))
-                             (center-pos (floor center-pixel (frame-char-width))))
-                    (beginning-of-line)
-                    (indent-to center-pos)
-                    (end-of-line))))))
+  "Center images in document."
+  (let* ((pixel-buffer-width (shr-pixel-buffer-width))
+         match)
+    (save-excursion
+      (goto-char (point-min))
+      (while (setq match (text-property-search-forward
+                          'display nil
+                          (lambda (_ p) (eq (car-safe p) 'image))))
+        (when-let ((size (car (image-size
+                               (prop-match-value match) 'pixels)))
+                   ((> size 150))
+                   (center-pixel (floor (- pixel-buffer-width size) 2))
+                   (center-pos (floor center-pixel (frame-char-width))))
+          (beginning-of-line)
+          (indent-to center-pos)
+          (end-of-line))))))
 
 (add-hook 'nov-post-html-render-hook 'nov-center-images)
+
+;; (advice-add #'org-display-inline-images :after #'nov-center-images)
 
 (with-eval-after-load 'evil
   (setq sentence-end-base "[.?!…‽;,][]\\n\"'”’)}»›]*")
