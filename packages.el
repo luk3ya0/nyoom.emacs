@@ -86,6 +86,8 @@
 
 (package! typescript-mode)
 
+(package! zones)
+
 (package! beacon :recipe (:host github :repo "Malabarba/beacon"))
 
 (package! org

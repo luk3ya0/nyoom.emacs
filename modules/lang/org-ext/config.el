@@ -72,7 +72,7 @@
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
                    (setq-local underline-minimum-offset 5)
-                   ;; (setq-local line-spacing 5)
+                   (setq-local line-spacing 3)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
@@ -247,8 +247,8 @@
   (defun my/latex-fragment-matrix-p ()
     "Return `t' if contain frac in current LaTeX fragment."
     (or
-     (string-match "matrix}" (my/org-latex--get-tex-string))
-     (string-match "array}" (my/org-latex--get-tex-string))))
+     (string-match "{matrix}" (my/org-latex--get-tex-string))
+     (string-match "{array}" (my/org-latex--get-tex-string))))
 
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
@@ -271,7 +271,7 @@ as a string.  It defaults to \"png\"."
     (setq my/position 100)
     (cond
           ((my/latex-fragment-matrix-p)
-           (setq my/position 61))
+           (setq my/position 70))
           ((my/latex-fragment-cfrac-and-subscript-p)
            (setq my/position 59))
           ((my/latex-fragment-frac-p)
@@ -347,7 +347,8 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (scimax-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'center)))
 
 
-  (advice-add 'org--make-preview-overlay :after 'scimax-org-latex-fragment-justify-advice))
+  (advice-add 'org--make-preview-overlay :after 'scimax-org-latex-fragment-justify-advice)
+  (advice-add 'org-display-inline-images :after 'scimax-org-latex-fragment-justify-advice))
 
 
 ;;; TODO ────────────────────────────────────────────────────────────────────────
