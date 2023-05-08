@@ -39,8 +39,8 @@
         '(("*" (bold))
           ("/" italic)
           ("_" nil)
-          ("=" (:background nil :foreground "pink4"))
-          ("~" (:background nil :foreground "tan"))))
+          ("=" (:foreground "pink4"))
+          ("~" (:foreground "tan"))))
   (setq org-archive-location (concat org-directory "roam/archive.org::")
         org-hide-leading-stars nil
         org-startup-indented nil
