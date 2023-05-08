@@ -246,8 +246,8 @@
   (defun my/latex-fragment-matrix-p ()
     "Return `t' if contain frac in current LaTeX fragment."
     (or
-     (string-match "{matrix}" (my/org-latex--get-tex-string))
-     (string-match "{array}" (my/org-latex--get-tex-string))))
+     (string-match "matrix}" (my/org-latex--get-tex-string))
+     (string-match "array}" (my/org-latex--get-tex-string))))
 
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
@@ -307,7 +307,7 @@ as a string.  It defaults to \"png\"."
 
   (require 'ov)
   ;; * Fragment justification
-  (defun scimax-org-latex-fragment-justify (justification)
+  (defun nyoom-org-latex-fragment-justify (justification)
     "Justify the latex fragment at point with JUSTIFICATION.
 JUSTIFICATION is a symbol for 'left, 'center or 'right."
     (interactive
@@ -340,15 +340,15 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
         (when (>= offset 0)
           (overlay-put ov 'before-string (make-string offset ?\ ))))))
 
-  (defun scimax-org-latex-fragment-justify-advice (_ _ _ _)
+  (defun nyoom-org-latex-fragment-justify-advice (_ _ _ _)
     "After advice function to justify fragments."
-    (scimax-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'center)))
+    (nyoom-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'center)))
 
-  (advice-add 'org--make-preview-overlay :after 'scimax-org-latex-fragment-justify-advice))
+  (advice-add 'org--make-preview-overlay :after 'nyoom-org-latex-fragment-justify-advice))
 
 ;;; Org Image ────────────────────────────────────────────────────────────────────────
 (after! org
-  (defun scimax-org-display-inline-images (&optional include-linked refresh beg end)
+  (defun nyoom-org-display-inline-images (&optional include-linked refresh beg end)
     "Display inline images.
 
 An inline image is a link which follows either of these
@@ -466,7 +466,8 @@ buffer boundaries with possible narrowing."
                                 (overlay-put ov 'face 'default)
                                 (overlay-put ov 'org-image-overlay t)
 
-                                (setq space-left (- (window-max-chars-per-line) (/ (org-display-inline-image--width link) text-px-unit))
+                                (setq space-left (- (window-max-chars-per-line)
+                                                    (/ (org-display-inline-image--width link) text-px-unit))
                                       offset (floor (cond
                                                      ((string= justify "center")
                                                       (- (/ space-left 2) shift))
@@ -485,7 +486,7 @@ buffer boundaries with possible narrowing."
                                 (push ov org-inline-image-overlays))))))))))))))))
 
   (defun org-display-inline-image--justify (link)
-    (let ((justify "left"))
+    (let ((justify "center"))
         (let* ((case-fold-search t)
                (par (org-element-lineage link '(paragraph)))
                (attr-re "^[ \t]*#\\+attr_.*?: +.*?:justify +\\(\\S-+\\)")
@@ -499,12 +500,12 @@ buffer boundaries with possible narrowing."
                (justify
                 (cond
                  ;; Convert numeric justifys to numbers, converting percentages.
-                 ((string= attr-justify "center")
-                  "center")
-                 (t "left"))))
+                 ((string= attr-justify "left")
+                  "left")
+                 (t "center"))))
           justify)))
 
-  (advice-add 'org-display-inline-images :override #'scimax-org-display-inline-images))
+  (advice-add 'org-display-inline-images :override #'nyoom-org-display-inline-images))
 
 ;;; TODO ────────────────────────────────────────────────────────────────────────
 (defface space-lock
