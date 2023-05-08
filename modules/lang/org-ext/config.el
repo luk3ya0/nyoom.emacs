@@ -454,6 +454,8 @@ buffer boundaries with possible narrowing."
                                            (point))))
                                     (shift (- (org-element-property :begin link) (line-beginning-position)))
                                     (justify (org-display-inline-image--justify link))
+                                    (text-px-unit
+                                     (round (/ (car (window-text-pixel-size)) (* 1.0 (window-text-width)))))
                                     )
                                 ;; (message justify)
                                 ;; FIXME: See bug#59902.  We cannot rely
@@ -464,12 +466,13 @@ buffer boundaries with possible narrowing."
                                 (overlay-put ov 'face 'default)
                                 (overlay-put ov 'org-image-overlay t)
 
-                                (setq space-left (- (window-max-chars-per-line) (/ (org-display-inline-image--width link) 9))
+                                (setq space-left (- (window-max-chars-per-line) (/ (org-display-inline-image--width link) text-px-unit))
                                       offset (floor (cond
                                                      ((string= justify "center")
                                                       (- (/ space-left 2) shift))
                                                      (t
                                                       0))))
+
 
                                 (when (>= offset 0)
                                   (overlay-put ov 'before-string (make-string offset ?\ )))
