@@ -296,6 +296,12 @@ and a list of files which contain phrase components.")
       auto-save-default t             ; Nobody likes to loose work, I certainly don't
       )
 
+;;; work specifically for org mode
+(add-hook 'org-mode-hook
+          (lambda ()
+            (define-key evil-insert-state-local-map
+                        (kbd "C-h") 'backward-delete-char)))
+
 (with-eval-after-load 'evil
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
@@ -363,7 +369,8 @@ and a list of files which contain phrase components.")
   :after evil
   :hook (org-mode . beacon-mode)
   :config
-  (setq beacon-blink-when-point-moves-vertically 1))
+  ;; (setq beacon-blink-when-point-moves-vertically 1)
+  )
 
 ;; scroll on jump with evil
 (with-eval-after-load 'evil

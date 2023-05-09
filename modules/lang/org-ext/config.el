@@ -348,6 +348,60 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 
 ;;; Org Image ────────────────────────────────────────────────────────────────────────
 (after! org
+  (defun nyoom-get-image-dimensions-imk (Filepath)
+    "Returns a image file's width and height as a vector.
+This function requires “magick identify” shell command.
+See also: `nyoom-get-image-dimensions'."
+    (let (($widthHeight
+           (split-string
+            (shell-command-to-string
+             (concat "magick identify -format \"%w %h\" " Filepath)))))
+      (vector
+       (string-to-number (elt $widthHeight 0))
+       (string-to-number (elt $widthHeight 1)))))
+
+  (defun nyoom-get-image-dimensions (Filepath)
+    "Returns a vector [width height] of a image's dimension.
+The elements are integer datatype.
+Support png jpg svg gif and any image type emacs supports.
+If it's svg, and dimension cannot be determined, it returns [0 0].
+If it's webp, calls `nyoom-get-image-dimensions-imk'.
+
+URL `http://xahlee.info/emacs/emacs/elisp_image_tag.html'
+Version 2017-01-11 2021-09-01"
+    (let ($x $y)
+      (cond
+       ((string-match "\.svg$" Filepath)
+        (progn
+          (with-temp-buffer
+            ;; hackish. grab the first occurence of width height in file
+            (insert-file-contents Filepath)
+            (goto-char (point-min))
+            (when (re-search-forward "width=\"\\([0-9]+\\).*\"" nil 1)
+              (setq $x (match-string-no-properties 1 )))
+            (goto-char (point-min))
+            (if (re-search-forward "height=\"\\([0-9]+\\).*\"" nil 1)
+                (setq $y (match-string-no-properties 1 ))))
+          (if (and $x $y)
+              (vector (string-to-number $x) (string-to-number $y))
+            [0 0])))
+       ((string-match "\.webp$" Filepath)
+        (nyoom-get-image-dimensions-imk Filepath))
+       (t
+        (let ($xy )
+          (progn
+            (clear-image-cache t)
+            (setq $xy (image-size
+                       (create-image
+                        (if (file-name-absolute-p Filepath)
+                            Filepath
+                          (concat default-directory Filepath)))
+                       t)))
+          $xy)))))
+
+  (defun nyoom-image-actual-width (org-link)
+    (car (nyoom-get-image-dimensions (org-element-property :path org-link))))
+
   (defun nyoom-org-display-inline-images (&optional include-linked refresh beg end)
     "Display inline images.
 
@@ -437,7 +491,12 @@ buffer boundaries with possible narrowing."
                                     (ignore-errors (org-attach-expand path)))
                                 (expand-file-name path))))
                     (when (and file (file-exists-p file))
-                      (let ((width (org-display-inline-image--width link))
+                      (let ((width (or
+                                    (org-display-inline-image--width link)
+                                    (if (> (nyoom-image-actual-width link) (round (* (window-max-chars-per-line) 9 0.8)))
+                                        (round (* (window-max-chars-per-line) 9 0.6))
+                                      (nyoom-image-actual-width link))
+                                    ))
                             (old (get-char-property-and-overlay
                                   (org-element-property :begin link)
                                   'org-image-overlay)))
@@ -454,9 +513,11 @@ buffer boundaries with possible narrowing."
                                            (point))))
                                     (shift (- (org-element-property :begin link) (line-beginning-position)))
                                     (justify (org-display-inline-image--justify link))
-                                    (text-px-unit
-                                     (round (/ (car (window-text-pixel-size)) (* 1.0 (window-text-width)))))
+                                    (normal-size (round (* (window-max-chars-per-line) 0.8)))
+                                    ;; (text-px-unit
+                                    ;;  (round (/ (car (window-text-pixel-size)) (* 1.0 (window-text-width)))))
                                     )
+                                (message "%s" width)
                                 ;; (message justify)
                                 ;; FIXME: See bug#59902.  We cannot rely
                                 ;; on Emacs to update image if the file
@@ -467,13 +528,12 @@ buffer boundaries with possible narrowing."
                                 (overlay-put ov 'org-image-overlay t)
 
                                 (setq space-left (- (window-max-chars-per-line)
-                                                    (/ (org-display-inline-image--width link) text-px-unit))
+                                                    (round (/ width 9)))
                                       offset (floor (cond
                                                      ((string= justify "center")
                                                       (- (/ space-left 2) shift))
                                                      (t
                                                       0))))
-
 
                                 (when (>= offset 0)
                                   (overlay-put ov 'before-string (make-string offset ?\ )))
