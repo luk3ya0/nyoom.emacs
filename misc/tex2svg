@@ -1,5 +1,7 @@
 #!/bin/bash
 
+folder=`dirname $1`
+echo ${folder}
 filename=$1
 extension="${filename##*.}"
 filename="${filename%.*}"
@@ -7,4 +9,4 @@ filename="${filename%.*}"
 # echo ${filename}
 # echo ${extension}
 
-xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory=. ${filename}.tex && dvisvgm ${filename}.xdv -n -c 1.7 -o ${filename}.svg
+xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory=${folder} ${filename}.tex && dvisvgm ${filename}.xdv -n -c 1.7 -o ${filename}.svg

@@ -107,10 +107,6 @@
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
-  (defun ob-latex-preamble (_)
-    ;; (message (format "%s" params))
-    (format "%s\n" "\\documentclass{standalone}"))
-  (setq org-babel-latex-preamble #'ob-latex-preamble)
   (add-to-list 'org-preview-latex-process-alist
                '(xdvsvgm :progams
                  ("xelatex" "dvisvgm")
@@ -153,6 +149,7 @@
 
                                    ;; "\\setmathfont[range=\\bigcup]{Cambria Math}"
 
+                                   ;; "\\setmathfont[range={\"0021-\"003E},Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont[range={\"2261,\"2262},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
                                    ;; "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
                                    ;; "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
@@ -170,6 +167,58 @@
                                 "biber %b"
                                 ;; "rm -fr %b.out %b.log %b.tex %b.brf %b.bbl auto"
                                 ))
+  (defun ob-latex-preamble (params)
+    ;; (message (format "%s" params))
+
+    (mapconcat 'identity '("\\documentclass[dvisvgm]{article}"
+              "\\usepackage[usenames]{color}"
+              "\\usepackage{graphicx}"
+              "\\usepackage[normalem]{ulem}"
+              "\\usepackage{amsmath}"
+              "\\usepackage{amssymb}"
+              "\\usepackage{nicematrix}"
+
+              "\\usepackage{tabularray}"
+              "\\usepackage{rotating}"
+              "\\usepackage{multirow}"
+              "\\usepackage{mathtools}"
+              "\\def\\block(#1,#2)#3{\\multicolumn{#2}{c}{\\multirow{#1}{*}{$ #3 $}}}"
+
+              "\\usepackage{tikz}"
+              "\\usetikzlibrary{arrows.meta}"
+              "\\usetikzlibrary{intersections}"
+              "\\usetikzlibrary{angles,quotes}"
+              "\\usepackage{fontspec}"
+              "\\usepackage[math-style=upright]{unicode-math}"
+              "\\setmainfont{Fira Code}"
+              "\\setmathfont{Fira Math}"
+              "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
+              "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+              "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+              "\\setmathfont[range=it,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+              "\\setmathfont[range=bfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+              "\\setmathfont[range=bfit,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
+              "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
+              "\\setmathfont[range={\"2261,\"2262},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
+              "\\setmathfont[range={\"005B,\"005D},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
+              "\\setmathfont[range={\"0021-\"003E}]{Fira Code}"
+
+              "\\pagestyle{empty}"
+              "\\setlength{\\textwidth}{\\paperwidth}"
+              "\\addtolength{\\textwidth}{-3cm}"
+              "\\setlength{\\oddsidemargin}{1.5cm}"
+              "\\addtolength{\\oddsidemargin}{-2.54cm}"
+              "\\setlength{\\evensidemargin}{\\oddsidemargin}"
+              "\\setlength{\\textheight}{\\paperheight}"
+              "\\addtolength{\\textheight}{-\\headheight}"
+              "\\addtolength{\\textheight}{-\\headsep}"
+              "\\addtolength{\\textheight}{-\\footskip}"
+              "\\addtolength{\\textheight}{-3cm}"
+              "\\setlength{\\topmargin}{1.5cm}"
+              "\\addtolength{\\topmargin}{-2.54cm}"
+              ) "\n" ))
+
+  (setq org-babel-latex-preamble #'ob-latex-preamble)
 
   (defun my/org-latex--get-tex-string ()
     "Return the content of the LaTeX fragment at point."
@@ -214,7 +263,10 @@
 
   (defun my/latex-fragment-subscript-p ()
     "Return `t' if '_' in current LaTeX fragment."
-     (memq 95 (string-to-list (my/org-latex--get-tex-string))))
+    (and
+     (not (string-match-p "_\{.*?\}\(" (my/org-latex--get-tex-string)))
+     (memq 95 (string-to-list (my/org-latex--get-tex-string)))
+         ))
 
   (defun my/latex-fragment-script-p ()
     "Return `t' if both '_' &  '^' in current LaTeX fragment."
@@ -249,6 +301,10 @@
      (string-match "matrix}" (my/org-latex--get-tex-string))
      (string-match "array}" (my/org-latex--get-tex-string))))
 
+
+  (defun my/log-subscript-fragment-p ()
+    (string-match "log^\{" (my/org-latex--get-tex-string)))
+
   (defun my/latex-fragment-bracket-p ()
     "Return `t' if '(' in current LaTeX fragment."
     (let (tex-string)
@@ -274,12 +330,10 @@ as a string.  It defaults to \"png\"."
            (setq my/position 59))
           ((my/latex-fragment-frac-p)
            (setq my/position 67))
-          ;; ((my/latex-fragment-tail-and-subscript-p)
-          ;;  (setq my/position 63))
           ((my/latex-fragment-script-p)
            (setq my/position 76))
           ((my/latex-fragment-subscript-p)
-           (setq my/position 68))
+           (setq my/position 82))
           ((my/latex-tail-latin-p)
            (setq my/position 82))
           ((my/latex-fragment-radical-p)
@@ -289,6 +343,8 @@ as a string.  It defaults to \"png\"."
           ((my/latex-tail-pun-p)
            (setq my/position 83))
           ((my/latex-fragment-floor-p)
+           (setq my/position 83))
+          ((my/log-subscript-fragment-p)
            (setq my/position 83))
           ((my/latex-fragment-superscript-p)
            (setq my/position 100))
@@ -371,20 +427,20 @@ URL `http://xahlee.info/emacs/emacs/elisp_image_tag.html'
 Version 2017-01-11 2021-09-01"
     (let ($x $y)
       (cond
-       ((string-match "\.svg$" Filepath)
-        (progn
-          (with-temp-buffer
-            ;; hackish. grab the first occurence of width height in file
-            (insert-file-contents Filepath)
-            (goto-char (point-min))
-            (when (re-search-forward "width=\"\\([0-9]+\\).*\"" nil 1)
-              (setq $x (match-string-no-properties 1 )))
-            (goto-char (point-min))
-            (if (re-search-forward "height=\"\\([0-9]+\\).*\"" nil 1)
-                (setq $y (match-string-no-properties 1 ))))
-          (if (and $x $y)
-              (vector (string-to-number $x) (string-to-number $y))
-            [0 0])))
+       ;; ((string-match "\.svg$" Filepath)
+       ;;  (progn
+       ;;    (with-temp-buffer
+       ;;      ;; hackish. grab the first occurence of width height in file
+       ;;      (insert-file-contents Filepath)
+       ;;      (goto-char (point-min))
+       ;;      (when (re-search-forward "width=\"\\([0-9]+\\).*\"" nil 1)
+       ;;        (setq $x (match-string-no-properties 1 )))
+       ;;      (goto-char (point-min))
+       ;;      (if (re-search-forward "height=\"\\([0-9]+\\).*\"" nil 1)
+       ;;          (setq $y (match-string-no-properties 1 ))))
+       ;;    (if (and $x $y)
+       ;;        (vector (string-to-number $x) (string-to-number $y))
+       ;;      (cons 0 0))))
        ((string-match "\.webp$" Filepath)
         (nyoom-get-image-dimensions-imk Filepath))
        (t
