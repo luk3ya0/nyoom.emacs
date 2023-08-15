@@ -57,10 +57,10 @@
 
 (setq display-line-numbers-type nil)
 
-(setq doom-font (font-spec :family "Fira Code" :size 15)
+(setq doom-font (font-spec :family "Fira Code" :size 19)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 15 :height 150)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 15 :height 150))
+      doom-unicode-font (font-spec :family "PingFang SC" :size 19 :height 190)
+      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 19 :height 190))
 
 (setq use-default-font-for-symbols nil)
 
