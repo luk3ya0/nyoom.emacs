@@ -48,9 +48,10 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
-(disable-packages! htmlsize org-superstar)
+(package! catppuccin-theme
+  :recipe (:host github :repo "luk3ya0/catppuccin-emacs"
+          :files ("*.el" "lisp/*.el")))
 
-(package! catppuccin-theme)
 
 ;;; Org Packages ────────────────────────────────────────────────────────────────
 (package! texfrag)
