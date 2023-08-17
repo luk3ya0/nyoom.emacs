@@ -59,14 +59,15 @@
 
 (setq doom-font (font-spec :family "Fira Code" :size 19)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "PingFang SC" :size 19 :height 190)
-      doom-variable-pitch-font (font-spec :family "PingFang SC" :size 19 :height 190))
+      doom-unicode-font (font-spec :family "Source Code Pro" :size 19 :height 190)
+      doom-variable-pitch-font (font-spec :family "Source Code Pro" :size 19 :height 190))
 
 (setq use-default-font-for-symbols nil)
 
 (add-hook! 'after-setting-font-hook
   (set-fontset-font t 'latin (font-spec :family "Fira Code"))
   (set-fontset-font t 'symbol (font-spec :family "Fira Code Symbol"))
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 19))
   (set-fontset-font t 'mathematical (font-spec :family "Fira Code Symbol"))
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji")))
 
