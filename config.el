@@ -52,8 +52,8 @@
              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
 ;; (setq doom-theme 'doom-smoooooth-light)
-;; (setq doom-theme 'doom-smoooooth)
-(setq doom-theme 'catppuccin)
+(setq doom-theme 'doom-smoooooth)
+;; (setq doom-theme 'catppuccin)
 
 (setq display-line-numbers-type nil)
 

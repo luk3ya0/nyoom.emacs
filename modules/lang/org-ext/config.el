@@ -12,8 +12,9 @@
     '((t (:inherit 'org-todo
           :foreground "azure2"
           :font-family "Fira Code"
-          :height 150
-          :avgwidth 160
+          :size 8
+          :height 80
+          :avgwidth 80
           :spacing 100)))
     "Org mode todo face"
     :group 'org-face)
@@ -22,8 +23,9 @@
     '((t (:inherit 'org-todo
           :foreground "azure4"
           :font-family "Fira Code"
-          :height 150
-          :avgwidth 160
+          :size 8
+          :height 80
+          :avgwidth 80
           :spacing 100)))
     "Org mode todo face"
     :group 'org-face)
@@ -72,7 +74,7 @@
 (dolist (hook '(org-mode-hook markdown-mode-hook))
   (add-hook hook (lambda ()
                    (setq-local underline-minimum-offset 5)
-                   (setq-local line-spacing 3)
+                   (setq-local line-spacing 5)
                    (visual-line-mode 1)
                    (flyspell-mode -1)
                    (hl-line-mode -1))))
@@ -114,14 +116,14 @@
                  :message "you need install the programs: xelatex and dvisvgm."
                  :image-input-type "xdv"
                  :image-output-type "svg"
-                 :image-size-adjust (1.86 . 1.5)
+                 :image-size-adjust (1.15 . 1.1)
                  :latex-compiler (
-                                  "gsed -i 's/\{article\}/\[dvisvgm\]\{article\}/g' %f"
+                                  "sed -i 's/\{article\}/\[dvisvgm\]\{article\}/g' %f"
                                   ;; "gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
                                   "cat %f > ~/file-bak.tex"
                                   "xelatex --shell-escape -interaction nonstopmode -no-pdf -output-directory %o %f")
                  :image-converter ("dvisvgm %f -n -b min -c %S -o %O"
-                                   "gsed -i 's/#000/none/g' %O")))
+                                   "sed -i 's/#000/none/g' %O")))
   (setq org-preview-latex-default-process 'xdvsvgm)
   (setq org-latex-prefer-user-labels t
         org-startup-with-latex-preview nil
@@ -133,28 +135,10 @@
 
                                    ("" "fontspec" t)
                                    ("math-style=upright" "unicode-math" t)
+                                   ("" "firamath-otf" t)
 
                                    "\\setmainfont{Fira Code}"
                                    "\\setmathfont{Fira Math}"
-
-                                   "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
-
-                                   "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-                                   "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-                                   "\\setmathfont[range=it,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-                                   "\\setmathfont[range=bfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-                                   "\\setmathfont[range=bfit,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-
-                                   "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
-
-                                   ;; "\\setmathfont[range=\\bigcup]{Cambria Math}"
-
-                                   ;; "\\setmathfont[range={\"0021-\"003E},Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-                                   "\\setmathfont[range={\"2261,\"2262},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
-                                   ;; "\\setmathfont[range={\"005B,\"005D}]{Fira Code}"
-                                   ;; "\\setmathfont[range={\"007B,\"007D}]{Fira Code}"
-                                   ;; "\\setmathfont[range={\"0028,\"0029}]{Fira Code}"
-                                   "\\setmathfont[range={\"0021-\"003E}]{Fira Code}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
@@ -190,18 +174,10 @@
               "\\usetikzlibrary{angles,quotes}"
               "\\usepackage{fontspec}"
               "\\usepackage[math-style=upright]{unicode-math}"
-              "\\setmainfont{Fira Code}"
-              "\\setmathfont{Fira Math}"
-              "\\setmathfont[slash-delimiter=frac]{Cambria Math}"
-              "\\setmathfont[range=up,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-              "\\setmathfont[range=sfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-              "\\setmathfont[range=it,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-              "\\setmathfont[range=bfup,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-              "\\setmathfont[range=bfit,Path=/Users/luke/Library/Fonts/]{FiraCode-Medium.otf}"
-              "\\setmathfont[range=\\sum]{latinmodern-math.otf}"
-              "\\setmathfont[range={\"2261,\"2262},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
-              "\\setmathfont[range={\"005B,\"005D},Path=/Users/luke/Library/Fonts/]{DejaVuMathTeXGyre.otf}"
-              "\\setmathfont[range={\"0021-\"003E}]{Fira Code}"
+
+              "\\usepackage[sfdefault,lining]{FiraSans} %% option 'sfdefault' activates Fira Sans as the default text font"
+              "\\usepackage[fakebold]{firamath-otf}"
+              "\\renewcommand*\\oldstylenums[1]{{\\firaoldstyle #1}}"
 
               "\\pagestyle{empty}"
               "\\setlength{\\textwidth}{\\paperwidth}"
