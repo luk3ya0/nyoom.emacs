@@ -116,7 +116,7 @@
                  :message "you need install the programs: xelatex and dvisvgm."
                  :image-input-type "xdv"
                  :image-output-type "svg"
-                 :image-size-adjust (1.15 . 1.1)
+                 :image-size-adjust (0.85 . 0.9)
                  :latex-compiler (
                                   "sed -i 's/\{article\}/\[dvisvgm\]\{article\}/g' %f"
                                   ;; "gsed -i 's/\{article\}/\[tikz,dvisvgm\]\{article\}/g' %f"
@@ -139,6 +139,13 @@
 
                                    "\\setmainfont{Fira Code}"
                                    "\\setmathfont{Fira Math}"
+
+
+                                   "\\setmathfont[range=up,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=sfup,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=it,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=bfup,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range=bfit,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
