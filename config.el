@@ -311,6 +311,26 @@ and a list of files which contain phrase components.")
     (interactive)
     (insert (string-trim (shell-command-to-string "/opt/homebrew/bin/ocr -l zh"))))
 
+  (defun straight-replace (from-string to-string)
+    (interactive)
+    (perform-replace from-string to-string
+                     nil nil nil nil nil
+                     (use-region-beginning)
+                     (use-region-end)
+                     nil nil))
+
+  (defun cjk-replace ()
+    (interactive)
+    (goto-char 0)
+    (straight-replace "，" ", ")
+    (straight-replace "。" ". ")
+    (straight-replace "；" "; ")
+    (straight-replace "：" ": ")
+    (straight-replace "、" ", ")
+    (straight-replace "（" " (")
+    (straight-replace "）" ") ")
+    (straight-replace ") \." ")\."))
+
   ;; cursor movement
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
@@ -321,8 +341,8 @@ and a list of files which contain phrase components.")
   (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
 
   ;; text helper
-  (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
-  (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
+  ;; (define-key evil-insert-state-map (kbd "M-s-j") 'emit-ocr)
+  ;; (define-key evil-insert-state-map (kbd "M-s-k") 'emit-ocr-trim)
 
   (defun blink-on-scroll-up ()
     (interactive)
@@ -337,6 +357,7 @@ and a list of files which contain phrase components.")
   ;; edit helper
   (define-key evil-normal-state-map (kbd "RET") '+fold/toggle)
   (define-key evil-normal-state-map (kbd "s-p") 'what-face)
+  (define-key evil-normal-state-map (kbd "M-s-j") 'cjk-replace)
 
   (define-key evil-normal-state-map (kbd "C-u") 'blink-on-scroll-up)
   (define-key evil-normal-state-map (kbd "C-d") 'blink-on-scroll-down)
