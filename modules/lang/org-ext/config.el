@@ -146,6 +146,9 @@
                                    "\\setmathfont[range=it,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont[range=bfup,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
                                    "\\setmathfont[range=bfit,Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+
+                                   "\\setmathfont[range={\"2261,\"2262},Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
+                                   "\\setmathfont[range={\"0021-\"003E},Path=/home/luke/\.fonts/]{FiraCode-Medium.otf}"
                                    )
         org-format-latex-options '(
                                    ;; :foreground "Black"
