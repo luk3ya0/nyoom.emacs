@@ -45,7 +45,7 @@ Can be an integer to determine the exact padding."
   "A dark theme inspired by Atom One Dark."
 
   ;; name        default   256           16
-  ((bg         '("#15191E" "black"       "black"  ))
+  ((bg         '("#191724" "black"       "black"  ))
    (fg         '("#bbc2cf" "#bfbfbf"     "brightwhite"  ))
 
    ;; These are off-color variants of bg/fg, used primarily for `solaire-mode',

@@ -214,13 +214,14 @@ and a list of files which contain phrase components.")
 (use-package! latex-preview-pane
   :init
   (setq pdf-latex-command "xelatex"
+        shell-escape-mode "-shell-escape"
         preview-orientation 'right))
 
 (use-package! lsp-mode
   :config
   (setq
    lsp-latex-texlab-executable-argument-list
-   '("-xelatex","-verbose","-file-line-error","-synctex=1","-interaction=nonstopmode","%f")))
+   '("-xelatex","-verbose", "-shell-escape", "-file-line-error","-synctex=1","-interaction=nonstopmode","%f")))
 
 ;;; Action ──────────────────────────────────────────────────────────────────────
 (bind-keys ([(super a)] . mark-whole-buffer)
