@@ -634,14 +634,15 @@ buffer boundaries with possible narrowing."
      (0 (list 'face nil 'display (fira-code-progress-percent (match-string 1)))))
     ("\\[\\([0-9]+/[0-9]+\\)\\]"
      (0 (list 'face nil 'display (fira-code-progress-count (match-string 1)))))
-    ;; ("\\(-\\)"
-    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
-    ;; ("\\(──\\)"
-    ;;  (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+    ;; ("^\\(-\\)$"
+    ;;  (0 (list 'face nil 'display (dash-to-hyphen (match-string 1)))))
+    ("^\\(-\\{1,\\}\\)$"
+     ;; (0 (list 'face 'fira-lock 'display (dash-to-hyphen (match-string 1)))))
+     (0 (list 'face nil 'display (dash-to-hyphen (match-string 1)))))
     ))
 
-;; (defun dash-to-hyphen (value)
-;;   (format "%s" (make-string (length value) #x2500)))
+(defun dash-to-hyphen (value)
+  (format "%s" (make-string (length value) #x2014)))
 
 (defun fira-code-progress-count (value)
   (concat (fira-code-progress-bar value) " " value))
@@ -692,27 +693,27 @@ buffer boundaries with possible narrowing."
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
 
 ;; org mode motion
-(with-eval-after-load 'evil
-  (defun narrow-p ()
-    "Return t if a buffer is narrowed"
-    (not (equal (- (point-max) (point-min)) (buffer-size))))
-
-  (defun what-org ()
-    "Get the org-element-type at point."
-    (interactive)
-    (require 'org-element)
-    (message "element type of %s, parent type of %s"
-             (org-element-type (org-element-at-point))
-             (org-element-property :language (org-element-at-point))))
-
-  (defun toggle-narrow ()
-    (interactive)
-    (if (narrow-p)
-        (widen)
-      (org-narrow-to-subtree)))
-
-  (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
-  (define-key evil-normal-state-map (kbd "s-o") 'what-org))
+;; (with-eval-after-load 'evil
+;;   (defun narrow-p ()
+;;     "Return t if a buffer is narrowed"
+;;     (not (equal (- (point-max) (point-min)) (buffer-size))))
+;;
+;;   (defun what-org ()
+;;     "Get the org-element-type at point."
+;;     (interactive)
+;;     (require 'org-element)
+;;     (message "element type of %s, parent type of %s"
+;;              (org-element-type (org-element-at-point))
+;;              (org-element-property :language (org-element-at-point))))
+;;
+;;   (defun toggle-narrow ()
+;;     (interactive)
+;;     (if (narrow-p)
+;;         (widen)
+;;       (org-narrow-to-subtree)))
+;;
+;;   (define-key evil-normal-state-map (kbd "C-o") 'toggle-narrow)
+;;   (define-key evil-normal-state-map (kbd "s-o") 'what-org))
 
 ;; quickly edit org mode with normal mode
 (with-eval-after-load 'evil
@@ -864,3 +865,32 @@ buffer boundaries with possible narrowing."
 
   (evil-define-key 'visual global-map
     (kbd "/") 'wrap-with-italic))
+
+;; Referenced: https://www.reddit.com/r/emacs/comments/b8jqor/making_orgmode_narrowing_as_intuitive_as_workflow/
+(with-eval-after-load 'evil
+  (defun vimacs/org-narrow-to-subtree
+      ()
+    (interactive)
+    (let ((org-indirect-buffer-display 'current-window))
+      (if (not (boundp 'org-indirect-buffer-file-name))
+          (let ((above-buffer (current-buffer))
+                (org-filename (buffer-file-name)))
+            (org-tree-to-indirect-buffer (1+ (org-current-level)))
+            (setq-local org-indirect-buffer-file-name org-filename)
+            (setq-local org-indirect-above-buffer above-buffer))
+        (let ((above-buffer (current-buffer))
+              (org-filename org-indirect-buffer-file-name))
+          (org-tree-to-indirect-buffer (1+ (org-current-level)))
+          (setq-local org-indirect-buffer-file-name org-filename)
+          (setq-local org-indirect-above-buffer above-buffer)))))
+
+  (defun vimacs/org-widen-from-subtree
+      ()
+    (interactive)
+    (let ((above-buffer org-indirect-above-buffer)
+          (org-indirect-buffer-display 'current-window))
+      (kill-buffer)
+      (switch-to-buffer above-buffer)))
+
+  (define-key evil-normal-state-map (kbd "C-o") 'vimacs/org-narrow-to-subtree)
+  (define-key evil-normal-state-map (kbd "s-o") 'vimacs/org-widen-from-subtree))

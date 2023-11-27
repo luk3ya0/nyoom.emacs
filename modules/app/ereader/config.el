@@ -133,8 +133,6 @@
               (ov-map-put (current-sentence-beg) (current-visual-sentence-end))
               (ov-map-put (next-visual-sentence-start) (current-sentence-end)))
           (ov-map-put (current-sentence-beg) (current-sentence-end))))
-    (if (eq major-mode 'org-mode)
-        (org-latex-preview '(16)))
     )
 
   (defun underline-forward ()
