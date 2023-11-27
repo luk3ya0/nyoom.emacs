@@ -31,7 +31,7 @@
 ;; (mac-start-animation (selected-window) :type 'move-out
 ;;                      :duration 1.0 :direction 'right)
 
-(push '(width  . 91)                         default-frame-alist)
+(push '(width  . 120)                        default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
 (push '(height . 54)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
@@ -52,22 +52,23 @@
              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
 ;; (setq doom-theme 'doom-smoooooth-light)
-(setq doom-theme 'doom-smoooooth)
+;; (setq doom-theme 'doom-smoooooth)
+(setq doom-theme 'doom-gruvbox)
 ;; (setq doom-theme 'catppuccin)
 
 (setq display-line-numbers-type nil)
 
-(setq doom-font (font-spec :family "Fira Code" :size 19)
+(setq doom-font (font-spec :family "Fira Code" :size 20)
       doom-serif-font doom-font
-      doom-unicode-font (font-spec :family "Source Code Pro" :size 19 :height 190)
-      doom-variable-pitch-font (font-spec :family "Source Code Pro" :size 19 :height 190))
+      doom-unicode-font (font-spec :family "Source Code Pro" :size 20 :height 200)
+      doom-variable-pitch-font (font-spec :family "Source Code Pro" :size 20 :height 200))
 
 (setq use-default-font-for-symbols nil)
 
 (add-hook! 'after-setting-font-hook
   (set-fontset-font t 'latin (font-spec :family "Fira Code"))
   (set-fontset-font t 'symbol (font-spec :family "Fira Code Symbol"))
-  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 19))
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 20))
   (set-fontset-font t 'mathematical (font-spec :family "Fira Code Symbol"))
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji")))
 
@@ -323,14 +324,24 @@ and a list of files which contain phrase components.")
   (defun cjk-replace ()
     (interactive)
     (goto-char 0)
+    (straight-replace "？" "\? ")
+    (straight-replace "【" " \[")
+    (straight-replace "】" "\] ")
+    (straight-replace "“" " \"")
+    (straight-replace "”" "\" ")
     (straight-replace "，" ", ")
     (straight-replace "。" ". ")
     (straight-replace "；" "; ")
     (straight-replace "：" ": ")
     (straight-replace "、" ", ")
     (straight-replace "（" " (")
+    (straight-replace "（" " (")
     (straight-replace "）" ") ")
-    (straight-replace ") \." ")\."))
+    (straight-replace "）" ") ")
+    (straight-replace ") \." ")\.")
+    (straight-replace ") ," "),")
+    (straight-replace "\" ," "\",")
+    (straight-replace "\" \." "\"\."))
 
   ;; cursor movement
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
