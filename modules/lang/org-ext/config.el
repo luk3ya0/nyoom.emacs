@@ -722,13 +722,13 @@ buffer boundaries with possible narrowing."
     (require 'org-element)
     (setq lang (org-element-property :language (org-element-at-point)))
     (message "src block lang %s" lang)
-    (if (string-equal lang "java")
-        (progn
-          (org-edit-special)
-          (kill-region (point-min) (point-max))
-          ;; (shell-command "pbpaste | google-java-format --aosp - | pbcopy")
-          (insert (shell-command-to-string "pbpaste | google-java-format --aosp -"))
-          ))
+    ;; (if (string-equal lang "java")
+    ;;     (progn
+    ;;       (org-edit-special)
+    ;;       (kill-region (point-min) (point-max))
+    ;;       ;; (shell-command "pbpaste | google-java-format --aosp - | pbcopy")
+    ;;       (insert (shell-command-to-string "pbpaste | google-java-format --aosp -"))
+    ;;       ))
 
     (if (string-equal lang "go")
         (progn

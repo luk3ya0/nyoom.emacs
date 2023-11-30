@@ -341,7 +341,10 @@ and a list of files which contain phrase components.")
     (straight-replace ") \." ")\.")
     (straight-replace ") ," "),")
     (straight-replace "\" ," "\",")
-    (straight-replace "\" \." "\"\."))
+    (straight-replace "\? \"" "\?\"")
+    (straight-replace "\" \." "\"\.")
+    (straight-replace "\"  " "\" ")
+    (straight-replace "  \"" " \""))
 
   ;; cursor movement
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
