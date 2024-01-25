@@ -23,6 +23,11 @@
 (setq user-full-name "Luke Yao"
       user-mail-address "oneTOinf@163.com")
 
+
+;; (setq package-archives '(("gnu"    . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+;;                          ("org-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+;;                          ("melpa"  . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+
 ;;; UI ──────────────────────────────────────────────────────────────────────────
 ;; Crazy example
 ;; (mac-start-animation nil :type 'page-curl-with-shadow
@@ -31,9 +36,9 @@
 ;; (mac-start-animation (selected-window) :type 'move-out
 ;;                      :duration 1.0 :direction 'right)
 
-(push '(width  . 120)                        default-frame-alist)
+(push '(width  . 160)                        default-frame-alist)
 (push '(min-width  . 1)                      default-frame-alist)
-(push '(height . 54)                         default-frame-alist)
+(push '(height . 108)                         default-frame-alist)
 (push '(min-height . 1)                      default-frame-alist)
 (push '(internal-border-width . 14)          default-frame-alist)
 
@@ -443,3 +448,7 @@ and a list of files which contain phrase components.")
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
   )
+
+(use-package! fira-code-mode
+  :custom (fira-code-mode-disabled-ligatures '("[]" "x" "***"))  ; ligatures you don't want
+  :hook org-mode)                                                ; mode to enable fira-code-mode in

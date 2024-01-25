@@ -102,10 +102,9 @@
         org-appear-autosubmarkers t
         org-appear-autolinks nil))
 
-(use-package! org-fragtog
-  :after org
-  ;; :hook (org-mode . org-fragtog-mode)
-  )
+;; (use-package! org-fragtog
+;;   :after org
+;;   :hook (org-mode . org-fragtog-mode))
 
 ;;; Org Latex ───────────────────────────────────────────────────────────────────
 (after! org
@@ -728,7 +727,7 @@ buffer boundaries with possible narrowing."
     ;;       (kill-region (point-min) (point-max))
     ;;       ;; (shell-command "pbpaste | google-java-format --aosp - | pbcopy")
     ;;       (insert (shell-command-to-string "pbpaste | google-java-format --aosp -"))
-    ;;       ))
+    ;;      ))
 
     (if (string-equal lang "go")
         (progn
